@@ -1,0 +1,3 @@
+.asm.obj .gas.obj : $(__MAKEFILES__) .autodepend
+    @%make echo_as
+    $(as) $[@ $(include_a_path) $(clib_a_flags) $(a_dbg_flags) $($^&_flags)

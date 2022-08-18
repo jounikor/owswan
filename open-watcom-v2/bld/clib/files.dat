@@ -1,0 +1,141 @@
+# CLIB piece of install manifest
+#
+###################
+# 16-bit Libraries
+#
+[ DEFAULT dir="lib286/dos" cond="dostarg tools16" where="c f77 jc jf77" ]
+type="l"    usr="clibc.lib"     conda="mc"  where="c jc"
+type="l"    usr="clibh.lib"     conda="mh"  where="c jc"
+type="l"    usr="clibl.lib"     conda="ml"
+type="l"    usr="clibol.lib"    conda="ml"
+type="s"    usr="d16msels.obj"
+type="s"    usr="dos16m.obj"
+type="l"    usr="clibm.lib"     conda="mm"
+type="l"    usr="clibom.lib"    conda="mm"
+type="l"    usr="clibs.lib"     conda="ms"  where="c jc"
+type="l"    usr="wovl.lib"      conda="mm ml |"
+type="s"    usr="cstart_t.obj"  conda="ms"
+type="s"    usr="binmode.obj"
+type="s"    usr="commode.obj"
+
+type="l"    usr="doslfnc.lib"   conda="mc"  where="c jc"
+type="l"    usr="doslfnh.lib"   conda="mh"  where="c jc"
+type="l"    usr="doslfnl.lib"   conda="ml"
+type="l"    usr="doslfnol.lib"  conda="ml"
+type="l"    usr="doslfnm.lib"   conda="mm"
+type="l"    usr="doslfnom.lib"  conda="mm"
+type="l"    usr="doslfns.lib"   conda="ms"  where="c jc"
+
+[ DEFAULT dir="lib286/os2" cond="os2targ tools16" where="c f77 jc jf77" ]
+type="l"    usr="dospmc.lib"    conda="mc"  where="c jc"
+type="l"    usr="dospmh.lib"    conda="mh"  where="c jc"
+type="l"    usr="dospml.lib"    conda="ml"
+type="l"    usr="dospmm.lib"    conda="mm"
+type="l"    usr="dospms.lib"    conda="ms"  where="c jc"
+
+type="l"    usr="clibc.lib"     conda="mc"  where="c jc"
+type="l"    usr="clibh.lib"     conda="mh"  where="c jc"
+type="l"    usr="clibl.lib"     conda="ml"
+type="l"    usr="clibdll.lib"   conda="ml"
+type="l"    usr="clibmtl.lib"   conda="ml"
+type="l"    usr="clibm.lib"     conda="mm"
+type="l"    usr="clibs.lib"     conda="ms"  where="c jc"
+type="s"    usr="binmode.obj"
+type="s"    usr="commode.obj"
+
+[ DEFAULT dir="lib286/win" cond="wintarg tools16" where="c f77 jc jf77" ]
+type="l"    usr="clibc.lib"     conda="mc"  where="c jc"
+type="l"    usr="clibl.lib"     conda="ml"
+type="s"    usr="libentry.obj"
+type="l"    usr="clibm.lib"     conda="mm"
+type="l"    usr="clibs.lib"     conda="ms"  where="c jc"
+type="s"    usr="binmode.obj"
+type="s"    usr="commode.obj"
+
+###################
+# 32-bit Libraries
+#
+[ DEFAULT dir="lib386/dos" cond="dostarg" where="c f77 jc jf77" ]
+type="l"    usr="clib3r.lib"    conda="3r"
+type="l"    usr="clib3s.lib"    conda="3s"
+type="s"    usr="cstrtx3r.obj"  conda="3r"
+type="s"    usr="cstrtx3s.obj"  conda="3s"
+type="s"    usr="dllstrtr.obj"  conda="3r"
+type="s"    usr="dllstrts.obj"  conda="3s"
+type="s"    usr="binmode.obj"   conda="3r 3s |"
+type="s"    usr="commode.obj"   conda="3r 3s |"
+
+type="l"    usr="doslfn3r.lib"  conda="3r"
+type="l"    usr="doslfn3s.lib"  conda="3s"
+
+[ DEFAULT dir="lib386/netware" cond="nlmtarg" where="c f77 jc jf77" ]
+type="l"    usr="clib3s.lib"
+type="l"    usr="clib3sl.lib"
+type="l"    usr="libc3s.lib"
+type="l"    usr="libc3sl.lib"
+type="s"    usr="binmode.obj"
+
+[ DEFAULT dir="lib386/os2" cond="os2targ" where="c f77 jc jf77" ]
+type="l"    usr="clib3r.lib"    conda="3r"
+type="l"    usr="clib3s.lib"    conda="3s"
+type="s"    usr="binmode.obj"   conda="3r 3s |"
+type="s"    usr="commode.obj"   conda="3r 3s |"
+
+[ DEFAULT dir="lib386/win" cond="wintarg" where="c f77 jc jf77" ]
+type="l"    usr="clib3r.lib"    conda="3r"
+type="l"    usr="clib3s.lib"    conda="3s"
+type="s"    usr="binmode.obj"   conda="3r 3s |"
+type="s"    usr="commode.obj"   conda="3r 3s |"
+
+[ DEFAULT dir="lib386/nt" cond="wnttarg" where="c f77 jc jf77 ac" ]
+type="l"    usr="clib3r.lib"    conda="3r"
+type="l"    usr="clib3s.lib"    conda="3s"
+type="s"    usr="binmode.obj"
+type="s"    usr="commode.obj"
+
+[ DEFAULT dir="libaxp/nt" cond="alphatarg" where="ac" ]
+type="l"    usr="clib.lib"
+type="s"    usr="binmode.obj"
+type="s"    usr="commode.obj"
+
+[ DEFAULT dir="lib386/linux" cond="lnxtarg" where="c f77 jc jf77" ]
+type="l"    usr="clib3r.lib"    conda="3r"
+type="l"    usr="clib3s.lib"    conda="3s"
+#type="s"   usr="binmode.obj"
+type="s"    usr="commode.obj"
+
+[ DEFAULT dir="lib386/rdos" cond="rdostarg" where="c f77 jc jf77" ]
+type="l"    usr="clib3r.lib"    conda="3r"
+type="l"    usr="clib3s.lib"    conda="3s"
+type="s"    usr="binmode.obj"
+type="s"    usr="commode.obj"
+type="s"    usr="resstub.obj"
+
+[ DEFAULT dir="lib386/rdosdev" cond="rdostarg" where="c f77 jc jf77" ]
+type="l"    usr="clib3r.lib"
+
+#######################################
+# 32-bit run-time DLL import libraries
+#
+[ DEFAULT dir="lib386/nt" cond="wnttarg" where="c f77 jc jf77 ac" ]
+type="l"    usr="clbrdll.lib"   conda="3r"      desc="C DLL Runtime Libraries"
+type="l"    usr="clbsdll.lib"   conda="3s"      desc="C DLL Runtime Libraries"
+
+[ DEFAULT dir="lib386/os2" cond="os2targ" where="c f77 jc jf77" ]
+type="l"    usr="clbrdll.lib"   conda="3r"      desc="C DLL Runtime Libraries"
+type="l"    usr="clbsdll.lib"   conda="3s"      desc="C DLL Runtime Libraries"
+
+################################
+# 32-bit run-time DLL libraries
+#
+[ DEFAULT dir="binnt" cond="wnttarg" where="c f77 jc jf77 ac" ]
+type="d"    usr="clbr??.dll"    conda="3r"      desc="C DLL Runtime Libraries"
+type="s"    usr="clbr??.sym"    conda="3r"      desc="C DLL Runtime Libraries"
+type="d"    usr="clbs??.dll"    conda="3s"      desc="C DLL Runtime Libraries"
+type="s"    usr="clbs??.sym"    conda="3s"      desc="C DLL Runtime Libraries"
+
+[ DEFAULT dir="binp/dll" cond="os2targ" where="c f77 jc jf77" ]
+type="d"    usr="clbr??.dll"    conda="3r"      desc="C DLL Runtime Libraries"
+type="s"    usr="clbr??.sym"    conda="3r"      desc="C DLL Runtime Libraries"
+type="d"    usr="clbs??.dll"    conda="3s"      desc="C DLL Runtime Libraries"
+type="s"    usr="clbs??.sym"    conda="3s"      desc="C DLL Runtime Libraries"

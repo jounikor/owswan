@@ -1,0 +1,30 @@
+#
+#       This is the common makefile for each library.
+#
+
+proj_name = posix_lib
+
+posix_lib_autodepends = .AUTODEPEND
+
+!include $(posix_dir)/model.mif
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+!include $(posix_dir)/common.mif
+
+#
+# cflags
+#
+.c: $(posix_dir)/misc
+
+inc_dirs += -I"$(posix_dir)/h"
+
+#
+# LIB
+#
+_subdir_ =
+libtarg_objs = $(posixlib_objs)
+libtarg_name = $(_subdir_)posix
+!include libtarg.mif

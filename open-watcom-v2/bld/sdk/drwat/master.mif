@@ -1,0 +1,126 @@
+proj_name = drwatcom
+
+sys_windowed = 1
+
+!ifndef drwatcom_autodepends
+drwatcom_autodepends = .AUTODEPEND
+!endif
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include trmem.mif
+
+!include $(wdisasm_dir)/client.mif
+!include $(commonui_dir)/client.mif
+
+!include $(dig_dir)/digcli.mif
+!include $(dig_dir)/dipcli.mif
+!include $(dig_dir)/madcli.mif
+
+!ifndef drwatcom_95
+drwatcom_95 = 0
+!endif
+
+common_dir = ../../common
+
+#
+# cflags
+#
+.c : ../$(host_os);../c;$(dig_srcs);$(mad_srcs);$(dis_srcs);$(commonui_dir)/c
+
+inc_dirs = -I. -I"../$(host_os)" -I"../h" -I"$(dig_dir)/h" $(dis_includes) $(commonui_inc_dirs)
+
+extra_cpp_flags =
+!ifeq drwatcom_95 1
+extra_cpp_flags += -DCHICAGO
+!endif
+!ifdef %OWUSE_FILENAME_VERSION
+extra_cpp_flags += -DUSE_FILENAME_VERSION=$(bld_ver)
+!endif
+
+extra_cpp_flags_nt = -DNOUSE3D
+
+extra_cpp_flags_mem = -DWANT_MSGS
+
+extra_c_flags_i86 = -zW -zu -3
+extra_c_flags_axp =
+
+#
+# aflags
+#
+.asm : .
+
+#
+# lflags
+#
+extra_l_flags = option quiet name $(proj_name).exe
+
+extra_l_flags_nt_axp = op start=WinMainCRTStartup ref WinMainCRTStartup
+extra_l_flags_nt = $(extra_l_flags_nt_$(host_cpu))
+!ifeq drwatcom_95 1
+extra_l_flags_nt += lib th32.lib
+!endif
+
+extra_l_flags_win = lib commdlg.lib
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_prebuild_objs = rcstr.grh $(dis_prereq)
+exetarg_objs_nt       = global.obj param.obj procctl.obj memory.obj &
+    drproc.obj handler.obj memview.obj proclist.obj thrdctl.obj &
+    pefile.obj autoget.obj lddips.obj memwndcd.obj &
+    madrtn.obj madsys1.obj regstr.obj reglist.obj bitman.obj &
+    strcnv.obj regcrt.obj $(mad_objs)
+!ifeq drwatcom_95 1
+exetarg_objs_nt      += reg95.obj
+!else
+exetarg_objs_nt      += reg.obj
+!endif
+exetarg_objs_win      = globals.obj notify.obj winproc.obj debug.obj dump.obj &
+    win32app.obj lddips.obj stack.obj $(dis_objs)
+exetarg_objs = &
+    listbox.obj drwatlog.obj stat.obj lognote.obj &
+    drwatcom.obj sym.obj profile.obj fault.obj &
+    disasm.obj drwatmem.obj $(exetarg_objs_$(host_os)) &
+    dipcli.obj digcli.obj $(dip_objs)
+exetarg_libs          = $(commonui_lib)
+exetarg_res_version_nt_386 = exever.res
+exetarg_res_version_nt_x64 = exever.res
+exetarg_res           = $(proj_name).res
+exetarg_nt_manif_386  = ntmanif.res
+exetarg_nt_manif_x64  = ntmanif.res
+!include exetarg.mif
+
+#
+# rc and others
+#
+!include verrc.mif
+
+rc_inc_dirs = -I"../res/$(host_os)" -I"../res" -I"../$(host_os)" -I"$(dig_dir)/h" $(commonui_inc_dirs)
+
+!ifeq host_os win
+$(proj_name).res : ../res/$(host_os)/drwatcom.rc .AUTODEPEND
+    @%make echo_rc
+    $(rc) $(rc_flags) -ad -zk $(cppflags) $(rc_inc_path) $[@ -fo=$@
+!else
+$(proj_name).res : ../res/$(host_os)/drnt.rc .AUTODEPEND
+    @%make echo_rc
+    $(rc) $(rc_flags) -ad -zk0 $(cppflags) $(rc_inc_path) $[@ -fo=$@
+!endif
+
+ntmanif.res : ../res/nt/ntmanif.rc
+    @%make echo_rc
+    $(rc) $(rc_flags) -I"../res/nt" $(inc_dirs_sys_nt) $< -fo=$@
+
+rcstr.grh : rcstrmsg.gh
+    @%make echo_awk
+    $(awk) -f $(build_dir)/msgtoh.awk -v OUTFILE=$^. $[@
+
+rcstrmsg.gh : ../res/$(host_os)/drwatcom.msg
+    @%make echo_cpp
+    $(cpp) $(rc_ui_flags) $(cppflags) -I"$(dig_dir)/h" $(commonui_inc_dirs) -o$@ $[@

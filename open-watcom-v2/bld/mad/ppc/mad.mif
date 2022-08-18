@@ -1,0 +1,12 @@
+target_cpu = ppc
+
+imp_objs = &
+        ppcaddr.obj &
+        ppcctrl.obj &
+        ppctypes.obj &
+        ppcreg.obj &
+        ppccall.obj &
+        ppcdisas.obj &
+        ppctrace.obj
+
+!include ../../master.mif

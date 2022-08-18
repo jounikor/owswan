@@ -1,0 +1,25 @@
+proj_name = trap2txt
+
+trap2txt_autodepends = .autodepend
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+inc_dirs = -I"../h" -I"$(dip_dir)/watcom/h" -I"$(dig_dir)/h"
+
+extra_cpp_flags = -DMD_x86
+
+.cpp: ../c
+
+exetarg_objs = &
+    trap2txt.obj &
+    trsp_cap.obj &
+    trsp_env.obj &
+    trspfinf.obj &
+    trspfile.obj &
+    trsp_ovl.obj &
+    trsp_thr.obj &
+    trap_x86.obj
+
+!include exetarg.mif

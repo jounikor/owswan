@@ -1,0 +1,51 @@
+:CMT. This device definition is used to test PS output. 
+:CMT. Only one font is available.
+:CMT. This version was originaly used for testing %default_width().
+
+:CMT. Definition file                 Device name
+:CMT. ------------------------------------------------------
+:CMT. PSSPEC                          psspec
+
+:CMT. Corresponding driver
+:CMT. definition file                 Driver name
+:CMT. ------------------------------------------------------
+:CMT. PSSDRV                          pspecdrv
+
+:CMT. Font definition files used      Font name
+:CMT. ------------------------------------------------------
+:CMT. PSSFON01                        psspecfon01
+:CMT. PSSFON02                        psspecfon02
+:CMT. PSSFON03                        psspecfon03
+:CMT. PSSFON04                        psspecfon04
+:CMT. PSSFON05                        psspecfon05
+:CMT. PSSFON06                        psspecfon06
+:CMT. PSSFON07                        psspecfon07
+:CMT. PSSFON08                        psspecfon08
+:CMT. PSSFON09                        psspecfon09
+
+:DEVICE
+   defined_name          = 'psspec'
+   member_name           = 'psspec'
+   driver_name           = 'psspecdrv'
+   output_suffix         = 'pss'
+   output_name           = ''
+   page_width            = 8000
+   page_depth            = 10920
+   horizontal_base_units = 1000
+   vertical_base_units   = 1000
+
+:INCLUDE file='dev01.inc'.
+
+:INCLUDE file='dev02ps.inc'.
+
+:INCLUDE file='dev03.inc'.
+
+:INCLUDE file='dev04ps.inc'.
+
+:INCLUDE file='dev05.inc'.
+
+:INCLUDE file='dev06ps.inc'.
+
+:INCLUDE file='dev07ps.inc'.
+
+:eDEVICE.

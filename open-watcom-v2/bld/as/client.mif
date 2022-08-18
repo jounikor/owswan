@@ -1,0 +1,28 @@
+# AS in-line library finder.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+
+!ifdef bootstrap
+asminline_lib = $(as_dir)/$(target_cpu)/$(objs_subdir)/asinline.lib
+!else ifeq $(proj_name)_rtdll 1
+#
+# AS in-line run-time DLL used
+#
+asminline_lib = $(as_dir)/$(target_cpu)/$(objs_subdir).rtd/asinline.lib
+!else ifeq $(proj_name)_dll 1
+#
+# AS in-line DLL used
+#
+asminline_lib = $(as_dir)/$(target_cpu)/$(objs_subdir).dll/asinline.lib
+!else
+#
+# AS in-line library used
+#
+asminline_lib = $(as_dir)/$(target_cpu)/$(objs_subdir)/asinline.lib
+!endif
+
+#
+asminline_c =
+asminline_inc_dirs = -I"$(as_dir)/h" -I"$(owl_dir)/h"
+asminline_deps =
+asminline_objs =

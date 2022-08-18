@@ -1,0 +1,255 @@
+# driver for dll
+
+drv_objs = &
+    idedrv.obj &
+    idemsgfm.obj &
+    maindrv.obj
+
+# stand-alone executable
+
+exe_objs = &
+    idedrv.obj &
+    maindrv.obj
+
+# DLL stuff
+
+dll_objs =
+
+
+# C Files
+
+common_objs = &
+    $(_subdir_)analcall.obj &
+    $(_subdir_)analcast.obj &
+    $(_subdir_)analclss.obj &
+    $(_subdir_)analconv.obj &
+    $(_subdir_)analctor.obj &
+    $(_subdir_)anallval.obj &
+    $(_subdir_)analnew.obj &
+    $(_subdir_)analnode.obj &
+    $(_subdir_)analpcnv.obj &
+    $(_subdir_)analretn.obj &
+    $(_subdir_)analtyid.obj &
+    $(_subdir_)analtype.obj &
+    $(_subdir_)analudc.obj &
+    $(_subdir_)analyse.obj &
+    $(_subdir_)arglist.obj &
+    $(_subdir_)ascii.obj &
+    $(_subdir_)asmstmt.obj &
+    $(_subdir_)autodep.obj &
+    $(_subdir_)browsio.obj &
+    $(_subdir_)calldiag.obj &
+    $(_subdir_)callgrph.obj &
+    $(_subdir_)callopt.obj &
+    $(_subdir_)carve.obj &
+    $(_subdir_)casian.obj &
+    $(_subdir_)caux.obj &
+    $(_subdir_)cdopt.obj &
+    $(_subdir_)cgbackhn.obj &
+    $(_subdir_)cgbkarel.obj &
+    $(_subdir_)cgbkbpos.obj &
+    $(_subdir_)cgbkcdpm.obj &
+    $(_subdir_)cgbkcbak.obj &
+    $(_subdir_)cgbkcgrf.obj &
+    $(_subdir_)cgbkclab.obj &
+    $(_subdir_)cgbkcmds.obj &
+    $(_subdir_)cgbkcond.obj &
+    $(_subdir_)cgbkcstb.obj &
+    $(_subdir_)cgbkcstk.obj &
+    $(_subdir_)cgbkdecl.obj &
+    $(_subdir_)cgbkexpr.obj &
+    $(_subdir_)cgbkfctl.obj &
+    $(_subdir_)cgbkftab.obj &
+    $(_subdir_)cgbkibrp.obj &
+    $(_subdir_)cgbklabs.obj &
+    $(_subdir_)cgbkmain.obj &
+    $(_subdir_)cgbkobin.obj &
+    $(_subdir_)cgbkretn.obj &
+    $(_subdir_)cgbkrreg.obj &
+    $(_subdir_)cgbkrtti.obj &
+    $(_subdir_)cgbkrvar.obj &
+    $(_subdir_)cgbkscop.obj &
+    $(_subdir_)cgbkstab.obj &
+    $(_subdir_)cgbkstrn.obj &
+    $(_subdir_)cgbksvar.obj &
+    $(_subdir_)cgbkswit.obj &
+    $(_subdir_)cgbkthrw.obj &
+    $(_subdir_)cgbktsig.obj &
+    $(_subdir_)cgbkutil.obj &
+    $(_subdir_)cgfront.obj &
+    $(_subdir_)cginfo.obj &
+    $(_subdir_)cginimps.obj &
+    $(_subdir_)cginlibs.obj &
+    $(_subdir_)cginmisc.obj &
+    $(_subdir_)cgio.obj &
+    $(_subdir_)cgiobuff.obj &
+    $(_subdir_)cgsegid.obj &
+    $(_subdir_)cgtype.obj &
+    $(_subdir_)class.obj &
+    $(_subdir_)cmac1.obj &
+    $(_subdir_)cmac2.obj &
+    $(_subdir_)cmacadd.obj &
+    $(_subdir_)cmdln.obj &
+    $(_subdir_)cmdlnany.obj &
+    $(_subdir_)cmdlnbat.obj &
+    $(_subdir_)cmdlnctx.obj &
+    $(_subdir_)cmdlnprs.obj &
+    $(_subdir_)cmdscan.obj &
+    $(_subdir_)conpool.obj &
+    $(_subdir_)context.obj &
+    $(_subdir_)convctl.obj &
+    $(_subdir_)convdiag.obj &
+    $(_subdir_)cppexit.obj &
+    $(_subdir_)cpragma.obj &
+    $(_subdir_)cscan.obj &
+    $(_subdir_)cscanbuf.obj &
+    $(_subdir_)ctimepc.obj &
+    $(_subdir_)cusage.obj &
+    $(_subdir_)datadtor.obj &
+    $(_subdir_)datainit.obj &
+    $(_subdir_)dbgsupp.obj &
+    $(_subdir_)decl.obj &
+    $(_subdir_)defarg.obj &
+    $(_subdir_)dgfront.obj &
+    $(_subdir_)dirgraph.obj &
+    $(_subdir_)dmpobjmd.obj &
+    $(_subdir_)dupnode.obj &
+    $(_subdir_)dwio.obj &
+    $(_subdir_)dwiobuff.obj &
+    $(_subdir_)dwarf.obj &
+    $(_subdir_)dyncast.obj &
+    $(_subdir_)enum.obj &
+    $(_subdir_)except.obj &
+    $(_subdir_)extrf86.obj &
+    $(_subdir_)floatsup.obj &
+    $(_subdir_)fmtmsg.obj &
+    $(_subdir_)fmttype.obj &
+    $(_subdir_)fmtsym.obj &
+    $(_subdir_)fname.obj &
+    $(_subdir_)fnbody.obj &
+    $(_subdir_)fnname.obj &
+    $(_subdir_)fnovload.obj &
+    $(_subdir_)fnovrank.obj &
+    $(_subdir_)typerank.obj &
+    $(_subdir_)fold.obj &
+    $(_subdir_)globdata.obj &
+    $(_subdir_)gstack.obj &
+    $(_subdir_)hfile.obj &
+    $(_subdir_)hashtab.obj &
+    $(_subdir_)i64supp.obj &
+    $(_subdir_)ialias.obj &
+    $(_subdir_)icemit.obj &
+    $(_subdir_)ideentry.obj &
+    $(_subdir_)idemsgfm.obj &
+    $(_subdir_)idemsgpr.obj &
+    $(_subdir_)initfini.obj &
+    $(_subdir_)initref.obj &
+    $(_subdir_)iosupp.obj &
+    $(_subdir_)jis2unic.obj &
+    $(_subdir_)keyword.obj &
+    $(_subdir_)label.obj &
+    $(_subdir_)linkage.obj &
+    $(_subdir_)mainproc.obj &
+    $(_subdir_)membptr.obj &
+    $(_subdir_)memmgr.obj &
+    $(_subdir_)message.obj &
+    $(_subdir_)mngless.obj &
+    $(_subdir_)module.obj &
+    $(_subdir_)name.obj &
+    $(_subdir_)namspace.obj &
+    $(_subdir_)objmodel.obj &
+    $(_subdir_)opovload.obj &
+    $(_subdir_)pcheader.obj &
+    $(_subdir_)plusplus.obj &
+    $(_subdir_)ppexpn.obj &
+    $(_subdir_)preproc.obj &
+    $(_subdir_)pstk.obj &
+    $(_subdir_)ptree.obj &
+    $(_subdir_)ptreedec.obj &
+    $(_subdir_)reposit.obj &
+    $(_subdir_)rewrite.obj &
+    $(_subdir_)ring.obj &
+    $(_subdir_)ringcarv.obj &
+    $(_subdir_)ringfns.obj &
+    $(_subdir_)ringname.obj &
+    $(_subdir_)rtfun.obj &
+    $(_subdir_)rtngen.obj &
+    $(_subdir_)rtti.obj &
+    $(_subdir_)scope.obj &
+    $(_subdir_)segment.obj &
+    $(_subdir_)srcfile.obj &
+    $(_subdir_)specfuns.obj &
+    $(_subdir_)stack.obj &
+    $(_subdir_)stackcpp.obj &
+    $(_subdir_)stats.obj &
+    $(_subdir_)stringl.obj &
+    $(_subdir_)symbol.obj &
+    $(_subdir_)symdbg.obj &
+    $(_subdir_)symlocn.obj &
+    $(_subdir_)sysdep.obj &
+    $(_subdir_)template.obj &
+    $(_subdir_)tempor.obj &
+    $(_subdir_)thunk.obj &
+    $(_subdir_)tokenbuf.obj &
+    $(_subdir_)tokens.obj &
+    $(_subdir_)type.obj &
+    $(_subdir_)typecomp.obj &
+    $(_subdir_)typesig.obj &
+    $(_subdir_)utility.obj &
+    $(_subdir_)vbuf.obj &
+    $(_subdir_)vfun.obj &
+    $(_subdir_)vstk.obj &
+    $(_subdir_)watcom.obj &
+    $(_subdir_)ytab.obj &
+# watcom files
+    $(_subdir_)autodept.obj &
+    $(_subdir_)pathlist.obj &
+# fe_misc files
+    $(_subdir_)intlload.obj &
+    $(_subdir_)unicode.obj &
+# in-line assembler files
+    $(_subdir_)asmalloc.obj &
+    $(_subdir_)asmmsg.obj
+
+plusplus_trmem_objs = $(trmem_objs)
+
+!ifdef __WATCOM_TOOLS__
+# assumes Watcom math library
+plusplus_matherr_objs = $(_subdir_)cmatherr.obj
+!endif
+
+# debugging objects
+!ifeq release 0
+debug_objs = &
+    $(_subdir_)dbg.obj &
+    $(_subdir_)dbgcomma.obj &
+    $(_subdir_)dbgheap.obj &
+    $(_subdir_)dbgio.obj &
+    $(_subdir_)dbgptree.obj &
+    $(_subdir_)dbgzap.obj &
+    $(_subdir_)fnovprt.obj &
+!if 0
+    $(_subdir_)b_write.obj &
+    $(_subdir_)brinfdep.obj &
+    $(_subdir_)brinfmac.obj &
+    $(_subdir_)brinfo.obj &
+    $(_subdir_)brinfsrc.obj &
+    $(_subdir_)brmwrite.obj &
+!endif
+!endif
+
+# target processor-dependent objects
+
+cpp_objs_i86 = $(_subdir_)cmdlnx86.obj $(_subdir_)cpragx86.obj $(_subdir_)pragi86.obj
+cpp_objs_386 = $(_subdir_)cmdlnx86.obj $(_subdir_)cpragx86.obj $(_subdir_)prag386.obj
+cpp_objs_axp = $(_subdir_)cmdlnaxp.obj $(_subdir_)cpragaxp.obj $(_subdir_)pragaxp.obj
+#cpp_objs_ppc = $(_subdir_)cmdlnppc.obj $(_subdir_)cpragppc.obj $(_subdir_)pragppc.obj
+#cpp_objs_mps = $(_subdir_)cmdlnmps.obj $(_subdir_)cpragmps.obj $(_subdir_)pragmps.obj
+
+plusplus_template = $(common_objs) $(plusplus_matherr_objs) $(debug_objs) $(asminline_objs) $(cg_objs) $(cpp_objs_$(target_cpu)) $(plusplus_trmem_objs)
+
+comp_objs_drv = $(drv_objs)
+_subdir_ = $(dll_subdir)/
+comp_objs_dll = $+$(plusplus_template)$- $(dll_objs)
+_subdir_ =
+comp_objs_exe = $+$(plusplus_template)$- $(exe_objs)

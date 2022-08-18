@@ -1,0 +1,120 @@
+proj_name = vi
+
+name = vix
+
+!ifndef vi_autodepends
+vi_autodepends = .AUTODEPEND
+!endif
+
+vi_trmem = 1
+
+vi_dos_extender = causeway
+
+.EXTENSIONS: .vi .dat
+
+error_dat = ../dat/error.dat
+
+additional_clean = *.rex *.gdh *.gch $(bind_compiled) $(error_dat)
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include win386.mif
+!include trmem.mif
+
+!include $(commonui_dir)/client.mif
+!include $(wpi_dir)/client.mif
+!include $(ui_dir)/client.mif
+!include $(rcsdll_dir)/client.mif
+
+!include ../mif/include.mif
+!include ../mif/objects.mif
+!include ../mif/compile.mif
+!include ../mif/special.mif
+!include ../mif/link.mif
+!include ../mif/bind.mif
+
+.dat : $(vi_dir)/dat
+
+#
+# bind vi scripts to final vi executable
+#
+vi.exe: $(error_dat) $(bind_files) $(name).exe $(__MAKEFILES__)
+    @set edpath=../dat
+    @%make edbind_data
+    copy $(name).exe vi.exe
+!ifdef __WATCOM_TOOLS__
+    copy $(name).sym vi.sym
+!endif
+
+#
+# compile vi scripts to bind to final vi executable
+#
+$(bind_compiled) : $(bind_compiled:./=../dat/) $(__MAKEFILES__)
+    vicomp ../dat/$^. $^.
+
+#
+# EXE
+#
+exetarg_prebuild_objs = $(special) $(other) $(videps)
+exetarg_objs          = $(objsroot) $(objinit) $(objs)
+exetarg_libs          = $(libs)
+exetarg_res_version_nt_386 = exever.res
+exetarg_res_version_nt_x64 = exever.res
+!ifeq sys_windowed 1
+exetarg_res           = $(name).res
+!endif
+exetarg_nt_manif_386  = ntmanif.res
+exetarg_nt_manif_x64  = ntmanif.res
+exetarg_name          = $(name)
+!include exetarg.mif
+
+#
+# rc and others
+#
+!include verrc.mif
+
+$(name).res : $(vi_dir)/res/viw.rc $(__MAKEFILES__) $(vi_autodepends)
+    @%make echo_rc
+    $(rc) $(rc_flags) -ad -zk0 $(rc_inc_path) $[@ -fo=$@
+
+ntmanif.res : ../res/ntmanif.rc
+    @%make echo_rc
+    $(rc) $(rc_flags) -I"../res" $(inc_dirs_sys_nt) $< -fo=$@
+
+rcstr.grh : rcstrmsg.gh $(__MAKEFILES__)
+    @%make echo_awk
+    $(awk) -f $(build_dir)/msgtoh.awk -v OUTFILE=$^. $[@
+
+rcstrmsg.gh : $(vi_dir)/res/vi.msg $(vi_dir)/res/tooltips.msg ../h/langdef.h $(msgfiles) $(__MAKEFILES__)
+    @%make echo_cpp
+    $(cpp) $(rc_ui_flags) -o$@ $[@
+
+setfs.obj : setfs.c setfs.gch setfs.gdh
+setgen.obj : setgen.c setgen.gch setgen.gdh
+setscr.obj : setscr.c setscr.gch
+
+setfs.gch : ../win/ctl/setfs.ch
+setscr.gch : ../win/ctl/setscr.ch
+setgen.gch : ../win/ctl/setgen.ch
+
+setfs.gch setscr.gch setgen.gch : $(__MAKEFILES__)
+    parsectl $[@ $@ Ctl_$^&
+
+setfs.gdh : ../win/ctl/setfs.dh
+setgen.gdh : ../win/ctl/setgen.dh
+
+setfs.gdh setgen.gdh: $(__MAKEFILES__)
+    parsedyn $[@ $@ Dyn_$^&
+
+$(error_dat) : ../h/_errs1.h ../h/_errs.h
+    @%make echo_awk
+    $(awk) -f ../makedat.awk -v OUTFILE=$(error_dat) $< $<
+
+edbind_data : .PROCEDURE .EXPLICIT
+    $(noecho)%create edbind.tmp
+    @for %i in ($(bind_files:./=)) do @%append edbind.tmp %i
+!ifeq verbose 0
+    @echo edbind edbind.tmp $(name).exe
+!endif
+    $(edbind) -dedbind.tmp -q $(name).exe

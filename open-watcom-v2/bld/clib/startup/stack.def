@@ -1,0 +1,14 @@
+_cbyte
+_cbyte2
+_curbrk
+_Envptr
+_LpCmdLine
+_LpPgmName
+_LpwCmdLine
+_LpwPgmName
+_osmajor
+_osminor
+_STACKLOW
+_STACKTOP
+__STKOVERFLOW
+__FPE_handler

@@ -1,0 +1,6 @@
+# wscromtool component of install manifest
+
+[ DEFAULT type="e" where="c" ]
+dir="binl"      usr="wscromtool"         cond="lnxhost"
+dir="binl64"    usr="wscromtool"         cond="lnx64host"                    keys="lx64"
+dir="osx64"     usr="swcromtool"

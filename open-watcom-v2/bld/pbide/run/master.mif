@@ -1,0 +1,21 @@
+proj_name = run
+
+run_autodepends = .AUTODEPEND
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c: ..
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_objs = run.obj
+!include exetarg.mif

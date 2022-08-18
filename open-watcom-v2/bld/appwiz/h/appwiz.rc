@@ -1,0 +1,15 @@
+#include <windows.h>
+#include "newproj.h"
+#include "rcstr.grh"
+
+STRINGTABLE
+BEGIN
+    #define pick(c,e,j) c, [ e ]
+
+    #include "appwiz.msg"
+
+    #undef pick
+END
+
+#include "newproj.dlg"
+

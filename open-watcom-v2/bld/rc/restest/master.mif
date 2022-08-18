@@ -1,0 +1,48 @@
+proj_name = restest
+
+restest_autodepends = .AUTODEPEND
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c: ..
+
+inc_dirs = -I..
+
+extra_l_flags = opt map
+extra_l_flags_nt = lib version.lib
+extra_l_flags_win = lib ver.lib
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_objs_nt = msgtbl.obj
+exetarg_objs = &
+    restest.obj &
+    resproc.obj &
+    verinfo.obj &
+    string.obj  &
+    menu.obj    &
+    dialog.obj  &
+    data.obj    &
+    cursor.obj  &
+    icon.obj    &
+    accel.obj   &
+    bitmap.obj  &
+    $(exetarg_objs_$(host_os))
+exetarg_res = $(proj_name).res
+!include exetarg.mif
+
+#
+# rc and others
+#
+$(proj_name).res : ../restest.rc $(__MAKEFILES__)
+    @%make echo_rc
+    $(rc) $(inc_dirs) $(inc_dirs_sys) -bt=$(host_os) -r $[@ -fo=$@

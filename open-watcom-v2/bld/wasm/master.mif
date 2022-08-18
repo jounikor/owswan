@@ -1,0 +1,133 @@
+proj_name = wasm
+
+!ifndef wasm_autodepends
+wasm_autodepends = .AUTODEPEND
+!endif
+
+wasm_nofpu = 1
+
+wasm_trmem = 1
+
+#wasm_dos_extender = causeway
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include wres.mif
+!include trmem.mif
+!include $(wasm_dir)/client.mif
+
+#
+# cflags
+#
+.c : ../c;$(trmem_dir);$(watcom_dir)/c
+
+inc_dirs  = -I. -I"../h" -I"$(fe_misc_dir)/h"
+
+extra_cpp_flags =-D_STANDALONE_
+#extra_cpp_flags += -DINCL_MSGTEXT
+!ifeq release 0
+extra_cpp_flags += -DDEBUG_OUT
+!endif
+
+extra_cpp_flags_asmalloc = $(trmem_cpp_flags)
+
+extra_c_flags_asmalloc = $(trmem_cover_cflags)
+
+#
+# lflags
+#
+extra_l_flags = lib $(wres_lib)
+extra_l_flags_qnx = option offset=16k, stack=12k
+extra_l_flags_dos_i86 = option stack=6k
+extra_l_flags_dos_386 = option stack=12k
+extra_l_flags_dos = $(extra_l_flags_dos_$(host_cpu))
+extra_l_flags_linux = option stack=12k
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_prebuild_objs = asmops.gh asmopsd.gh usage.gh wasmsmsg.grh wasmcmsg.grh
+exetarg_objs = &
+    $(extra_objs_$(host_os)_$(host_cpu)) &
+    main.obj &
+    write.obj &
+    fatal.obj &
+    direct.obj &
+    posndir.obj &
+    asmeval.obj &
+    asmalloc.obj &
+    asmmsg.obj &
+    asmerr.obj &
+    wasmmsg.obj &
+    macro.obj &
+    condasm.obj &
+    breakout.obj &
+    asmstruc.obj &
+    asmexpnd.obj &
+    mangle.obj &
+    for.obj &
+    asmins.obj &
+    asmscan.obj &
+    asmline.obj &
+    asmsym.obj &
+    tbyte.obj &
+    asmlabel.obj &
+    asmfixup.obj &
+    asmmatch.obj &
+    asmdata.obj &
+    asmjump.obj &
+    autodept.obj &
+    dostimet.obj &
+    queues.obj &
+    pathlist.obj &
+    omfcarve.obj &
+    omfobjre.obj &
+    omfqueue.obj &
+    omffixup.obj &
+    omflifix.obj &
+    omfgen.obj &
+    omfgenio.obj &
+    $(trmem_objs)
+
+exetarg_libs = $(wres_lib)
+exetarg_res_version_nt_386 = exever.res
+exetarg_res_version_nt_x64 = exever.res
+exetarg_res_wresui = wresui.res
+exetarg_qnx_res    = usage.u
+!ifdef bootstrap
+exetarg_name       = bwasm
+!else
+exetarg_name       = wasm
+!endif
+!include exetarg.mif
+
+#
+# rc and others
+#
+!include verrc.mif
+
+rcui_inc_dirs  = -I. -I"../h"
+
+wresui.res : ../h/wasm.rc usage.gh wasmcmsg.grh wasmsmsg.grh $(__MAKEFILES__)
+    @%make echo_rc
+    $(rcui8) -D_STANDALONE_
+
+wasmsmsg.grh : ../h/wasms.msg $(__MAKEFILES__)
+    @%make echo_awk
+    $(awk) -v base=MSG_WASM_BASE -f $(build_dir)/makemsg.awk -v OUTFILE=$^. $[@
+
+!ifdef exetarg_qnx_res
+optencod_opt_qnx    = -u=$(exetarg_qnx_res)
+!endif
+optencod_targets = $(host_os)
+!ifeq release 0
+optencod_targets += dbg
+!endif
+
+usage.gh $(exetarg_$(host_os)_res) : ../h/options.gml $(__MAKEFILES__)
+    @%make echo_optencod
+    $(optencod) -rc=MSG_USAGE_BASE -utf8 $(optencod_opt_$(host_os)) $[@ . . $@ $(optencod_targets)

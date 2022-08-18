@@ -1,0 +1,24 @@
+/*
+ *  search.h    Function prototypes for searching functions
+ *
+:include crwat.sp
+ */
+#ifndef _SEARCH_H_INCLUDED
+#define _SEARCH_H_INCLUDED
+
+:include readonly.sp
+
+:include owrtlink.sp
+
+:include cpluspro.sp
+
+_WCRTLINK extern void *lfind( const void *__key, const void *__base,
+                              unsigned *__num, unsigned __width,
+                              int (_WCCALLBACK * __compare)(const void *, const void *) );
+_WCRTLINK extern void *lsearch( const void *__key, void *__base,
+                                unsigned *__num, unsigned __width,
+                                int (_WCCALLBACK * __compare)(const void *, const void *) );
+
+:include cplusepi.sp
+
+#endif

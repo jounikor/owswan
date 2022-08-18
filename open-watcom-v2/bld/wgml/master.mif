@@ -1,0 +1,69 @@
+#
+# Watcom GML/Script (wgml) Makefile
+# =======================================
+#
+# wgml depends on
+#                 bld\trmem            memory tracker
+#
+
+proj_name = wgml
+name = wgml
+
+!ifndef wgml_autodepends
+wgml_autodepends = .AUTODEPEND
+!endif
+
+wgml_trmem = 1
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include wres.mif
+!include trmem.mif
+
+!include ../wgmlobjs.mif
+
+#
+# cflags
+#
+.c: ../c;../../watcom/c;$(trmem_dir)
+
+inc_dirs = -I. -I"../h" $(wres_inc_dirs)
+
+extra_cpp_flags_gmemory = $(trmem_cpp_flags)
+
+#  extra_c_flags      += -zpw
+#  extra_c_flags      += -fti
+#  extra_c_flags      += -pcl
+#extra_c_flags_gsyssym = -P
+
+extra_c_flags_gmemory = $(trmem_cover_cflags)
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_prebuild_objs = wgmlmsgs.gh wgmlmsge.gh
+exetarg_objs          = $(objs)
+exetarg_libs          = $(wres_lib)
+exetarg_res_wresui    = wresui.res
+!include exetarg.mif
+
+#
+# rc and others
+#
+msgfiles = ../h/wgmlerr.msg ../h/wgml.msg
+
+wresui.res : ../h/wgml.rc wgmlmsgs.gh ../h/wgmlmsg.h $(msgfiles) $(__MAKEFILES__)
+    @%make echo_rc
+    $(rcui8)
+
+wgmlmsgs.gh : $(msgfiles) $(__MAKEFILES__)
+    @%make echo_awk
+    $(awk) -v base=000 -f ../makemdef.awk -v OUTFILE=$^. $(msgfiles)
+
+wgmlmsge.gh : $(msgfiles) $(__MAKEFILES__)
+    @%make echo_awk
+    $(awk) -v base=000 -f ../msgtoenm.awk -v OUTFILE=$^. $(msgfiles)

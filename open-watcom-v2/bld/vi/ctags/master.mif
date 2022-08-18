@@ -1,0 +1,33 @@
+!ifndef clib_ctags
+proj_name = ctags
+ctags_autodepends = .AUTODEPEND
+!else
+proj_name = clibtags
+clibtags_autodepends = .AUTODEPEND
+!endif
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+.c : ..;../../c
+
+inc_dirs = -I.. -I"../../h"
+
+extra_cpp_flags = -D__ENABLE_FNAME_PROCESSING__ $(extra_cppflags)
+
+lflags_dos_386 = system dos4g
+
+extra_l_flags_dos = op stack=20k
+
+exetarg_objs = &
+    ctags.obj &
+    file.obj &
+    globals.obj &
+    myio.obj &
+    scanasm.obj &
+    scanc.obj &
+    scanfor.obj &
+    taglist.obj
+
+!include exetarg.mif

@@ -1,0 +1,1 @@
+wsccrt0.obj : ../../../a/wsccrt0.asm ../../../../h/libwsc.h

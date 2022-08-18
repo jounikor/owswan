@@ -1,0 +1,27 @@
+proj_name = ipfcdump
+
+ipfcdump_autodepends = .autodepend
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c : ..
+
+inc_dirs = -I..
+
+#
+# lflags
+#
+extra_l_flags = op eliminate
+
+#
+# EXE
+#
+exetarg_objs = ipfcdump.obj bitmap.obj cells.obj child.obj controls.obj &
+    dict.obj extfiles.obj fonts.obj fts.obj gnames.obj header.obj &
+    index.obj nls.obj panel.obj strings.obj toc.obj
+!include exetarg.mif

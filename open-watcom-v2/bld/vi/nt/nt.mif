@@ -1,0 +1,17 @@
+objnttimeroot = &
+    int.obj
+
+objntsizeroot = &
+    biosnt.obj
+
+objntsize = &
+    getspcmd.obj &
+    ntsys.obj &
+    ntmain.obj &
+    ntmouse.obj &
+    dosdir.obj &
+    time.obj  &
+    spawn.obj
+
+extraobjs = $(objntsize)
+extraobjsroot = $(objnttimeroot) $(objntsizeroot)

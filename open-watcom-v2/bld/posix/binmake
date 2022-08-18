@@ -1,0 +1,9 @@
+#pmake: binmake
+
+host_os  = $(bld_os)
+host_cpu = $(bld_cpu)
+!ifeq bld_os dos
+host_cpu = i86
+!endif
+
+!include ../makeall.mif

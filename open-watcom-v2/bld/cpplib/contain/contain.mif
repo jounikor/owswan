@@ -1,0 +1,17 @@
+prefix   = cont
+prefix_x = conx
+
+# C++ files in CPP directory
+
+objs_cpp = &
+    $(_subdir_)wcexcept.obj &
+    $(_subdir_)wchash.obj &
+    $(_subdir_)wclist.obj &
+    $(_subdir_)wcskip.obj
+
+pch_flags = -fh=pch01.pch
+pch_flags_x = -fh=$(x_subdir)/pch01.pch
+
+dep_dirs_x = $(x_subdir)
+
+!include $(cpplib_dir)/mklib.mif

@@ -1,0 +1,81 @@
+proj_name = guisample
+name = sample
+
+!ifndef guisample_autodepends
+guisample_autodepends = .AUTODEPEND
+!endif
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include win386.mif
+
+!include $(commonui_dir)/client.mif
+!include $(gui_dir)/client.mif
+!include $(ui_dir)/client.mif
+
+!include wres.mif
+
+#
+# cflags
+#
+.c: ../c;$(os_source_dir);$(os_extra_dir)
+
+inc_dirs = -I. -I"../h" $(gui_inc_dirs) -I"$(gui_dir)/$(gui_type)/h"
+
+#
+# lflags
+#
+extra_l_flags_nov = import @$(nwoss_dir)/common/imp/ownwos.imp
+!ifneq sys_windowed 1
+extra_l_flags_win = import DEATH GDI.121 import RESURRECTION GDI.122
+!endif
+
+#
+# EXE's
+#
+exetarg_objs       = sample.obj dlgstat.obj dlgdynam.obj dlgtest.obj sampdef.obj
+exetarg_libs       = $(gui_lib) $(ui_lib) $(wres_lib)
+exetarg_name       = sample
+!ifeq sys_windowed 1
+!ifeq host_os os2
+exetarg_res        = samplepm.res
+!else
+exetarg_res        = sample.res
+!endif
+!include exetarg.mif
+!undef exetarg_res
+!else
+exetarg_res_wresui = wresui.res
+!include exetarg.mif
+!undef exetarg_res_wresui
+!endif
+
+exetarg_objs       = pmsample.obj dlgstat.obj dlgdynam.obj dlgtest.obj sampdef.obj
+exetarg_name       = pmsample
+!include exetarg.mif
+
+exetarg_objs       = samp2.obj dlgstat.obj dlgdynam.obj dlgtest.obj sampdef.obj
+exetarg_name       = samp2
+!include exetarg.mif
+
+#
+# rc and others
+#
+!ifdef gui_os2pm
+sample_rc_inc_dirs = -I"../res/pm" -I"../res" -I"../h"
+!else
+sample_rc_inc_dirs = -I"../res/win" -I"../res" -I"../h"
+!endif
+
+rc_inc_dirs = -I. $(sample_rc_inc_dirs) $(gui_rc_inc_dirs)  $(commonui_inc_dirs)
+rcui_inc_dirs = -I. $(sample_rc_inc_dirs) $(gui_rc_inc_dirs) $(commonui_inc_dirs)
+
+samplepm.res : ../res/samplepm.rc ../res/samplepm.dlg
+        $(rc) $(rc_flags) -ad $(rc_inc_path) $[@ -fo=$@
+
+sample.res : ../res/sample.rc ../res/sample.dlg
+        $(rc) $(rc_flags) -ad -DWINRC $(rc_inc_path) $[@ -fo=$@
+
+wresui.res : ../res/sample.rc ../res/sample.dlg
+        $(rcui) -ad

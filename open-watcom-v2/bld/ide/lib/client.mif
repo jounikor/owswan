@@ -1,0 +1,2 @@
+idelib_inc_dirs = -I"$(idelib_dir)/h"
+idelib_lib = $(idelib_dir)/$(objs_subdir)/ide.lib

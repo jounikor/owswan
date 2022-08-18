@@ -1,0 +1,27 @@
+proj_name = wstuba
+
+wstuba_autodepends = .autodepend
+
+memory_model_i86 = s
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# aflags
+#
+.asm : ..
+
+all : wstub.exe wstubq.exe
+
+#
+# EXE's
+#
+exetarg_objs = wstub.obj
+exetarg_name = wstub
+!include exetarg.mif
+
+exetarg_objs = wstubq.obj
+exetarg_name = wstubq
+!include exetarg.mif

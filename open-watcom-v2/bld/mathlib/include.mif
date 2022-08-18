@@ -1,0 +1,24 @@
+include_default = -I"$(mathlib_dir)/h"
+include_watcom  = -I"$(watcom_dir)/h" -I"$(lib_misc_dir)/h" -I"$(comp_cfg_dir)/h"
+
+# include_c_(system)
+include_c_msdos    = $(inc_dirs_lang_dos)
+include_c_os2      = $(inc_dirs_lang_dos) $(inc_dirs_sys_os2)
+include_c_windows  = $(inc_dirs_lang_dos) $(inc_dirs_sys_win)
+include_c_winnt    = $(inc_dirs_lang_dos) $(inc_dirs_sys_nt)
+include_c_linux    = $(inc_dirs_lang_linux)
+include_c_netware  = $(inc_dirs_lang_dos)
+include_c_qnx      = $(inc_dirs_lang_qnx)
+
+include_c_path = $(include_default) $(include_c_$(system)) $(include_watcom)
+
+# include_a_(processor)
+include_a_286 = -I"$(fpuemu_dir)/i86/inc"
+include_a_287 =
+include_a_386 = -I"$(fpuemu_dir)/386/inc"
+include_a_387 =
+include_a_axp =
+include_a_ppc =
+include_a_mps =
+
+include_a_path = $(include_default) $(include_watcom) $(include_a_$(processor))

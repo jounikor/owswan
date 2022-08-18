@@ -1,0 +1,19 @@
+# libname_(processor)
+libwsc_suffix_ms = s
+libwsc_suffix_mm = m
+libwsc_suffix_mc = c
+libwsc_suffix_ml = l
+libwsc_suffix_mh = h
+libwsc_suffix_stack = s
+libwsc_suffix_register = r
+libname_086 = $(libwsc_suffix_$(model))
+libname = libwsc$(libname_$(processor))
+
+!ifeq release 0
+libwsc_lib_flags = -b-c-n-pa
+!else
+libwsc_lib_flags = -b-c-n-pa-s-t-zld
+!endif
+
+libwsc_linkage_flags_086_static  = -z
+libwsc_linkage_flags = $(libwsc_linkage_flags_$(libwsc_$(processor))_$(linkage))

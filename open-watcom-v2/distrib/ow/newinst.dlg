@@ -1,0 +1,14 @@
+# UTF-8 encoding, ¥
+name=NewInstall
+condition=PreviousInstall !
+dynamic_text=targ_1,\
+        //1"%AppName% will be installed in '%DstDir%'"\
+        //2"%AppName% は '%DstDir%' にインストールされます"\
+        //0
+static_text=
+include=full.dlg
+include=sel.dlg
+static_text=
+include=space.dlg
+static_text=
+include=pnhc.dlg

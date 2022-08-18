@@ -1,0 +1,174 @@
+proj_name=hdr
+
+!include cproj.mif
+!include ../hfiles.mif
+
+dos_options   = -kDOS
+linux_options = -kLINUX -u
+qnx_options   = -kQNX -t8 -u
+rdos_options  = -kRDOS
+
+!ifeq release 1
+wsplice_extra_opts =
+!else
+wsplice_extra_opts = -d"depends.dep"
+!endif
+
+wsplice_opts = $(wsplice_extra_opts) -i.. $($(system)_options) ../common.sp $[@ $@
+wsplice_opts_p = $(wsplice_extra_opts) -i.. $($(system)_options) -kCNAME $(options_$^&) ../common.sp $[@ $@
+wsplice_opts_c = $(wsplice_extra_opts) -i.. $($(system)_options) $(options_h_$^&) ../common.sp $[@ $@
+
+wsplice_opts_i386 = $(wsplice_extra_opts) -i.. -kARCHI386 $($(system)_options) ../common.sp $[@ $@
+wsplice_opts_mips = $(wsplice_extra_opts) -i.. -kARCHMIPS $($(system)_options) ../common.sp $[@ $@
+
+# order of directories is important for DOS
+# multi level tree must be created from top to bottom
+# DOS can create only simple sub-directory in existing directory
+# you must create parent before child directory
+dos_dirs   = h h/sys
+linux_dirs = h h/sys h/netinet h/arpa h/arch h/arch/i386 h/arch/i386/sys h/arch/mips h/arch/mips/sys
+qnx_dirs   = h h/sys
+rdos_dirs  = h h/sys h/netinet h/arpa
+
+mh_dir = ../watcom
+qnx_mh_dir = ../quantum
+
+crwatpro_gsp = crwatpro.gsp
+
+.EXTENSIONS
+.EXTENSIONS : . .h .hpp .cnv .gsp .sp .mh .mhp
+
+all : $($(system)_dirs) $($(system)_files) .symbolic
+    @%null
+
+.mh: $($(system)_mh_dir);$(mh_dir)
+.mhp: $(mh_dir)
+.sp: $(hdr_dir)
+
+.mhp{h}.hpp:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+.mh{h}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts_c)
+
+{dos}.mh{h}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+{linux}.mh{h}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+{rdos}.mh{h}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+{qnx}.mh{h}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+{sys}.mh{h/sys}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+{arpa}.mh{h/arpa}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+{netinet}.mh{h/netinet}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+{dos/sys}.mh{h/sys}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+{linux/sys}.mh{h/sys}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+{linux/netinet}.mh{h/netinet}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+{linux/arch/i386}.mh{h/arch/i386}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts_i386)
+
+{linux/arch/i386/sys}.mh{h/arch/i386/sys}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts_i386)
+
+{linux/arch/mips}.mh{h/arch/mips}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts_mips)
+
+{linux/arch/mips/sys}.mh{h/arch/mips/sys}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts_mips)
+
+.mh.cnv:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+.sp.gsp:
+    $(awk) -f $(hdr_dir)/cpyyear.awk -v CPYYEAR=$(curr_year) -v OUTFILE=$@ $[@
+
+#
+# Handle C++ and cname style headers (files without extension)
+#
+.mh.:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts_p)
+
+#
+# Special case for cname style headers
+#
+options_complex  = -kCPPONLY
+options_limits   = -kCPPONLY
+options_locale   = -kCPPONLY
+options_memory   = -kCPPONLY
+options_string   = -kCPPONLY
+
+#
+# Special case for included C++ cname style headers
+#   for optimize C++ declaration out of C part
+#
+options_h__algmut  = -kCNAME
+options_h__algnmod = -kCNAME
+options_h__algsort = -kCNAME
+options_h__hash    = -kCNAME
+options_h__meta    = -kCNAME
+options_h__rbtree  = -kCNAME
+options_h__strdef  = -kCNAME
+options_h_ctype    = -kCONLY
+options_h_except   = -kCNAME
+options_h_generic  = -kCNAME
+options_h_inttypes = -kCONLY
+options_h_locale   = -kCONLY
+options_h_math     = -kCONLY
+options_h_signal   = -kCONLY
+options_h_stdarg   = -kCONLY
+options_h_stdbool  = -kCONLY
+options_h_stddef   = -kCONLY
+options_h_stdint   = -kCONLY
+options_h_stdio    = -kCONLY
+options_h_stdlib   = -kCONLY
+options_h_string   = -kCONLY
+options_h_time     = -kCONLY
+options_h_wcdefs   = -kCPPONLY
+options_h_wctype   = -kCONLY
+options_h_wchar    = -kCONLY
+
+!ifneq $(system)_dirs
+$($(system)_dirs): .EXPLICIT
+    mkdir -p $@
+!endif
+
+!include $(mh_dir)/deps.mif
+
+clean: .SYMBOLIC
+    rm -f $(crwatpro_gsp)
+    rm -rf h

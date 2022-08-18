@@ -1,0 +1,23 @@
+proj_name   = mkcdpg
+
+mkcdpg_autodepends = .AUTODEPEND
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c: ..
+
+inc_dirs        = -I"$(wrc_dir)/h"
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_objs = mkcdpg.obj
+!include exetarg.mif

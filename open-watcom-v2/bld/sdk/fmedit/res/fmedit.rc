@@ -1,0 +1,44 @@
+#include <windows.h>
+#include "fmdlgs.rh"
+#include "fmmenu.rh"
+
+FMEDIT ICON "fmedit.ico"
+
+SetupMenu MENU
+BEGIN
+    MENUITEM "&Grid", IDM_GRID
+END
+
+EscAccelTable ACCELERATORS
+BEGIN
+    VK_ESCAPE, IDM_ESCAPE, VIRTKEY
+END
+
+CutAccelTable ACCELERATORS
+BEGIN
+    VK_DELETE, IDM_CUTOBJECT, SHIFT, VIRTKEY
+END
+
+CopyAccelTable ACCELERATORS
+BEGIN
+    VK_INSERT, IDM_COPYOBJECT, CONTROL, VIRTKEY
+END
+
+PasteAccelTable ACCELERATORS
+BEGIN
+    VK_INSERT, IDM_PASTEOBJECT, SHIFT, VIRTKEY
+END
+
+DeleteAccelTable ACCELERATORS
+BEGIN
+    VK_DELETE, IDM_DELETEOBJECT, VIRTKEY
+END
+
+LEFT    BITMAP "left.bmp"
+HCENTRE BITMAP "hcentre.bmp"
+RIGHT   BITMAP "right.bmp"
+TOP     BITMAP "top.bmp"
+VCENTRE BITMAP "vcentre.bmp"
+BOTTOM  BITMAP "bottom.bmp"
+
+#include "fmdlgs.dlg"

@@ -1,0 +1,8 @@
+#pmake: binmake
+
+host_os  = $(bld_os)
+host_cpu = $(bld_cpu)
+
+proj_path = ..
+
+!include ../master.mif

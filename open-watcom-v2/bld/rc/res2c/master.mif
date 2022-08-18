@@ -1,0 +1,26 @@
+proj_name   = res2c
+
+res2c_autodepends = .AUTODEPEND
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c: ..
+
+inc_dirs = -I..
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_objs = &
+    resdump.obj  &
+    loadchar.obj &
+    loadtype.obj
+!include exetarg.mif

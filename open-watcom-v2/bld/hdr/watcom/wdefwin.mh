@@ -1,0 +1,33 @@
+/*
+ *  wdefwin.h   default windowing calls
+ *
+:include crwat.sp
+ */
+#ifndef _WDEFWIN_H_INCLUDED
+#define _WDEFWIN_H_INCLUDED
+
+:include readonly.sp
+
+#ifndef __SW_BW
+ #error wdefwin.h is for use the default windowing system, use the /bw switch
+#endif
+
+:include owrtlink.sp
+
+:include cpluspro.sp
+
+#if defined( __WINDOWS__ ) || defined( __NT__ ) || defined( __OS2__ ) && !defined( _M_I86 )
+_WCRTLINK extern int _dwDeleteOnClose( int handle );
+_WCRTLINK extern int _dwSetAboutDlg( const char *title, const char *text );
+_WCRTLINK extern int _dwSetAppTitle( const char *title );
+_WCRTLINK extern int _dwSetConTitle( int handle, const char *title );
+_WCRTLINK extern int _dwYield( void );
+_WCRTLINK extern int _dwShutDown( void );
+#else
+ #error You cannot use the default windowing system in a non GUI environment
+ #error Make sure you use the /bt= switch to select the target system
+#endif
+
+:include cplusepi.sp
+
+#endif

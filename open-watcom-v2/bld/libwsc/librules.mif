@@ -1,0 +1,8 @@
+.c.obj : $(__MAKEFILES__) .autodepend
+    @%make echo_cc
+    @echo $[@ $(include_c_path) $($[&_opts) $(clib_c_flags)
+    $(cc) $[@ $(include_c_path) $($[&_opts) $(clib_c_flags) $($[&_postopts) $(c_dbg_flags)
+
+.asm.obj .gas.obj : $(__MAKEFILES__) .autodepend
+    @%make echo_as
+    $(as) $[@ $(include_a_path) $($[&_opts) $(clib_a_flags) $($[&_postopts) $(a_dbg_flags)

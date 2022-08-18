@@ -1,0 +1,12 @@
+/*
+ *  usb100.h    Backward compatibility header
+ *
+:include crwatcnt.sp
+ */
+
+#ifndef __USB100_H__
+#define __USB100_H__
+
+#include "usbspec.h"
+
+#endif /* __USB100_H__ */

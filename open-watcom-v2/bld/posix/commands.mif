@@ -1,0 +1,68 @@
+#
+#   commands:   define the names of all the commands in the project
+#
+
+#   The directory $(posix_dir)\src\<command_name> must exist and contain
+#   the source for each command.
+
+#                 all qnx boot      # build doc test
+#==============================     ================
+!inject basename  all qnx           #
+!inject cat       all qnx boot      # build     test
+!inject cmp       all qnx           #
+!inject comm      all qnx           #
+!inject compress  all qnx           #
+!inject cp        all               #
+!inject cut       all qnx           #
+!inject date      all qnx           #
+!inject dev       all qnx           #
+!inject df        all               #
+!inject dirname   all qnx           #
+!inject du        all               #
+!inject egrep     all     boot      # build doc test
+!inject env       all qnx           #
+!inject expand    all qnx           #
+!inject false     all qnx           #
+!inject fgrep     all               #
+!inject fmt       all qnx           #
+!inject fold      all qnx           #
+!inject gnutar    all               #
+!inject head      all qnx boot      #           test
+!inject chmod     all     boot      #           test
+!inject lc        all qnx           #
+!inject line      all qnx           #
+!inject ls        all               #
+!inject mkdir     all               #
+!inject more      all qnx           #
+!inject od        all               #
+!inject paste     all qnx           #
+!inject ps        all qnx           #
+!inject pwd       all qnx           #
+!inject rev       all qnx           #
+!inject rm        all               #
+!inject rmdir     all               #
+!inject sed       all qnx boot      # build     test
+!inject sleep     all     boot      #           test
+!inject sort      all     boot      #           test
+!inject split     all qnx           #
+!inject strings   all qnx           #
+!inject tail      all qnx           #
+!inject tee       all qnx boot      #           test
+!inject tr        all qnx boot      #           test
+!inject true      all qnx           #
+!inject trunc     all qnx           #
+!inject unexpand  all qnx           #
+!inject uniq      all qnx boot      # build
+!inject uudecode  all qnx           #
+!inject uuencode  all qnx           #
+!inject wc        all qnx boot      # build     test
+!inject which     all     boot      #
+!inject who       all qnx           #
+
+!ifdef bootstrap
+commands = $(boot)
+!else ifeq host_os qnx
+commands = $(qnx)
+!else
+commands = $(all)
+!endif

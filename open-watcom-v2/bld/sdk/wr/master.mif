@@ -1,0 +1,120 @@
+proj_name = wr
+
+!ifndef wr_autodepends
+wr_autodepends = .AUTODEPEND
+!endif
+
+memory_model_i86 = l
+
+sys_windowed = 1
+sys_dll = 1
+#suppress_bd = 1
+
+wr_trmem = 1
+
+win_yacc_prefix = winy
+win_yacc_file   = $(win_yacc_prefix)tab
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include dllbase.mif
+!include wres.mif
+!include trmem.mif
+
+!include $(commonui_dir)/client.mif
+!include $(cpp_dir)/client.mif
+
+#
+# cflags
+#
+.c:   ../c;$(trmem_dir);$(cpp_c_dirs);$(wrc_dir)/c;$(watcom_dir)/c
+
+inc_dirs = -I. -I"../h" $(cpp_inc_dirs) $(wres_inc_dirs) -I"$(wrc_dir)/h" &
+    $(commonui_inc_dirs)
+
+extra_cpp_flags   = -DINSIDE_WRDLL
+
+extra_cpp_flags_wrmem = $(trmem_cpp_flags)
+
+extra_c_flags_win = -zu-zw-zc
+
+# wr objects
+extra_c_flags_wrmem = $(trmem_cover_cflags)
+
+#
+# lflags
+#
+extra_l_flags = debug all option quiet, map, elim, v, static
+#extra_l_flags_win_i86 = sys windows
+#extra_l_flags_nt_386  = sys nt_win
+#extra_l_flags_nt_axp  = sys ntaxp_win
+
+extra_l_flags_dll = op implib $(wr_dllbase_$(host_os)_$(host_cpu))
+extra_l_flags_dll_nt = op heap=16k commit heap=8k
+extra_l_flags_dll_win = op rwr, stack=16k export WEP RESIDENT &
+#    segment  _TEXT PRELOAD FIXED &
+#    segment  CLASS 'CODE' LOADONCALL MOVEABLE DISCARDABLE &
+#    segment  CLASS 'CODE' PRELOAD
+
+# explicit rules
+#################
+
+#
+# DLL
+#
+dlltarg_prebuild_objs = $(win_yacc_file).h rcmsg.grh wrmsg.grh
+dlltarg_objs_cpp      = preproc.obj ppexpr.obj ppmacro.obj ppenv.obj pathlist.obj
+dlltarg_objs_rc = &
+    pass2.obj exeseg.obj exeresw.obj rcstr.obj ppalloc.obj &
+    exeutil.obj exeobj.obj exerespe.obj rcio.obj semutil.obj &
+    global.obj semstrw.obj semsnglw.obj semantic.obj semantcw.obj semraw.obj &
+    rcerrors.obj tmpctl.obj autodep.obj &
+    dbtable.obj sharedio.obj mergedir.obj rcspawn.obj
+dlltarg_objs          = wrmain.obj wrmem.obj wrmsg.obj wrfindt.obj wrtmpfil.obj &
+    wrrdw16.obj wrrdwnt.obj wrrdres.obj wrimg.obj &
+    wrsvexe.obj wrsvres.obj &
+    wridfile.obj wrinfo.obj wrstrdup.obj &
+    wrlist.obj wrdel.obj wrstr.obj wrclean.obj &
+    wrdata.obj wrnamoor.obj wrwresid.obj &
+    wrselft.obj wrmemf.obj wrdmsg.obj wrctl3d.obj &
+    wrbitmap.obj wricon.obj wr_wres.obj wrselimg.obj &
+    wrrnames.obj wrhash.obj wredit.obj wrutil.obj $(trmem_objs) &
+    wrstubs.obj rcerrprt.obj rcgetenv.obj $(dlltarg_objs_cpp) $(dlltarg_objs_rc)
+dlltarg_libs          = $(wres_lib) $(commonui_lib)
+dlltarg_res_version_nt_386 = version.res
+dlltarg_res_version_nt_x64 = version.res
+dlltarg_res           = $(proj_name).res
+!include dlltarg.mif
+
+#
+# EXE TEST
+#
+exetarg_objs = test.obj
+exetarg_libs = $(proj_name).lib
+exetarg_name = test
+!include exetarg.mif
+
+#
+# rc and others
+#
+!include verrc.mif
+
+rc_inc_dirs = -I"$(wrc_dir)/h" #$(cpp_inc_dirs) $(wres_inc_dirs) -I"$(wrc_dir)/h" $(commonui_inc_dirs)
+
+$(proj_name).res: ../res/wr.rc $(__MAKEFILES__) .AUTODEPEND
+    @%make echo_rc
+    $(rc) $(rc_flags) -zku0 -ad $(rc_inc_path) $[@ -fo=$@
+
+rcmsg.grh :  $(wrc_dir)/h/rc.msg $(__MAKEFILES__)
+    @%make echo_awk
+    $(awk) -v base=MSG_RC_BASE -f $(build_dir)/makemsg.awk -v OUTFILE=$^. $[@
+
+wrmsg.grh: ../res/wr.msg $(__MAKEFILES__)
+    @%make echo_cpp
+    $(awk) -v base=MSG_BASE -f $(build_dir)/makemsg.awk -v OUTFILE=$^. $[@
+
+$(win_yacc_file).h : $(wrc_dir)/y/rcwin.y $(wrc_dir)/y/yydrivrw.c $(wrc_dir)/h/rcmem.h $(__MAKEFILES__)
+    @%make echo_yacc
+    $(yacc) -b $(win_yacc_prefix) -d -db -dd $[@ $(wrc_dir)/y/yydrivrw.c >$(nulldevice)
+    @rm -f $(win_yacc_file).c # C code isn't used

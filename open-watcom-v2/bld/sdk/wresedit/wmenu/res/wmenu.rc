@@ -1,0 +1,59 @@
+#include <windows.h>
+#include "sysall.rh"
+#include "about.rh"
+#include "banner.h"
+
+#define FIRST_COPYRIGHT_YEAR 2002
+
+#include "sysindep.rc"
+
+"WMenuAccelTable" ACCELERATORS
+BEGIN
+    VK_DELETE,  IDM_MENU_DELETE,    VIRTKEY
+    VK_F1,      IDM_HELP,           VIRTKEY
+    "X",        IDM_MENU_CUT,       CONTROL, VIRTKEY
+    "C",        IDM_MENU_COPY,      CONTROL, VIRTKEY
+    "V",        IDM_MENU_PASTE,     CONTROL, VIRTKEY
+END
+
+/* icons */
+"APPLICON"      ICON "wmenu.ico"
+
+/* about box bitmap */
+"AboutLogo"     BITMAP MOVEABLE DISCARDABLE "logo.bmp"
+
+/* ribbon bitmaps */
+"Clear"         BITMAP "clear.bmp"
+"New"           BITMAP "new.bmp"
+"Open"          BITMAP "open.bmp"
+"Save"          BITMAP "save.bmp"
+
+"Cut"           BITMAP "cut.bmp"
+"Copy"          BITMAP "copy.bmp"
+"Paste"         BITMAP "paste.bmp"
+
+"InsertItem"    BITMAP "insitem.bmp"
+"InsertPopup"   BITMAP "inspopup.bmp"
+"InsertSep"     BITMAP "inssep.bmp"
+"DeleteItem"    BITMAP "delitem.bmp"
+"InsertAfter"   BITMAP "insafter.bmp"
+"InsertBefore"  BITMAP "insbefor.bmp"
+"InsertSub"     BITMAP "inssub.bmp"
+"InsertNoSub"   BITMAP "insnosub.bmp"
+
+STRINGTABLE
+BEGIN
+    #define pick(c,e) c, [ e ]
+
+    #include "rcstrmsg.gh"
+    #include "uistrmsg.gh"
+
+    #undef pick
+END
+
+#define sp( a, b ) a
+#include "wmenu.men"
+#undef sp
+
+#include "menuedit.dlg"
+#include "about.dlg"

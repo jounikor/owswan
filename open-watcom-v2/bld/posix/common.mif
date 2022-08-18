@@ -1,0 +1,76 @@
+#
+#   COMMON:     common definitions of compiler and linker
+#
+
+#
+#   Macros used by this file:
+#
+#   posix_dir   Must point to the root of the posix project.
+#
+#   cflags      If defined, these options to the compiler override the
+#               defaults selected by this file.
+#
+#   make_lib    If this is defined then wmake was invoked to make posixlib.
+#
+#   if make_lib isn't defined, then the following must be defined:
+#
+#   name        The name of the command which is being built.  The
+#               directory $(posix_dir)/src/$(name) must exist, and
+#               contain the source for the command.
+
+#
+# definitions for POSIX library build
+#
+
+std_subdir_i86 = m$(model)
+std_subdir_386 = m$(model)
+std_subdir_x64 = _s
+std_subdir_axp = _s
+std_subdir_mps = _s
+std_subdir_ppc = _s
+
+alt_subdir_dosi86s = mc
+alt_subdir_os2i86s = mc
+alt_subdir_dosi86c = ms
+alt_subdir_os2i86c = ms
+
+!ifeq proj_name posix_all
+!ifdef alt_subdir_$(host_os)$(host_cpu)$(model)
+alt_posixlib = 1
+!endif
+!endif
+
+posixlib_objs = &
+    $(_subdir_)alloc.obj &
+    $(_subdir_)argvenv.obj &
+    $(_subdir_)argvrx.obj &
+    $(_subdir_)console.obj &
+    $(_subdir_)die.obj &
+    $(_subdir_)filerx.obj &
+    $(_subdir_)fnlower.obj &
+    $(_subdir_)fncomp.obj &
+    $(_subdir_)getclsz.obj &
+    $(_subdir_)getopt.obj &
+    $(_subdir_)isdotdot.obj &
+    $(_subdir_)lineprt.obj &
+    $(_subdir_)quit.obj &
+    $(_subdir_)regexp.obj
+
+!ifdef bootstrap
+stdlibdir=$(std_subdir_$(host_cpu))
+!ifdef alt_posixlib
+altlibdir=$(alt_subdir_$(host_os)$(host_cpu)$(model))
+!endif
+!else
+stdlibdir=$(posix_dir)/misc/$(objs_subdir)/$(std_subdir_$(host_cpu))
+!ifdef alt_posixlib
+altlibdir=$(posix_dir)/misc/$(objs_subdir)/$(alt_subdir_$(host_os)$(host_cpu)$(model))
+!endif
+!endif
+
+#
+#       compiler options
+#
+
+extra_cppflags_ntaxp = -DWIN32 -D_WIN32
+extra_cpp_flags      = -DSTANDALONE_RX $(extra_cppflags_$(host_os)$(host_cpu)) $(extra_cppflags)

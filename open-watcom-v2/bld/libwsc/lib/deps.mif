@@ -1,0 +1,1 @@
+test.obj  : ../../../c/test.c       $(libwsc_dir)/h/libwsc.h

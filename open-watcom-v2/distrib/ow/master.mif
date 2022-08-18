@@ -1,0 +1,155 @@
+installer_c_dos_386     = open-watcom-$(bld_ver_str:.=_)-c-dos.exe
+installer_c_win_386     = open-watcom-$(bld_ver_str:.=_)-c-win16.exe
+installer_c_nt_386      = open-watcom-$(bld_ver_str:.=_)-c-win-x86.exe
+installer_c_os2_386     = open-watcom-$(bld_ver_str:.=_)-c-os2.exe
+installer_c_linux_386   = open-watcom-$(bld_ver_str:.=_)-c-linux-x86
+installer_c_nt_x64      = open-watcom-$(bld_ver_str:.=_)-c-win-x64.exe
+installer_c_linux_x64   = open-watcom-$(bld_ver_str:.=_)-c-linux-x64
+installer_c = $(installer_c_$(host_os)_$(host_cpu))
+
+installer_f77_dos_386   = open-watcom-$(bld_ver_str:.=_)-f77-dos.exe
+installer_f77_win_386   = open-watcom-$(bld_ver_str:.=_)-f77-win16.exe
+installer_f77_nt_386    = open-watcom-$(bld_ver_str:.=_)-f77-win-x86.exe
+installer_f77_os2_386   = open-watcom-$(bld_ver_str:.=_)-f77-os2.exe
+installer_f77_linux_386 = open-watcom-$(bld_ver_str:.=_)-f77-linux-x86
+installer_f77_nt_x64    = open-watcom-$(bld_ver_str:.=_)-f77-win-x64.exe
+installer_f77_linux_x64 = open-watcom-$(bld_ver_str:.=_)-f77-linux-x64
+installer_f77 = $(installer_f77_$(host_os)_$(host_cpu))
+
+setup_c_dos_386     = $(setupgui_dir)/dos386/setup.exe
+setup_c_win_386     = $(setupgui_dir)/win386/csetup.exe
+setup_c_nt_386      = $(setupgui_dir)/nt386.gui/csetup.exe
+setup_c_os2_386     = $(setupgui_dir)/os2386.gui/csetup.exe
+setup_c_linux_386   = $(setupgui_dir)/linux386/setup.exe
+setup_c_nt_x64      = $(setupgui_dir)/ntx64.gui/csetup.exe
+setup_c_linux_x64   = $(setupgui_dir)/linuxx64/setup.exe
+setup_c = $(setup_c_$(host_os)_$(host_cpu))
+
+setup_f77_dos_386   = $(setupgui_dir)/dos386/setup.exe
+setup_f77_win_386   = $(setupgui_dir)/win386/f77setup.exe
+setup_f77_nt_386    = $(setupgui_dir)/nt386.gui/f77setup.exe
+setup_f77_os2_386   = $(setupgui_dir)/os2386.gui/f77setup.exe
+setup_f77_linux_386 = $(setupgui_dir)/linux386/setup.exe
+setup_f77_nt_x64    = $(setupgui_dir)/ntx64.gui/f77setup.exe
+setup_f77_linux_x64 = $(setupgui_dir)/linuxx64/setup.exe
+setup_f77 = $(setup_f77_$(host_os)_$(host_cpu))
+
+!ifdef __UNIX__
+dstdir_dos_386     = C:\\WATCOM
+dstdir_win_386     = C:\\WATCOM
+dstdir_nt_386      = C:\\WATCOM
+dstdir_os2_386     = C:\\WATCOM
+dstdir_linux_386   = /usr/bin/watcom
+dstdir_nt_x64      = C:\\WATCOM
+dstdir_linux_x64   = /usr/bin/watcom
+!else
+dstdir_dos_386     = C:\WATCOM
+dstdir_win_386     = C:\WATCOM
+dstdir_nt_386      = C:\WATCOM
+dstdir_os2_386     = C:\WATCOM
+dstdir_linux_386   = /usr/bin/watcom
+dstdir_nt_x64      = C:\WATCOM
+dstdir_linux_x64   = /usr/bin/watcom
+!endif
+dstdir = $(dstdir_$(host_os)_$(host_cpu))
+
+langdat_keys_ntx64    = -k ntx64
+langdat_keys_linuxx64 = -k lx64
+langdat_keys = $(langdat_keys_$(bld_os)$(bld_cpu))
+!ifdef %OWUSE_FILENAME_VERSION
+langdat_keys += -k newdbg
+!endif
+
+#mkinf_opt_linux = -utf8
+
+!ifdef __UNIX__
+nulldevice = /dev/null
+!else
+nulldevice = nul
+!endif
+
+!ifdef %OWDEBUGBUILD
+debug = $(%OWDEBUGBUILD)
+!endif
+
+distrib_bindir = ../bin
+
+!ifeq host_cpu x64
+!ifneq bld_cpu x64
+skip_build: .symbolic
+!else ifndef bld64host_$(host_os)
+skip_build: .symbolic
+!endif
+!endif
+
+!ifdef missing
+
+all: .SYMBOLIC
+    langdat -l filelist $(langdat_keys) -r $(bld_ver) c
+    mkinf -x -i../include $(mkinf_opt_$(host_os)) c filelist $(%OWRELROOT)
+    langdat -l filelist $(langdat_keys) -r $(bld_ver) f77
+    mkinf -x -i../include $(mkinf_opt_$(host_os)) f77 filelist $(%OWRELROOT)
+    @rm -rf filelist
+
+!else
+
+all : $(distrib_bindir)/$(installer_c) $(distrib_bindir)/$(installer_f77) .SYMBOLIC
+
+$(distrib_bindir)/$(installer_c) : ../files.dat $(distrib_bindir) $(setup_c) .ALWAYS
+    @rm -f *.__c
+    @%make clean_inf
+    langdat -l filelist $(langdat_keys) -r $(bld_ver) -c $[@ c
+    @copy $]@ setup.exe
+    mkinf -i.. -i../../include -dBldVer=$(bld_ver_str) -dDstDir=$(dstdir) $(mkinf_opt_$(host_os)) c filelist $(%OWRELROOT)
+    @copy setup.inf $(%OWRELROOT)/setup.inf
+    uzip setup.zip instarch.lst $(%OWRELROOT)
+    @rm $(%OWRELROOT)/setup.inf
+    @rm setup.exe
+!ifdef debug
+    @%ren filelist      filelist.__c
+    @%ren instarch.lst  instarch.__c
+    @%ren setup.inf     setup.__c
+!else
+    @%make clean_inf
+!endif
+    mkexezip $@ setup.zip $]@
+    @rm setup.zip
+
+$(distrib_bindir)/$(installer_f77) : ../files.dat $(distrib_bindir) $(setup_f77) .ALWAYS
+    @rm -f *.__f
+    @%make clean_inf
+    langdat -l filelist $(langdat_keys) -r $(bld_ver) -c $[@ f77
+    @copy $]@ setup.exe
+    mkinf -i.. -i../../include -dBldVer=$(bld_ver_str) -dDstDir=$(dstdir) $(mkinf_opt_$(host_os)) f77 filelist $(%OWRELROOT)
+    @copy setup.inf $(%OWRELROOT)/setup.inf
+    uzip setup.zip instarch.lst $(%OWRELROOT)
+    @rm $(%OWRELROOT)/setup.inf
+    @rm setup.exe
+!ifdef debug
+    @%ren filelist      filelist.__f
+    @%ren instarch.lst  instarch.__f
+    @%ren setup.inf     setup.__f
+!else
+    @%make clean_inf
+!endif
+    mkexezip $@ setup.zip $]@
+    @rm setup.zip
+
+$(distrib_bindir) :
+    mkdir $@
+
+clean_inf : .PROCEDURE .EXPLICIT
+    @if exist filelist @rm filelist
+    @if exist instarch.lst @rm instarch.lst
+    @if exist setup.inf @rm setup.inf
+
+clean : .symbolic
+    @if exist $(distrib_bindir)/$(installer_c) rm $(distrib_bindir)/$(installer_c)
+    @if exist $(distrib_bindir)/$(installer_f77) rm $(distrib_bindir)/$(installer_f77)
+    @if exist setup.zip rm setup.zip
+    @if exist setup.exe rm setup.exe
+    @%make clean_inf
+    @rm -f *.__c
+    @rm -f *.__f
+
+!endif

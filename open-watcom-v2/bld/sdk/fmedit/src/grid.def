@@ -1,0 +1,5 @@
+extern bool SnapRectToGrid( RECT * );
+extern void SnapPointToGrid( POINT * );
+extern void SnapPointToResizeGrid( POINT * );
+
+WINEXPORT extern INT_PTR CALLBACK FMGridDlgProc( HWND, UINT, WPARAM, LPARAM );

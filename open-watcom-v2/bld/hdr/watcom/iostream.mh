@@ -1,0 +1,85 @@
+///////////////////////////////////////////////////////////////////////////
+// FILE: iostream/iostream.h (iostreams "top level" file)
+//
+:keep CPP_HDR
+:include crwat.sp
+//
+// Description: This header is part of the C++ standard library. It
+//              declares the global stream objects and includes other
+//              iostream headers as necessary.
+///////////////////////////////////////////////////////////////////////////
+:segment !CNAME
+#ifndef _IOSTREAM_H_INCLUDED
+#define _IOSTREAM_H_INCLUDED
+
+:include readonly.sp
+
+#ifndef _IOSTREAM_INCLUDED
+ #include <iostream>
+#endif
+using std::cin;
+using std::cout;
+using std::cerr;
+using std::clog;
+
+// All included names should also be in the global namespace.
+#ifndef _IOS_H_INCLUDED
+ #include <ios.h>
+#endif
+
+#ifndef _STREAMBUF_H_INCLUDED
+ #include <streambuf.h>
+#endif
+
+#ifndef _ISTREAM_H_INCLUDED
+ #include <istream.h>
+#endif
+
+#ifndef _OSTREAM_H_INCLUDED
+ #include <ostream.h>
+#endif
+
+#endif
+:elsesegment
+#ifndef _IOSTREAM_INCLUDED
+#define _IOSTREAM_INCLUDED
+
+:include readonly.sp
+
+:include cpponly.sp
+
+:include owrtlink.sp
+
+#ifndef _IOS_INCLUDED
+ #include <ios>
+#endif
+
+#ifndef _STREAMBUF_INCLUDED
+ #include <streambuf>
+#endif
+
+#ifndef _ISTREAM_INCLUDED
+ #include <istream>
+#endif
+
+#ifndef _OSTREAM_INCLUDED
+ #include <ostream>
+#endif
+
+enum {
+    DEFAULT_PUTBACK_SIZE = 4,
+    DEFAULT_MAINBUF_SIZE = 512,
+    DEFAULT_BUF_SIZE     = DEFAULT_MAINBUF_SIZE + DEFAULT_PUTBACK_SIZE
+};
+
+// **************************** PREDEFINED STREAMS ***************************
+
+:include nsstd.sp
+  _WPRTLINK extern istream _WCDATA cin;
+  _WPRTLINK extern ostream _WCDATA cout;
+  _WPRTLINK extern ostream _WCDATA cerr;
+  _WPRTLINK extern ostream _WCDATA clog;
+:include nsstdepi.sp
+
+#endif
+:endsegment

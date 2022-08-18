@@ -1,0 +1,18 @@
+//
+//  eh.h        Cover file to include except.h
+//
+:keep CPP_HDR
+:include crwat.sp
+//
+#ifndef _EH_H_INCLUDED
+#define _EH_H_INCLUDED
+
+:include readonly.sp
+
+:include cpponly.sp
+
+#ifndef _EXCEPT_H_INCLUDED
+ #include <except.h>
+#endif
+
+#endif

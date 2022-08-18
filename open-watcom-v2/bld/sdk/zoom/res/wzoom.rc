@@ -1,0 +1,36 @@
+#include <windows.h>
+#include "config.rh"
+#include "wzoom.rh"
+#include "about.rh"
+#include "rcstr.grh"
+#include "uistr.grh"
+#include "banner.h"
+
+#define FIRST_COPYRIGHT_YEAR 1994
+
+"APPLICON" ICON "zoom.ico"
+
+#ifdef JAPANESE
+ #define sp( s1, s2 ) s2
+#else
+ #define sp( s1, s2 ) s1
+#endif
+#include "menu.rc"
+#undef menupick
+
+STRINGTABLE
+BEGIN
+  #ifdef JAPANESE
+    #define pick(c,e,j) c, [ j ]
+  #else
+    #define pick(c,e,j) c, [ e ]
+  #endif
+
+    #include "rcstrmsg.gh"
+    #include "uistrmsg.gh"
+
+    #undef pick
+END
+
+#include "config.dlg"
+#include "about.dlg"

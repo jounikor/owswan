@@ -1,0 +1,116 @@
+#
+# WATCOM Presentation Graphics (PGCHART.LIB)
+#
+proj_name = pgchart
+
+subdir_v2 = v2objs
+
+crwatpro_gsp = crwatpro.gsp
+
+additional_clean = $(crwatpro_gsp)
+
+pgchart_autodepends = .AUTODEPEND
+pgchart_nofpu = 1
+pgchart_distrib_lib = 1
+
+suppress_zc = 1
+
+suffix_register = r
+suffix_stack = s
+
+memory_model_i86 = s
+memory_model_386 = s
+!ifeq host_os os2
+memory_model_386 = f
+!else ifeq host_os win
+memory_model_i86 = l
+!endif
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c: ../c
+
+inc_dirs = -I. -I"../h" -I"../../h" -I"$(mathlib_dir)/h" -I"$(watcom_dir)/h" $(inc_dirs_lang_dos)
+
+extra_cpp_flags = -D_ENABLE_AUTODEPEND -D_FARD=
+
+extra_cpp_flags_i86 = -D_CGRAPH=__loadds
+extra_cpp_flags_386 = -D_CGRAPH=
+!ifeq convention stack
+extra_cpp_flags_386 += -D__STACK
+!endif
+
+extra_c_flags = -os -zl -nm=$[&$(suffix_$(convention)) -fo=$@
+
+extra_c_flags_386_register = -3r
+extra_c_flags_386_stack = -3s
+extra_c_flags_386 = $(extra_c_flags_386_$(convention))
+extra_c_flags_i86 = -nt=GRAPH_TEXT
+
+extra_c_flags_win = -zW
+
+# explicit rules
+#################
+
+all : chart.lib chart2.lib .symbolic
+
+template = &
+    $(_subdir_)pgancom.obj &
+    $(_subdir_)pganms.obj &
+    $(_subdir_)pganpie.obj &
+    $(_subdir_)pganscms.obj &
+    $(_subdir_)pgaxis.obj &
+    $(_subdir_)pgchart.obj &
+    $(_subdir_)pgchrdef.obj &
+    $(_subdir_)pgchrtpi.obj &
+    $(_subdir_)pgdfault.obj &
+    $(_subdir_)pghlabel.obj &
+    $(_subdir_)pginit.obj &
+    $(_subdir_)pglegend.obj &
+    $(_subdir_)pgmisc.obj &
+    $(_subdir_)pgpal.obj &
+    $(_subdir_)pgscale.obj &
+    $(_subdir_)pgsctter.obj &
+    $(_subdir_)pgstyle.obj &
+    $(_subdir_)pgtitle.obj &
+    $(_subdir_)pgvars.obj &
+    $(_subdir_)pgvlabel.obj
+
+#
+# LIB
+#
+_subdir_ =
+libtarg_prebuild_objs = pgchart.gh graph.gh
+libtarg_objs          = $(template)
+libtarg_name          = chart
+!include libtarg.mif
+
+#
+# LIB version 2
+#
+_subdir_ = $(subdir_v2)/
+libtarg_prebuild_objs = $(subdir_v2) pgchart.gh graph2.gh
+libtarg_objs          = $(template)
+libtarg_name          = chart2
+!include libtarg.mif
+
+#
+# rc and others
+#
+wsplice_opts_dos = -kDOS
+wsplice_opts_os2 = -kDOS
+wsplice_opts_qnx = -kQNX -u
+wsplice_opts_win = -kDOS
+
+!include $(graphlib_dir)/headers.mif
+
+extra_cpp_v2_flags = -DVERSION2
+extra_a_v2_flags = -DVERSION2
+
+defrule_key = v2
+!include defrule.mif

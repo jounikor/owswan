@@ -1,0 +1,23 @@
+!ifdef %OWUSE_FILENAME_VERSION
+dllname = codevi$(bld_ver)
+!else
+dllname = codeview
+!endif
+
+imp_objs = &
+        cvmisc.obj &
+        cvld.obj &
+        cvmod.obj &
+        cvtype.obj &
+        cvsym.obj &
+        cvcue.obj &
+        cvvirt.obj &
+        cvloc.obj &
+        demangle.obj
+
+extra_incs = -I"$(lib_misc_dir)/h"
+extra_srcs = $(lib_misc_dir)/c
+
+extra_dllbase = $(dip_dllbase_$(host_os)_$(host_cpu)_codeview)
+
+!include ../../master.mif

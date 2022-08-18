@@ -1,0 +1,65 @@
+proj_name = dwarfr
+
+!ifndef dwarfr_autodepends
+dwarfr_autodepends = .AUTODEPEND
+!endif
+
+dwarfr_nofpu = 1
+
+!ifeq host_cpu x64
+sys_dll = 1
+!endif
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c: ../c
+
+inc_dirs = -I"../h"
+
+!ifeq use_virtmem 1
+extra_cpp_flags = -DUSE_VIRTMEM
+!endif
+
+extra_c_flags_i86 = -zc -zu
+extra_c_flags_386 = -zc
+extra_c_flags_win = -zW
+
+extra_c_flags_drutils  = -I"$(lib_misc_dir)/h"
+extra_c_flags_drsearch = -I"$(posix_dir)/h"
+
+# explicit rules
+#################
+
+#
+# LIB
+#
+!ifeq use_virtmem 1
+libtarg_objs_virt = virtmem.obj
+!else
+libtarg_objs_virt = virtstub.obj
+!endif
+libtarg_objs = &
+    drarange.obj &
+    drdecnam.obj &
+    drenum.obj   &
+    drfdkids.obj &
+    drgetref.obj &
+    drgettab.obj &
+    drinfo.obj   &
+    drinit.obj   &
+    drline.obj   &
+    drloc.obj    &
+    drpubnam.obj &
+    drscope.obj  &
+    drsearch.obj &
+    drstack.obj  &
+    drtype.obj   &
+    drutils.obj  &
+    $(libtarg_objs_virt)
+!include libtarg.mif
+

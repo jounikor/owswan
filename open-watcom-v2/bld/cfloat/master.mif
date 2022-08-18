@@ -1,0 +1,33 @@
+proj_name       = cf
+
+cf_autodepends = .autodepend
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c: $(cfloat_dir)/c
+
+inc_dirs = -I"../h"
+
+# explicit rules
+#################
+
+#
+# LIB
+#
+libtarg_objs = &
+    cfconv.obj &
+    cfdiv.obj &
+    cfinvers.obj &
+    cfmath.obj &
+    cfmem.obj &
+    cfmul.obj &
+    cftof.obj &
+    cfutil.obj &
+    u32moddi.obj
+!include libtarg.mif
+

@@ -1,0 +1,10 @@
+#                       d16 d32 dpm nt  nta ntp nvc ncl nvl nll o16 o32 q16 q32 w16 w32 l32 lpc lmp rdu rdk
+#===========================================================================================================
+!inject wsccrt0.obj     d16
+
+objsuffix=files
+!include ../../../../objlist.mif
+objsuffix=
+
+086_option_zdp =-zdp
+086_option_of =-of

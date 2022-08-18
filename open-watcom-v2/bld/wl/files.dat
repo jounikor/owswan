@@ -1,0 +1,81 @@
+#######################
+# DOS and Windows 3.x
+#
+[ DEFAULT type="e" dir="binw" cond="doshost winhost |" where="c jc f77 jf77" ]
+type="e" usr="wlink.exe"        old="bin"
+type="e" usr="ms2wlink.exe"     old="binb"
+type="e" usr="fcenable.exe"     old="binb"
+type="e" usr="exe2bin.exe"
+type="s" usr="wlink.lnk"        old="bin"
+
+#######################
+# OS/2
+#
+[ DEFAULT dir="binp" cond="os2host" where="c jc f77 jf77" ]
+type="e" usr="wlink.exe"
+type="d" usr="wlinkd.dll"       dir="binp/dll"
+type="e" usr="ms2wlink.exe"
+type="e" usr="fcenable.exe"
+type="e" usr="exe2bin.exe"
+type="s" usr="wlink.lnk"
+
+#######################
+# Windows NT - 386
+#
+[ DEFAULT dir="binnt" cond="wnthost" where="c jc f77 jf77 ac" ]
+type="e" usr="wlink.exe"
+type="d" usr="wlinkd.dll"
+type="e" usr="ms2wlink.exe"
+type="e" usr="fcenable.exe"
+type="e" usr="exe2bin.exe"
+type="s" usr="wlink.lnk"
+
+#######################
+# Windows NT - AXP
+#
+[ DEFAULT dir="axpnt" cond="alphahost" where="ac" ]
+type="e" usr="wlink.exe"
+type="d" usr="wlinkd.dll"
+type="e" usr="ms2wlink.exe"
+type="e" usr="fcenable.exe"
+type="e" usr="exe2bin.exe"
+type="s" usr="wlink.lnk"
+
+#######################
+# Windows NT - X64
+#
+[ DEFAULT dir="binnt64" cond="wnt64host" where="c jc f77 jf77" keys="ntx64" ]
+type="e" usr="wlink.exe"
+type="d" usr="wlinkd.dll"
+type="e" usr="ms2wlink.exe"
+type="e" usr="fcenable.exe"
+type="e" usr="exe2bin.exe"
+type="s" usr="wlink.lnk"
+
+#######################
+# Linux - 386
+#
+[ DEFAULT dir="binl" cond="lnxhost" where="c f77 jc jf77" ]
+type="e" usr="wlink"
+type="e" usr="ms2wlink"
+type="e" usr="fcenable"
+type="e" usr="exe2bin"
+type="s" usr="wlink.lnk"
+
+#######################
+# Linux - X64
+#
+[ DEFAULT dir="binl64" cond="lnx64host" where="c f77 jc jf77" keys="lx64" ]
+type="e" usr="wlink"
+type="e" usr="ms2wlink"
+type="e" usr="fcenable"
+type="e" usr="exe2bin"
+type="s" usr="wlink.lnk"
+
+#######################
+# RDOS - 386
+#
+[ DEFAULT dir="rdos" cond="rdoshost" where="c jc f77 jf77" ]
+type="e" usr="wlink.exe"
+type="e" usr="exe2bin.exe"
+type="s" usr="wlink.lnk"

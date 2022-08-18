@@ -1,0 +1,17 @@
+objunixtimeroot = &
+    int.obj
+
+objunixsizeroot = &
+    biosunix.obj
+
+objunixsize = &
+    unixsys.obj &
+    unixdir.obj &
+    unixmous.obj &
+    unixmain.obj &
+    time.obj &
+    spawn.obj &
+    stat2.obj
+
+extraobjs = $(objunixsize)
+extraobjsroot = $(objunixtimeroot) $(objunixsizeroot)

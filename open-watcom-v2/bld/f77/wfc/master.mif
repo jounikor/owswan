@@ -1,0 +1,138 @@
+proj_name = wfc
+
+!ifndef wfc_autodepends
+wfc_autodepends = .AUTODEPEND
+!endif
+
+additional_clean = *.grh
+
+wfc_trmem = 1
+
+exename_i86 = wfc
+exename_386 = wfc386
+exename_axp = wfcaxp
+exename_ppc = wfcppc
+exetarg_name = $(exename_$(target_cpu))
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include wres.mif
+!include trmem.mif
+
+!include $(cg_dir)/mif/fe.mif
+!include asclient.mif
+
+!include ../../files.mif
+
+#
+# cflags
+#
+.c: ..;../../c;$(asminline_c);$(trmem_dir);$(watcom_dir)/c;$(fe_misc_dir)/h
+
+inc_dirs= -I. -I.. -I"../../h" -I"../../../h" $(cg_inc_dirs) $(dwarfw_inc_dirs) -I"$(comp_cfg_dir)/h" &
+    -I"$(fe_misc_dir)/h" $(asminline_inc_dirs) -I"$(clib_dir)/h" -I"$(lib_misc_dir)/h"
+
+extra_cpp_flags =
+!ifeq dll_cg 1
+extra_cpp_flags += -D_CGDLL
+!endif
+
+extra_cpp_flags_fmemmgr = $(trmem_cpp_flags)
+extra_cpp_flags_trmemcvr = $(trmem_cpp_flags)
+
+extra_c_flags_trmemcvr = $(trmem_cover_cflags)
+
+#
+# aflags
+#
+!ifeq host_cpu axp
+.asm: ../../../asmaxp
+!endif
+
+extra_a_flags_axp = -oc
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_prebuild_objs = $(asminline_deps) wasmcmsg.grh usage.gh wfcmsgs.gh code$(target_cpu).gh
+exetarg_objs          = $(fobjs) $(trmem_objs) $(trmemcvr_objs)
+exetarg_libs          = $(asminline_lib) $(cg_libs) $(wres_lib)
+exetarg_res_version_nt_386 = exever.res
+exetarg_res_version_nt_x64 = exever.res
+exetarg_res_wresui    = wresui.res
+!include exetarg.mif
+
+wf77aux.obj : wf77aux.c regs.c
+
+#
+# rc and others
+#
+verrc_exe = $(exetarg_name)
+!include verrc.mif
+
+rcui_inc_dirs = -I. -I.. -I"../../h" -I"../../../h" $(asminline_inc_dirs) -I"$(comp_cfg_dir)/h" -I"$(fe_misc_dir)/h"
+
+wresui.res : ../../h/wfc.rc wasmcmsg.grh ../../h/wfc.rh
+    @%make echo_rc
+    $(rcui8)
+
+#msgencod_enc_linux = -utf8
+
+!ifeq target_cpu axp
+
+codeaxp.gh :
+    echo // Dummy file > $@
+
+!else ifeq target_cpu ppc
+
+codeppc.gh :
+    echo // Dummy file > $@
+
+!else ifeq target_cpu mps
+
+codemps.gh :
+    echo // Dummy file > $@
+
+!else  # Intel i86 or 386
+
+code$(target_cpu).gh : ./mkcode.exe xcode$(target_cpu).tmp
+    @%make echo_execute
+    $(noecho)$[@ $]@ $@
+!endif
+
+target_as_axp   = bwasaxp -zq -w8
+target_as_i86   = bwasm -zq -w8
+target_as_386   = bwasm -zq -w8 -3
+target_as_ppc   = bwasppc -zq -w8
+target_as_mps   = bwasmps -zq -w8
+
+xcode$(target_cpu).tmp: ../../a/code$(target_cpu).asm
+    @%make echo_aslink
+    $(noecho)*$(target_as_$(target_cpu)) -I"$(watcom_dir)/h" -fo=.obj $[@
+    $(noecho)*bwlink system bin op quiet file code$(target_cpu).obj name $@
+
+./mkcode.exe: mkcode.c
+    @%make echo_bldcl
+    $(bld_cl) $[@ $(bld_clflags) $(bld_ldflags)
+
+wfcmsgs.gh wfcmsgs.grh wfcgrps.gh wfcattrs.gh : ../../gml/wfcmsgs.gml
+    @%make echo_msgencod
+    $(msgencod) -s -ip -rc=MSG_LANG_BASE -utf8 $(msgencod_enc_$(host_os)) $[@ wfcmsgs.gh wfcmsgs.grh wfcgrps.gh wfcattrs.gh
+
+# .gh options and targets for various hosts
+!ifdef exetarg_qnx_res
+optencod_opt_qnx    = -u=$(exetarg_qnx_res)
+!endif
+#optencod_enc_linux  = -utf8
+optencod_targets = $(target_cpu) $(host_os)
+!ifeq release 0
+optencod_targets += dbg
+!endif
+
+usage.gh $(exetarg_$(host_os)_res) : ../../../gml/wfxopts.gml $(__MAKEFILES__)
+    @%make echo_optencod
+    $(optencod) -rc=MSG_USAGE_BASE -utf8 $(optencod_opt_$(host_os)) $[@ . . $@ $(optencod_targets)

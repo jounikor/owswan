@@ -1,0 +1,113 @@
+/*
+ *  sys/time.h      POSIX Time functions
+ *
+:include crwatcnt.sp
+ */
+#ifndef _SYS_TIME_H_INCLUDED
+#define _SYS_TIME_H_INCLUDED
+
+:include readonly.sp
+
+:include owrtlink.sp
+
+:segment LINUX
+:include time_t.sp
+
+:endsegment
+:include cpluspro.sp
+
+:segment LINUX | RDOS
+
+:segment LINUX
+:include lnxkpack.sp
+:elsesegment
+:include pshpackl.sp
+:endsegment
+
+/* I am not sure where this should go, so I am putting it here for now.
+ * It should probably exist in a separate header file like sys/select.h
+ * but it is not clear to me exactly where yet. KB.
+ */
+
+/* The fd_set member is required to be an array of longs.  */
+typedef long fd_mask;
+
+#define FD_SETSIZE          1024
+#define __NFDBITS           (8 * sizeof (fd_mask))
+#define __FDELT(__d)        ((__d) / __NFDBITS)
+#define __FDMASK(__d)       ((fd_mask) 1 << ((__d) % __NFDBITS))
+#define __FDS_BITS(__set)   ((__set)->fds_bits)
+
+/* fd_set for select */
+typedef struct {
+    fd_mask fds_bits[FD_SETSIZE / __NFDBITS];
+} fd_set;
+
+/* We don't use `memset' because this would require a prototype and
+ * the array isn't too big.
+ */
+#define FD_ZERO(__set) \
+    do { \
+        unsigned int __i; \
+        fd_set *__arr = (__set); \
+        for(__i = 0; __i < sizeof(fd_set) / sizeof(fd_mask); ++__i) \
+            __FDS_BITS(__arr)[__i] = 0; \
+    } while( 0 )
+#define FD_SET(__d,__set)   (__FDS_BITS(__set)[__FDELT (__d)] |= __FDMASK(__d))
+#define FD_CLR(__d,__set)   (__FDS_BITS(__set)[__FDELT (__d)] &= ~__FDMASK(__d))
+#define FD_ISSET(__d,__set) (__FDS_BITS(__set)[__FDELT (__d)] & __FDMASK(__d))
+
+:elsesegment
+:include pshpackl.sp
+
+:endsegment
+/*
+ * Structure returned by gettimeofday() system call,
+ * and used in other calls.
+ */
+struct timezone {
+    int tz_minuteswest;     /* minutes west of Greenwich */
+    int tz_dsttime;         /* type of dst correction */
+};
+
+:include timeval.sp
+
+#define DST_NONE        0       /* not on dst */
+#define DST_USA         1       /* USA style dst */
+#define DST_AUST        2       /* Australian style dst */
+#define DST_WET         3       /* Western European dst */
+#define DST_MET         4       /* Middle European dst */
+#define DST_EET         5       /* Eastern European dst */
+#define DST_CAN         6       /* Canada */
+#define DST_GB          7       /* Great Britain and Eire */
+#define DST_RUM         8       /* Romania */
+#define DST_TUR         9       /* Turkey */
+#define DST_AUSTALT     10      /* Australian style with shift in 1986 */
+
+/*
+ * Structure used by getitimer() and setitimer() system calls.
+ */
+struct itimerval {
+    struct timeval it_interval; /* Value to put into `it_value' when the timer expires. */
+    struct timeval it_value;    /* Time to the next timer expiration. */
+};
+
+#define ITIMER_REAL     0       /* Timers run in real time. */
+#define ITIMER_VIRTUAL  1       /* Timers run only when the process is executing. */
+#define ITIMER_PROF     2       /* Process or kernel on its behalf is executing. */
+
+_WCRTLINK extern int gettimeofday( struct timeval *__tv, struct timezone *__tz );
+_WCRTLINK extern int settimeofday( const struct timeval *__tv, const struct timezone *__tz );
+:segment LINUX | RDOS
+_WCRTLINK extern int select( int __width, fd_set *__readfds, fd_set *__writefds, fd_set *__exceptfds, struct timeval *__timeout );
+:endsegment
+_WCRTLINK extern int getitimer( int __which, struct itimerval *__value );
+_WCRTLINK extern int setitimer( int __which, const struct itimerval *__value, struct itimerval *__ovalue );
+::_WCRTLINK extern int adjtime( struct timeval *__itv, struct timeval *__otv );
+::_WCRTLINK extern int utimes( char *__path, struct timeval *__tvp );
+
+:include poppack.sp
+
+:include cplusepi.sp
+
+#endif /* !_SYS_TIME_H_INCLUDED */

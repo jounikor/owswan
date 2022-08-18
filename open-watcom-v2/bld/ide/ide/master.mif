@@ -1,0 +1,107 @@
+proj_name = ide
+
+sys_windowed = 1
+
+!ifndef ide_autodepends
+ide_autodepends = .autodepend
+!endif
+
+target_os2 = os2
+target_nt  = win
+target_win = win
+
+docs_host_dir = $(docs_dir)/$(host_os)
+
+additional_clean = $(docs_host_dir)/ide.gh
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+!include $(idelib_dir)/client.mif
+!include $(wclass_dir)/client.mif
+!include $(gui_dir)/client.mif
+!include $(commonui_dir)/client.mif
+!include $(wpi_dir)/client.mif
+
+!include wres.mif
+
+!include ../objects.mif
+
+#
+# cflags
+#
+c_path_os2  = $(batch_dir)/os2
+c_path_nt   = $(batch_dir)/nt
+c_path_win  = $(batch_dir)/dos;$(batch_dir)/os2
+
+.c : ../cpp;$(c_path_$(host_os));$(watcom_dir)/c
+.cpp : ../cpp
+
+inc_dirs_win = -I"$(batch_dir)/dos"
+inc_dirs = -I"../h" $(wclass_inc_dirs) $(idelib_inc_dirs) $(gui_inc_dirs) $(commonui_inc_dirs) &
+    $(wpi_inc_dirs) -I"$(docs_host_dir)" -I"$(editdll_dir)" -I"$(rcsdll_dir)" -I"$(batch_dir)/h"
+
+extra_cpp_flags     = -DGUI_IS_GUI
+extra_cpp_flags_os2 = -D__OS2_PM__
+
+!ifeq host_os win
+extra_cpp_flags_link  = -DSERVER
+!endif
+
+!ifdef __WATCOM_TOOLS__
+!ifeq host_os win
+extra_c_flags_link  += -3
+!endif
+!endif
+
+!ifdef __WATCOM_TOOLS__
+extra_cxx_flags_i86 = -zc -zm
+!endif
+
+#
+# lflags
+#
+extra_l_flags   = op eliminate op description 'Open Watcom IDE'
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_prebuild_objs = $(docs_host_dir)/ide.gh
+exetarg_objs          = $(objs)
+exetarg_libs          = $(idelib_lib) $(wclass_lib) $(gui_lib) $(wres_lib)
+exetarg_res_version_res_exe_nt_386 = exever.res
+exetarg_res_version_res_exe_nt_x64 = exever.res
+exetarg_nt_manif_386  = ntmanif.res
+exetarg_nt_manif_x64  = ntmanif.res
+exetarg_res           = $(proj_name).res
+!include exetarg.mif
+
+#
+# rc and others
+#
+!include verrc.mif
+
+ide_rc_inc_dirs = -I"../res/$(target_$(host_os))" -I"../res"
+
+rc_inc_dirs = $(ide_rc_inc_dirs) $(gui_rc_inc_dirs)
+
+$(exetarg_res) : ../res/$(target_$(host_os))/ide.rc $(gui_dir)/h/gui.rc
+    @%make echo_rc
+    $(rc) $(rc_flags) $(rc_inc_path) $[@ -fo=$@
+
+ntmanif.res : ../res/win/ntmanif.rc
+    @%make echo_rc
+    $(rc) $(rc_flags) -I"../res/win" $(inc_dirs_sys_nt) $< -fo=$@
+
+curr_dir=$+$(%__CWD__)$-
+
+$(docs_host_dir) : .SYMBOLIC
+    $(noecho)cd $@
+
+$(docs_host_dir)/ide.gh : $(docs_host_dir) .ALWAYS
+    $(noecho)!$(nested_wmake) -h -f ../mif/onebook.mif hbook=ide header=1 dotarget=$(host_os)
+    $(noecho)cd $(curr_dir)

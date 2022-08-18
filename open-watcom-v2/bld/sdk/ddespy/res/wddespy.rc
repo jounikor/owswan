@@ -1,0 +1,46 @@
+#include <windows.h>
+#include "ddemenu.rh"
+#include "rcstr.grh"
+#include "uistr.grh"
+#include "cbfilt.rh"
+#include "msgfilt.rh"
+#include "about.rh"
+#include "banner.h"
+
+#define FIRST_COPYRIGHT_YEAR 1994
+
+"APPLICON" ICON "ddespy.ico"
+
+"CONV"    BITMAP "conv.bmp"
+"LINK"    BITMAP "link.bmp"
+"STRING"  BITMAP "string.bmp"
+"SERVER"  BITMAP "server.bmp"
+"LOG"     BITMAP "log.bmp"
+"MARK"    BITMAP "mark.bmp"
+"ERASE"   BITMAP "erase.bmp"
+"HWNDAKA" BITMAP "hwndaka.bmp"
+"CONVAKA" BITMAP "convaka.bmp"
+"TASKAKA" BITMAP "taskaka.bmp"
+
+#include "ddemenu.rc"
+
+STRINGTABLE
+BEGIN
+  #ifdef JAPANESE
+    #define pick(c,e,j) c, [ j ]
+  #else
+    #define pick(c,e,j) c, [ e ]
+  #endif
+
+    #include "rcstrmsg.gh"
+    #include "uistrmsg.gh"
+
+    #undef pick
+END
+
+#include "msgfilt.dlg"
+#include "cbfilt.dlg"
+#include "log.rc"
+#include "alias.rc"
+#include "mark.rc"
+#include "about.dlg"

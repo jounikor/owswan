@@ -1,0 +1,50 @@
+proj_name       = owl
+owl_autodepends = .autodepend
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c: $(owl_dir)/c
+
+inc_dirs = -I"../h"
+
+# explicit rules
+#################
+
+#
+# LIB
+#
+libtarg_objs = owl.obj &
+    owbuffer.obj &
+    owcoff.obj &
+    owdebug.obj &
+    owelf.obj &
+    owemit.obj &
+    owfile.obj &
+    owreloc.obj &
+    owsect.obj &
+    owstring.obj &
+    owsymbol.obj &
+    owsymdmp.obj &
+    log.obj
+!include libtarg.mif
+
+#
+# EXE's
+#
+exetarg_objs = bufftest.obj $(libtarg_objs)
+exetarg_name = bufftest
+!include exetarg.mif
+
+exetarg_objs = strtest.obj $(libtarg_objs)
+exetarg_name = strtest
+!include exetarg.mif
+
+exetarg_objs = patchtst.obj $(libtarg_objs)
+exetarg_name = patchtst
+!include exetarg.mif
+

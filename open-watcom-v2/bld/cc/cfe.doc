@@ -1,0 +1,46 @@
+
+        C Front End Notes
+        -----------------
+
+1. Major header files
+   The major header files are cvars.h, ctypes.h and cops.h. Most source
+   files need only include cvars.h.
+   cvars.h      - primary include file. The file includes most of the
+                  other header files. Most global data variables are
+                  declared here using the GLOBAL macro. All function
+                  prototypes are also in this file.
+   ctypes.h     - defines common data structures, enum constants
+   cops.h       - defines parse tree operators and parse tree data structures
+   cerrs.h      - error messages
+
+2. Adding a new keyword:
+   - the cc/h directory contains 4 files containing list of keywords
+   c.key     - normal standard C keywords
+   seh.key   - keywords for structured exception handling
+   pc.key    - keywords generally associated with PC implementations
+
+   e.g. to add __int64 as a keyword
+   - add entry to pc.key
+     The second column indicates what token class this new token
+     belongs to. Token classes start with TC_ and can be found in
+     ctokens.h. Since 'int' and 'long' are listed as TC_KEYWORD,
+     we should make '__int64' a TC_KEYWORD.
+   - wmake will run findhash which tries to find a perfect hash for
+     the list of keywords it is given. If it is successful, it will
+     create 2 files: weights.gh and keywords.gh
+
+3. Adding a new error message:
+   All error messages are added to cerrs.gml in the cc/gml directory. The
+   GML file is included into the C compiler error message reference book;
+   this is an excellent mechanism to ensure that the documentation matches
+   reality. Messages come in several groups:
+
+   - warning level 1
+   - warning level 2
+   - warning level 3
+   - errors
+   - notes
+
+   The warning levels are defined using the warn() macro in cwngs.h. Note
+   that a warn() macro is only needed for warnings and not error or note
+   messages.

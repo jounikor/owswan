@@ -1,0 +1,52 @@
+proj_name = cpplib
+
+x_subdir = xobjs
+
+!include $(cpplib_dir)/master.mif
+
+# make targets for libraries
+#
+# source-dependent targets are found in macros:
+#   objs_asm:       assembler
+#   objs_c:         C
+#   objs_cpp:       C++
+#
+_subdir_ = $(x_subdir)/
+xobjs = $+ $(objs_asm) $(objs_c) $(objs_cpp) $-
+_subdir_ =
+objs = $+ $(objs_asm) $(objs_c) $(objs_cpp) $-
+files = $+ $(static_objs) $-
+
+.cpp : ../../cpp
+
+.asm : ../../a;../../inc
+
+!ifeq release 0
+objs += $(dbg_objs_c)
+xobjs += $(dbg_objs_c)
+!endif
+
+!ifndef target_objs
+target_objs = $(objs)
+!endif
+
+!ifndef target_xobjs
+target_xobjs = $(xobjs)
+!endif
+
+libs : .symbolic $(target_lib) $(target_lib_x) $(files)
+    @%null
+
+$(target_lib) : $(dep_dirs) $(target_objs) $(__MAKEFILES__)
+    $(noecho)%create $^&.lbc
+    @for %i in ($(target_objs)) do @%append $^&.lbc +%i
+    @%make echo_lib
+    $(librarian) $(plib_lib_flags) $@ @$^&.lbc
+
+!ifdef target_lib_x
+$(target_lib_x) : $(dep_dirs_x) $(target_xobjs) $(__MAKEFILES__)
+    $(noecho)%create $^&.lbc
+    @for %i in ($(target_xobjs)) do @%append $^&.lbc +%i
+    @%make echo_lib
+    $(librarian) $(plib_lib_flags) $@ @$^&.lbc
+!endif

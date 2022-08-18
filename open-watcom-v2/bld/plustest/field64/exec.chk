@@ -1,0 +1,9 @@
+PASS compiling test1
+*****Test completed successfully*****
+PASS executing test1
+PASS compiling test2
+*****Test completed successfully*****
+PASS executing test2
+PASS compiling test3
+*****Test completed successfully*****
+PASS executing test3

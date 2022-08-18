@@ -1,0 +1,87 @@
+///////////////////////////////////////////////////////////////////////////
+// FILE: new/new.h (Dynamic memory support)
+//
+:keep CPP_HDR
+:include crwat.sp
+//
+// Description: This header is part of the C++ standard library.
+///////////////////////////////////////////////////////////////////////////
+:segment !CNAME
+#ifndef _NEW_H_INCLUDED
+#define _NEW_H_INCLUDED
+
+:include readonly.sp
+
+#ifndef _NEW_INCLUDED
+ #include <new>
+#endif
+:: No using declarations here. <new.h> exists only to support legacy
+:: programs. Thus access to new features (like std::bad_alloc) via
+:: <new.h> is not provided.
+using std::new_handler;
+using std::set_new_handler;
+
+#endif
+:elsesegment
+#ifndef _NEW_INCLUDED
+#define _NEW_INCLUDED
+
+:include readonly.sp
+
+:include cpponly.sp
+
+:include owrtlink.sp
+
+#ifndef _CSTDDEF_INCLUDED
+ #include <cstddef>
+#endif
+
+#ifndef _EXCEPTION_INCLUDED
+ #include <exception>
+#endif
+
+:include cpppfv.sp
+
+extern void *operator new( std::size_t );
+extern void *operator new( std::size_t, void * );
+extern void *operator new []( std::size_t );
+extern void *operator new []( std::size_t, void * );
+extern void operator delete( void * );
+extern void operator delete []( void * );
+_WPRTLINK extern PFU _set_new_handler( PFU );
+:segment DOS | LINUX | RDOS
+#if defined(__SW_BR) || defined(_RTDLL)
+ _WPRTLINK extern _PUP _set_op_new( _PUP );
+ _WPRTLINK extern _PUP _set_op_new_array( _PUP );
+ _WPRTLINK extern _PVV _set_op_delete( _PVV );
+ _WPRTLINK extern _PVV _set_op_delete_array( _PVV );
+#endif
+:endsegment
+
+:include nsstd.sp
+    typedef void (_WCCALLBACK *new_handler)();
+    _WPRTLINK extern new_handler set_new_handler( new_handler );
+:include nsstdepi.sp
+
+// NOTE: Open Watcom currently does not throw std::bad_alloc on
+// allocation failures. This class is defined here to so that programs
+// that reference it will at least compile. Consider this a first step
+// in building an exception throwing implementation of operator new.
+
+:include nsstd.sp
+  class bad_alloc : public exception {
+  public:
+    bad_alloc( ) _WCTHROWS() :
+      exception( "unable to allocate memory" ) { }
+
+    bad_alloc( const bad_alloc & ) _WCTHROWS() { }
+
+    bad_alloc & operator=( bad_alloc & ) _WCTHROWS()
+        { return *this; }
+
+    virtual ~bad_alloc( ) _WCTHROWS() { }
+  };
+:include nsstdepi.sp
+
+#endif
+:endsegment

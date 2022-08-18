@@ -1,0 +1,72 @@
+proj_name = flib
+
+!ifndef flib_autodepends
+flib_autodepends = .AUTODEPEND
+!endif
+
+additional_clean = *.gc
+
+# remap fpu to processor
+flib_086 = 086
+flib_087 = 086
+flib_286 = 286
+flib_287 = 286
+flib_386 = 386
+flib_387 = 386
+flib_axp = axp
+flib_mps = mps
+flib_ppc = ppc
+
+flib_host_cpu_086 = i86
+flib_host_cpu_286 = i86
+flib_host_cpu_386 = 386
+flib_host_cpu_axp = axp
+flib_host_cpu_ppc = ppc
+host_cpu = $(flib_host_cpu_$(flib_$(processor)))
+
+flib_host_os_msdos   = dos
+flib_host_os_winnt   = nt
+flib_host_os_windows = win
+flib_host_os_os2     = os2
+flib_host_os_qnx     = qnx
+flib_host_os_netware = nov
+flib_host_os_linux   = linux
+host_os = $(flib_host_os_$(system))
+
+!include cproj.mif
+!include deftarg.mif
+
+!include ../../flags.mif
+!include ../../objects.mif
+!include ../../librules.mif
+
+#-------------------------------------------------------------------------------
+
+asm_src_i86 = ../../asmi86;../../../asmi86
+asm_src_386 = ../../asm386;../../../asm386
+asm_src_axp = ../../asmaxp;../../../asmaxp
+asm_src_ppc = ../../asmppc;../../../asmppc
+
+.asm: $(asm_src_$(host_cpu))
+
+.c: ../../c;../../c/math;../../c/ifns;../../c/ufns
+
+#-------------------------------------------------------------------------------
+
+$(libname).lib : errcod.gh $(files) $(__MAKEFILES__)
+    $(noecho)%create $(libname).lbc
+    @for %%f in ($(files)) do @%append $(libname).lbc +%%f
+    @%make echo_lib
+    $(librarian) $(flib_lib_flags) $@ @$(libname).lbc
+
+errmsg.grc errgrp.gc errcod.gh: ../../../h/error.msg
+    errsrc $[@ eo r
+
+jerrmsg.grc:  ../../../h/error.msg
+    errsrc $[@ jo r
+
+rcui_inc_dirs = -I. -I.. -I"../../h" -I"../../../h" $(asminline_inc_dirs) -I"$(comp_cfg_dir)/h" -I"$(fe_misc_dir)/h"
+
+errmsg.res : ../../h/errmsg.rc errmsg.grc jerrmsg.grc ../../../h/errcod.h errcod.gh
+    @%make echo_rc
+    $(rcui8)

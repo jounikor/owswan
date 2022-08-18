@@ -1,0 +1,139 @@
+# VI component of install manifest
+
+#######################
+# DOS and Windows 3.x
+#
+[ DEFAULT dir="binw" cond="doshost winhost |" where="c f77 jc jf77" ]
+type="e" usr="vi.exe"
+type="e" usr="ctags.exe"
+type="e" usr="edbind.exe"
+
+[ DEFAULT dir="binw" cond="winhost" where="c f77 jc jf77" ]
+type="e" usr="viw.exe"
+type="e" usr="viw32.exe"
+
+#######################
+# OS/2
+#
+[ DEFAULT dir="binp" cond="os2host" where="c jc f77 jf77" ]
+type="e" usr="vi.exe"
+type="e" usr="ctags.exe"
+type="e" usr="edbind.exe"
+
+#######################
+# Windows NT - 386
+#
+[ DEFAULT dir="binnt" cond="wnthost" where="c f77 jc jf77 ac" ]
+type="e" usr="vi.exe"
+type="e" usr="viw.exe"
+type="e" usr="ctags.exe"
+type="e" usr="edbind.exe"
+
+#######################
+# Windows NT - AXP
+#
+[ DEFAULT dir="axpnt" cond="alphahost" where="ac" ]
+type="e" usr="vi.exe"
+type="e" usr="viw.exe"
+type="e" usr="ctags.exe"
+type="e" usr="edbind.exe"
+
+#######################
+# Windows NT - X64
+#
+[ DEFAULT dir="binnt64" cond="wnt64host" where="c f77 jc jf77" keys="ntx64" ]
+type="e" usr="vi.exe"
+type="e" usr="viw.exe"
+type="e" usr="ctags.exe"
+type="e" usr="edbind.exe"
+
+#######################
+# Linux - 386
+#
+[ DEFAULT dir="binl" cond="lnxhost" where="c f77 jc jf77" ]
+type="e" usr="vi"
+type="e" usr="ctags"
+type="e" usr="edbind"
+
+#######################
+# Linux - X64
+#
+[ DEFAULT dir="binl64" cond="lnx64host" where="c f77 jc jf77" keys="lx64" ]
+type="e" usr="vi"
+type="e" usr="ctags"
+type="e" usr="edbind"
+
+#######################
+# .VI scripts
+#
+[ DEFAULT type="s" dir="eddat" where="c f77 jc jf77 ac" ]
+
+usr="qall.vi"
+usr="rcs.vi"
+usr="err.vi"
+usr="wrme.vi"
+usr="forceout.vi"
+usr="cmdme.vi"
+usr="unlock.vi"
+usr="chkout.vi"
+usr="proc.vi"
+usr="toggle.vi"
+usr="fin.vi"
+usr="lnum.vi"
+usr="qh.vi"
+usr="qh2.vi"
+usr="tryme.vi"
+usr="ddesinit.vi"
+usr="ideact.vi"
+usr="mcselw.vi"
+usr="mlselw.vi"
+usr="mcsel.vi"
+usr="untitled.vi"
+usr="dde.vi"
+usr="menu.vi"
+usr="rdme.vi"
+usr="mlsel.vi"
+usr="wqh.vi"
+usr="wqh2.vi"
+usr="menuwin.vi"
+usr="ddecb.vi"
+usr="rdmewin.vi"
+usr="user.vi"
+usr="writeall.vi"
+usr="writewin.vi"
+usr="ed.cfg"
+usr="weditor.ini"       cond="winhost wnthost alphahost | |"
+usr="debug.cfg"
+usr="error.dat"
+usr="keys.dat"
+usr="winbind.dat"
+usr="edbind.dat"
+usr="skel.dat"
+usr="start.hlp"
+usr="cmd.hlp"
+usr="set.hlp"
+usr="key.hlp"
+usr="script.hlp"
+usr="regexp.hlp"
+usr="bindvi.bat"
+usr="bindvi.cmd"
+usr="clibhelp.vi"
+usr="mfchelp.vi"        where="c jc ac"
+usr="fhelp.vi"          where="f77 jf77"
+usr="awk.dat"
+usr="basic.dat"
+usr="bat.dat"
+usr="c.dat"
+usr="cpp.dat"
+usr="dbtest.dat"
+usr="fortran.dat"
+usr="gml.dat"
+usr="html.dat"
+usr="java.dat"
+usr="mif.dat"
+usr="perl.dat"
+usr="sql.dat"
+usr="wml.dat"
+usr="rc.dat"
+usr="pragma.dat"
+usr="declspec.dat"

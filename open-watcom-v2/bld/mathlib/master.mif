@@ -1,0 +1,39 @@
+proj_name = mathlib
+
+.EXTENSIONS: .gas
+
+# remap fpu to processor
+mlib_286 = 286
+mlib_287 = 286
+mlib_386 = 386
+mlib_387 = 386
+mlib_axp = axp
+mlib_mps = mps
+mlib_ppc = ppc
+
+mlib_host_cpu_086 = i86
+mlib_host_cpu_286 = i86
+mlib_host_cpu_386 = 386
+mlib_host_cpu_axp = axp
+mlib_host_cpu_ppc = ppc
+mlib_host_cpu_mps = mps
+host_cpu = $(mlib_host_cpu_$(mlib_$(processor)))
+
+mlib_host_os_msdos   = dos
+mlib_host_os_netware = nov
+mlib_host_os_os2     = os2
+mlib_host_os_qnx     = qnx
+mlib_host_os_windows = win
+mlib_host_os_winnt   = nt
+mlib_host_os_linux   = linux
+mlib_host_os_rdos    = rdos
+mlib_host_os_rdosdev = rdosdev
+host_os = $(mlib_host_os_$(system))
+
+!include cproj.mif
+!include libsubdi.mif
+
+!include $(mathlib_dir)/flags.mif
+!include $(mathlib_dir)/include.mif
+!include $(mathlib_dir)/librules.mif
+!include $(mathlib_dir)/lib.mif

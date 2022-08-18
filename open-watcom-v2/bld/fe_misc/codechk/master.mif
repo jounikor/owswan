@@ -1,0 +1,25 @@
+proj_name = codechk
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+inc_dirs = -I..
+
+.cpp: ..
+
+cobjs =  c_main.obj   &
+         gmlfile.obj
+
+jobjs =  j_main.obj   &
+         gmlfile.obj
+
+all: c_codech.exe j_codech.exe
+
+c_codech.exe : $(cobjs) $(__MAKEFILES__)
+    @%make echo_link
+    $(linker) name $^. $(lflags) file { $(cobjs) }
+
+j_codech.exe : $(jobjs) $(__MAKEFILES__)
+    @%make echo_link
+    $(linker) name $^. $(lflags) file { $(jobjs) }

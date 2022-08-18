@@ -1,0 +1,125 @@
+/*
+ *  sys/types.h Defined system types
+ *
+:include crwatqnx.sp
+ */
+#ifndef _SYS_TYPES_H_INCLUDED
+#define _SYS_TYPES_H_INCLUDED
+
+:include readonly.sp
+
+:include owrtlink.sp
+
+:segment LINUX | QNX
+#ifndef _LIMITS_H_INCLUDED
+ #include <limits.h>
+#endif
+
+:endsegment
+:include cpluspro.sp
+
+:: no Linux kernel structure
+:include pshpackl.sp
+
+/* 
+ *  ISO C types
+ */
+:include time_t.sp
+:include size_t.sp
+/* Exact-width types. */
+:include exactint.sp
+
+/*
+ *  POSIX 1003.1 types
+ */
+:include ssize_t.sp
+:include pid_t.sp
+:include off_t.sp
+:include timer_t.sp
+:include clockidt.sp
+:include schedp.sp
+:segment LINUX
+:include sem_t.sp
+:include pthread1.sp
+:include pthread2.sp
+
+:include incdir.sp
+
+#include _ARCH_INCLUDE(sys/types.h)
+#include _ARCH_INCLUDE(sys/sysmacros.h)
+
+:elsesegment DOS | QNX | RDOS
+:include dev_t.sp
+:include ino_t.sp
+:include mode_t.sp
+:include nlink_t.sp
+:include uid_t.sp
+:include gid_t.sp
+:include id_t.sp
+
+:endsegment
+:segment LINUX
+typedef unsigned char   u_char;
+typedef unsigned short  u_short;
+typedef unsigned int    u_int;
+typedef unsigned long   u_long;
+typedef unsigned __int64 u_quad_t;
+typedef __int64         quad_t;
+typedef quad_t          *qaddr_t;
+typedef int             key_t;
+:include ext.sp
+:include loff_t.sp
+:include extepi.sp
+
+:elsesegment QNX
+:keep XLOCALE
+:include wchar_t.sp
+:remove XLOCALE
+:include ext.sp
+typedef short unsigned  msg_t;  /* Used for message passing         */
+typedef long            nid_t;  /* Used for network IDs             */
+:include extepi.sp
+
+#define minor(__device)                 ((int)((__device) & 0x3ff))
+#define major(__device)                 ((int)(((__device) >> 10) & 0x3f))
+#define makedev(__node,__major,__minor) ((dev_t)(((__node) << 16) | ((__major) << 10) | (__minor)))
+
+typedef char _WCI86FAR *caddr_t;
+
+typedef unsigned char   u_int8_t;
+typedef unsigned short  u_int16_t;
+#if defined _M_I86
+typedef unsigned long   u_int32_t;
+#else
+typedef unsigned int    u_int32_t;
+#endif
+
+typedef char _WCFAR     *faddr_t;
+typedef unsigned long   paddr_t;
+typedef long            daddr_t;
+typedef unsigned char   uchar_t;
+typedef unsigned short  ushort_t;
+typedef unsigned int    uint_t;
+typedef unsigned long   ulong_t;
+typedef unsigned char   u_char;
+typedef unsigned short  u_short;
+typedef unsigned int    u_int;
+typedef unsigned long   u_long;
+typedef struct _uquad   { u_long val[2]; } u_quad;
+typedef struct _quad    {   long val[2]; } quad;
+typedef quad            *qaddr_t;
+typedef unsigned long   fixpt_t;
+typedef int             key_t;
+typedef unsigned short  sel_t;
+
+:elsesegment DOS | RDOS
+#define major(__device)             ((int)(((__device) >> 8) & 0xFF))
+#define minor(__device)             ((int)((__device) & 0xff))
+#define makedev(__major,__minor)    ((dev_t)(((__major) << 8) | (__minor)))
+
+:endsegment
+:include poppack.sp
+
+:include cplusepi.sp
+
+#endif

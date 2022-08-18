@@ -1,0 +1,61 @@
+proj_name       = ncurses
+
+ncurses_autodepends = .AUTODEPEND
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c: ../c
+
+inc_dirs = -I"../h"
+
+!ifeq host_os osx
+# To work around duplicate inlined symbols, e.g. __sputc
+c_flags += -std=gnu89
+!endif
+!ifeq release 0
+c_flags += -DTRACE
+!endif
+
+# explicit rules
+#################
+
+#
+# LIB
+#
+libtarg_ncurses_objs = &
+    access.obj &
+    comp_err.obj &
+    doalloc.obj &
+    fallback.obj &
+    free_tty.obj &
+    getenv_n.obj &
+    home_ter.obj &
+    lib_baud.obj &
+    lib_beep.obj &
+    lib_cur_.obj &
+    lib_napm.obj &
+    lib_setu.obj &
+    lib_tpar.obj &
+    lib_tput.obj &
+    lib_ttyf.obj &
+    read_ent.obj
+!ifeq release 0
+libtarg_ncurses_trace_objs = &
+    lib_data.obj &
+    lib_trce.obj &
+    lib_trcb.obj &
+    tracebuf.obj &
+    version.obj &
+    visbuf.obj
+!else
+libtarg_ncurses_trace_objs = &
+    notrace.obj
+!endif
+libtarg_objs = $(libtarg_ncurses_objs) $(libtarg_ncurses_trace_objs)
+!include libtarg.mif
+

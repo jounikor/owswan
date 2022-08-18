@@ -1,0 +1,37 @@
+proj_name = mkdisk
+
+mkdisk_autodepends = .autodepend
+
+mkdisk_trmem = 1
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include trmem.mif
+
+ziplib = $(setupgui_dir)/ziplib/$(objs_subdir)/ziplib.lib
+zlib   = $(setupgui_dir)/zlib/$(objs_subdir)/zlib.lib
+
+bld_extra_incs = -I"../../h" -I"$(libzip_dir)/lib" -I"$(zlib_dir)" -I"$(builder_dir)/h" -I"$(fe_misc_dir)/h"
+
+extra_cpp_flags_utils = $(trmem_cpp_flags)
+
+extra_c_flags_utils = $(trmem_cover_cflags)
+
+.c : ..;$(trmem_dir)
+
+commands = mkexezip.exe uzip.exe splitfil.exe packsize.exe genmkfil.exe langdat.exe mkinf.exe
+
+all : $(commands) .SYMBOLIC
+
+.c.exe:
+    @%make echo_bldcl
+    $(bld_cl) $[@ $(bld_clflags) $(bld_ldflags)
+
+langdat.exe : langdat.c $(builder_dir)/c/utils.c $(trmem_objs)
+    @%make echo_bldcl
+    $(bld_cl) $< $(bld_clflags) $(bld_ldflags)
+
+uzip.exe: uzip.c
+    @%make echo_bldcl
+    $(bld_cl) $[@ $(bld_clflags) $(ziplib) $(zlib) $(bld_ldflags)

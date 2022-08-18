@@ -1,0 +1,12 @@
+target_cpu = axp
+
+imp_objs = &
+        axpaddr.obj &
+        axpctrl.obj &
+        axptypes.obj &
+        axpreg.obj &
+        axpcall.obj &
+        axpdisas.obj &
+        axptrace.obj
+
+!include ../../master.mif

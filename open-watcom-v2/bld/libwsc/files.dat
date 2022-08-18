@@ -1,0 +1,12 @@
+# wsclib piece of install manifest
+#
+###################
+# 16-bit Libraries
+#
+
+[ DEFAULT cond="dostarg" type="l" where="c" desc="Wonderswan library" ]
+dir="lib286"        usr="wscl.lib.lib"     conda="ml"
+
+[ DEFAULT dir="libwsc" cond="dostarg tools16" where="c" ]
+type="s"    usr="wsccrt0.obj"      conda="ml"
+

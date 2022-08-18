@@ -1,0 +1,14 @@
+#define FIRST_USER_ACTION_ID    256
+#define FIRST_USER_NOTE_ID      256
+#define FIRST_USER_OBJ_ID       16
+
+#define EDIT_SELECT 0
+#define OBJ_ITEM 2
+#define OBJ_VICINITY 5
+#define MENU_NONE   0x00
+#define MENU_SETUP  0x01
+#define MENU_DELETE 0x02
+#define MENU_CUT    0x04
+#define MENU_PASTE  0x08
+#define MENU_COPY   0x10
+#define MENU_ALIGN  0x20

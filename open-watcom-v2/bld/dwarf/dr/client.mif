@@ -1,0 +1,24 @@
+# DWARF DR library finder.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+
+# these host use dwarf library with virtual memory emulation
+# dos/386
+# qnx/386
+# os2/i86
+# win/i86
+
+#
+# DWARF library
+#
+dwarfr_lib = $(dwarfr_dir)/$(objs_subdir)/dwarfr.lib
+
+#
+# DWARF run-time DLL used
+#
+!ifeq $(proj_name)_rtdll 1
+!endif
+
+#
+
+dwarfr_inc_dirs = -I"$(dwarfr_dir)/h"

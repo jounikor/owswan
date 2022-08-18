@@ -1,0 +1,213 @@
+eng_objs = &
+    $(trmem_objs) &
+    $(dip_objs) $(mad_objs) $(trp_objs) $(dig_objs) &
+    $(_subdir_)dumb.obj &
+    $(_subdir_)spawn.obj &
+    $(_subdir_)dbgchain.obj &
+    $(_subdir_)dbgvar.obj &
+    $(_subdir_)dbgvset.obj &
+    $(_subdir_)dbgass.obj &
+    $(_subdir_)dbgimg.obj &
+    $(_subdir_)dbglist.obj &
+    $(_subdir_)dbgpend.obj &
+    $(_subdir_)ambigsym.obj &
+    $(_subdir_)addarith.obj &
+    $(_subdir_)dbgbrk.obj &
+    $(_subdir_)dbgcall.obj &
+    $(_subdir_)dbgcall2.obj &
+    $(_subdir_)dbgcmd.obj &
+    $(_subdir_)dbgcmdln.obj &
+    $(_subdir_)dbgdot.obj &
+    $(_subdir_)dbgexec.obj &
+    $(_subdir_)dbgexpr.obj &
+    $(_subdir_)dbgexpr2.obj &
+    $(_subdir_)dbgexpr3.obj &
+    $(_subdir_)dbgexpr4.obj &
+    $(_subdir_)dbgfile.obj &
+    $(_subdir_)dbghook.obj &
+    $(_subdir_)dbginvk.obj &
+    $(_subdir_)dbglkup.obj &
+    $(_subdir_)dbgloc.obj &
+    $(_subdir_)dbglog.obj &
+    $(_subdir_)dbgmain.obj &
+    $(_subdir_)dbgmemor.obj &
+    $(_subdir_)memtypes.obj &
+    $(_subdir_)dbgmisc.obj &
+    $(_subdir_)dbgovl.obj &
+    $(_subdir_)dbgparse.obj &
+    $(_subdir_)dbgprint.obj &
+    $(_subdir_)dbgreg.obj &
+    $(_subdir_)dbgscan.obj &
+    $(_subdir_)dbgshow.obj &
+    $(_subdir_)dbgsrc.obj &
+    $(_subdir_)dbgstdio.obj &
+    $(_subdir_)dbgsys.obj &
+    $(_subdir_)dbgutil.obj &
+    $(_subdir_)dbg_dbg.obj &
+    $(_subdir_)dbgprog.obj &
+    $(_subdir_)strutil.obj &
+    $(_subdir_)stub.obj &
+    $(_subdir_)dbgwalk.obj &
+    $(_subdir_)dynmem.obj &
+    $(_subdir_)dbgsem.obj &
+    $(_subdir_)dbgtrace.obj &
+    $(_subdir_)dbgexins.obj &
+    $(_subdir_)dbgexdat.obj &
+    $(_subdir_)dbgmodfy.obj &
+    $(_subdir_)dbgtback.obj &
+    $(_subdir_)dbgerr.obj &
+    $(_subdir_)namelist.obj &
+    $(_subdir_)modlist.obj &
+    $(_subdir_)sortlist.obj &
+    $(_subdir_)remmisc.obj &
+    $(_subdir_)remcore.obj &
+    $(_subdir_)remfinfo.obj &
+    $(_subdir_)remenv.obj &
+    $(_subdir_)remfile.obj &
+    $(_subdir_)remthrd.obj &
+    $(_subdir_)remrtrd.obj &
+    $(_subdir_)removl.obj &
+    $(_subdir_)remasync.obj &
+    $(_subdir_)remcapb.obj &
+    $(_subdir_)ldsupp.obj &
+    $(_subdir_)doserr.obj &
+    $(_subdir_)diginter.obj &
+    $(_subdir_)dipinter.obj &
+    $(_subdir_)madinter.obj &
+    $(_subdir_)dbglit.obj &
+    $(_subdir_)dbginsty.obj &
+    $(_subdir_)dbgdata.obj &
+    $(_subdir_)dbgtoggl.obj &
+    $(_subdir_)dbgevent.obj &
+    $(_subdir_)dbgdll.obj &
+    $(_subdir_)dlgscan.obj &
+    $(_subdir_)dbgset.obj &
+    $(_subdir_)srcmgt.obj &
+    $(_subdir_)dbgupdt.obj &
+    $(_subdir_)symcomp.obj &
+    $(_subdir_)litwdeng.obj &
+    $(_subdir_)dbgcapt.obj &
+    $(_subdir_)autoenv.obj
+
+eng_objs_dos386 = &
+    $(_subdir_)dsxfork.obj &
+    $(_subdir_)dsxinit.obj &
+    $(_subdir_)dsxcmd.obj &
+    $(_subdir_)dsxfilio.obj &
+    $(_subdir_)dsxlkup.obj &
+    $(_subdir_)dsxhdlr.obj
+
+eng_objs_linux = &
+    $(_subdir_)lnxinit.obj &
+    $(_subdir_)linuxcmd.obj &
+    $(_subdir_)linuxio.obj &
+    $(_subdir_)lnxlkup.obj
+
+eng_objs_os2 = &
+    $(_subdir_)os2cmd.obj &
+    $(_subdir_)os2init.obj &
+    $(_subdir_)os2lkup.obj &
+    $(_subdir_)os2filio.obj
+
+eng_objs_qnx386 = &
+    $(_subdir_)qnxinit.obj &
+    $(_subdir_)qnxlkup.obj &
+    $(_subdir_)qnxcmd.obj &
+    $(_subdir_)qnxfilio.obj
+
+eng_objs_rdos386 = &
+    $(_subdir_)rdosinit.obj &
+    $(_subdir_)rdosio.obj &
+    $(_subdir_)rdoscmd.obj &
+    $(_subdir_)rdoslkup.obj
+
+eng_objs_nt = &
+    $(_subdir_)ntinit.obj &
+    $(_subdir_)ntfilio.obj &
+    $(_subdir_)ntfinfo.obj &
+    $(_subdir_)ntcmd.obj &
+    $(_subdir_)ntlkup.obj
+
+eng_objs_wini86 = &
+    $(_subdir_)wininit.obj &
+    $(_subdir_)wincmd.obj &
+    $(_subdir_)winfilio.obj &
+    $(_subdir_)winlkup.obj
+
+dui_objs = &
+    dbgwass.obj &
+    dbgwbrk.obj &
+    dbgwcall.obj &
+    dbgwdata.obj &
+    dbgwdisp.obj &
+    dbgwdlg.obj &
+    dbgwfil.obj &
+    dbgwfing.obj &
+    dbgwfpu.obj &
+    dbgwfunc.obj &
+    dbgwglob.obj &
+    dbgwicon.obj &
+    dbgwimg.obj &
+    dbgwinsp.obj &
+    dbgwintr.obj &
+    dbgwio.obj &
+    dbgwmac.obj &
+    dbgwmadr.obj &
+    dbgwmem.obj &
+    dbgwmmx.obj &
+    dbgwmod.obj &
+    dbgwpain.obj &
+    dbgwregs.obj &
+    dbgwrep.obj &
+    dbgwrtrd.obj &
+    dbgwset.obj &
+    dbgwsrch.obj &
+    dbgwthrd.obj &
+    dbgwtogl.obj &
+    dbgwtool.obj &
+    dbgwvar.obj &
+    dbgwxmm.obj &
+    dlgabout.obj &
+    dlgambig.obj &
+    dlgasync.obj &
+    dlgayn.obj &
+    dlgbreak.obj &
+    dlgcmd.obj &
+    dlgdll.obj &
+    dlgexpr.obj &
+    dlgfile.obj &
+    dlglist.obj &
+    dlgnewp.obj &
+    dlgnewws.obj &
+    dlgoptn.obj &
+    dlgscomp.obj &
+    dlgsrc.obj &
+    dlgstk.obj &
+    dlgvarx.obj &
+    dlgwind.obj &
+    dui.obj &
+    litwddui.obj &
+    modcomp.obj &
+    wnddump.obj &
+    wndhelp.obj &
+    wndmenu.obj &
+    wndsys.obj
+
+dui_objs_dos386   = dsxscrn.obj helpio.obj
+dui_objs_linux    = lnxscrn.obj helpio.obj
+dui_objs_qnx386   = qnxscrn.obj helpio.obj
+dui_objs_rdos386  = rdosscrn.obj helpio.obj
+!ifeq sys_windowed 1
+dui_objs_os2i86   = pmscrn.obj
+dui_objs_os2386   = pmscrn2.obj
+dui_objs_nt       = ntguiscn.obj ntdbgpb.obj
+dui_objs_win      = wguiscrn.obj
+!else
+dui_objs_os2i86   = os2scrn.obj helpio.obj
+dui_objs_os2386   = os2scrn.obj helpio.obj
+dui_objs_nt       = ntscrn.obj helpio.obj ntdbgpb.obj
+dui_objs_win      = winscrn.obj helpio.obj
+!endif
+
+engine_objs = $(eng_objs) $(eng_objs_$(host_os)) $(eng_objs_$(objs_subdir))
+ui_objs = $(dui_objs) $(dui_objs_$(host_os)) $(dui_objs_$(objs_subdir)) #$(objs_$(host_os)_$(host_cpu))

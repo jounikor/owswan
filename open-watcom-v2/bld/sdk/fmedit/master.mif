@@ -1,0 +1,79 @@
+proj_name = fmedit
+
+fmedit_autodepends = .autodepend
+
+sys_dll = 1
+
+suppress_bd = 1
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c:   ../src;$(version_dir);$(watcom_dir)/c
+
+inc_dirs = -I"../src" -I"../dev" -I"../res"
+
+extra_cpp_flags = -DFMEDITDLL
+
+extra_c_flags_win = -zu -zw
+
+!ifdef __WATCOM_TOOLS__
+extra_c_flags_fmedit = -bd
+!endif
+
+#
+# lflags
+#
+extra_l_flags_dll     = op implib
+extra_l_flags_dll_win = op rwr export WEP RESIDENT
+
+# explicit rules
+#################
+
+#
+# DLL
+#
+dlltarg_objs = &
+    align.obj &
+    space.obj &
+    fmedit.obj &
+    grid.obj &
+    paint.obj &
+    mouse.obj &
+    eatom.obj &
+    object.obj &
+    state.obj &
+    list.obj &
+    memory.obj &
+    cursor.obj &
+    scroll.obj &
+    oitem.obj &
+    currobj.obj &
+    curritem.obj &
+    clip.obj &
+    dlist.obj &
+    keybd.obj &
+    verdll.obj &
+    $(objs_$(host_os)) &
+    verimp.obj
+dlltarg_res_version_nt_386 = version.res
+dlltarg_res_version_nt_x64 = version.res
+dlltarg_res           = $(proj_name).res
+!include dlltarg.mif
+
+#
+# rc and others
+#
+!include verrc.mif
+
+rc_inc_dirs = -I"../res" -I"../dev"
+
+extra_rc_flags_win = -30
+
+$(proj_name).res: ../res/fmedit.rc $(__MAKEFILES__) .AUTODEPEND
+    @%make echo_rc
+    $(rc) $(rc_flags) $(rc_inc_path) $[@ -fo=$@

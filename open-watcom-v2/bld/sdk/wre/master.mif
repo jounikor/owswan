@@ -1,0 +1,106 @@
+proj_name = wre
+
+!ifndef wre_autodepends
+wre_autodepends = .AUTODEPEND
+!endif
+
+wre_trmem = 1
+
+sys_windowed = 1
+
+memory_model_i86 = l
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include wres.mif
+!include trmem.mif
+
+!include $(commonui_dir)/client.mif
+!include $(wpi_dir)/client.mif
+!include $(wr_dir)/client.mif
+!include $(cpp_dir)/client.mif
+
+#
+# cflags
+#
+.c : ../c;$(cpp_c_dirs);$(trmem_dir);$(watcom_dir)/c
+
+inc_dirs  = -I. -I"../h" -I"$(wresedit_dir)/h" $(wr_inc_dirs) $(wres_inc_dirs) &
+    $(cpp_inc_dirs) $(commonui_inc_dirs) $(wpi_inc_dirs)
+
+extra_cpp_flags     = -DWREDLL
+
+extra_cpp_flags_nt  = -DNOUSE3D
+
+extra_cpp_flags_trmemcvr = $(trmem_cpp_flags)
+
+extra_c_flags     = -fh
+
+extra_c_flags_win = -zw-zc
+
+!ifdef __WATCOM_TOOLS__
+extra_c_flags_preproc = -zm -fh=preproc.pch
+extra_c_flags_ppexpr  = -zm -fh=preproc.pch
+extra_c_flags_ppmacro = -zm -fh=preproc.pch
+extra_c_flags_ppenv   = -zm -fh=preproc.pch
+!endif
+
+extra_c_flags_trmemcvr = $(trmem_cover_cflags)
+
+#
+# lflags
+#
+extra_l_flags_nt = op heap=16k commit heap=8k
+extra_l_flags_win = op stack=32k,rwr library commdlg,ddeml
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_prebuild_objs = rcstr.grh
+exetarg_objs = &
+    wremain.obj wremem.obj wremsg.obj wreresin.obj wrestat.obj &
+    wregetfn.obj wrestrdp.obj wreselft.obj wreres.obj wrehints.obj &
+    wrelist.obj wrenames.obj wreopts.obj wretoolb.obj wreribbn.obj &
+    wreseted.obj wreftype.obj wregcres.obj wrerenam.obj wrefres.obj &
+    wrememf.obj wredel.obj wrewait.obj wresvobj.obj wrectl3d.obj &
+    wreaccel.obj wremenu.obj wrestr.obj wrenew.obj wre_wres.obj &
+    wredlg.obj wreimg.obj wredde.obj wresvmlt.obj wreimage.obj &
+    wreclip.obj wresym.obj &
+    preproc.obj ppexpr.obj ppmacro.obj ppenv.obj pathlist.obj &
+    $(trmem_objs) $(trmemcvr_objs)
+exetarg_libs = &
+    $(commonui_lib) $(wr_lib) $(wres_lib) $(wpi_lib) &
+    $(wresedit_dir)/waccel/$(objs_subdir)/wacc.lib &
+    $(wresedit_dir)/wmenu/$(objs_subdir)/wmenu.lib &
+    $(wresedit_dir)/wstring/$(objs_subdir)/wstring.lib
+exetarg_res_version_nt_386 = exever.res
+exetarg_res_version_nt_x64 = exever.res
+exetarg_res           = $(proj_name).res
+exetarg_nt_manif_386  = ntmanif.res
+exetarg_nt_manif_x64  = ntmanif.res
+!include exetarg.mif
+
+# rc and others
+!include verrc.mif
+
+rc_inc_dirs = -I"../res" $(commonui_inc_dirs)
+
+$(proj_name).res : ../res/wre.rc $(__MAKEFILES__) .AUTODEPEND
+    @%make echo_rc
+    $(rc) $(rc_flags) -ad -zk0 $(rc_inc_path) $[@ -fo=$@
+
+ntmanif.res : ../res/ntmanif.rc
+    @%make echo_rc
+    $(rc) $(rc_flags) -I"../res" $(inc_dirs_sys_nt) $< -fo=$@
+
+rcstrmsg.gh : ../res/wre.msg $(__MAKEFILES__)
+    @%make echo_cpp
+    $(cpp) $(rc_ui_flags) -o$@ $[@
+
+rcstr.grh : rcstrmsg.gh $(__MAKEFILES__)
+    @%make echo_awk
+    $(awk) -f $(build_dir)/msgtoh.awk -v OUTFILE=$^. $[@

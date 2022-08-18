@@ -1,0 +1,37 @@
+/* UTF-8 encoding, ¥ */
+
+#include "bpatch.rh"
+#include "wreslang.rh"
+
+STRINGTABLE
+BEGIN
+    #define pick(c,e,j) (c + RLE_ENGLISH * MSG_LANG_SPACING), [ e ]
+
+    #include "bpatch.msg"
+  #if defined( BPATCH )
+    #include "ppusage.gh"
+  #elif defined( BDUMP )
+    #include "pdusage.gh"
+  #elif defined( BDIFF )
+    #include "dusage.gh"
+  #else
+    (MSG_USAGE_BASE + RLE_ENGLISH * MSG_LANG_SPACING), [ " " ]
+  #endif
+
+    #undef pick
+
+    #define pick(c,e,j) (c + RLE_JAPANESE * MSG_LANG_SPACING), [ j ]
+
+    #include "bpatch.msg"
+  #if defined( BPATCH )
+    #include "ppusage.gh"
+  #elif defined( BDUMP )
+    #include "pdusage.gh"
+  #elif defined( BDIFF )
+    #include "dusage.gh"
+  #else
+    (MSG_USAGE_BASE + RLE_JAPANESE * MSG_LANG_SPACING), [ " " ]
+  #endif
+
+    #undef pick
+END

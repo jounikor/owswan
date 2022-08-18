@@ -1,0 +1,40 @@
+proj_name = watcom
+
+watcom_autodepends = .autodepend
+
+!include cproj.mif
+!include deftarg.mif
+
+.c: ../c
+
+inc_dirs = -I"../h"
+
+!ifndef __WATCOM_TOOLS__
+libs = clibext.lib clibexts.lib
+!endif
+
+all: $(libs) .symbolic
+
+clibext.lib : clibext.obj
+    @%make echo_lib
+    $(bld_lib) $<
+
+clibexts.lib : clibexts.obj
+    @%make echo_lib
+    $(bld_lib) $<
+
+clibext.obj: clibext.c $(__MAKEFILES__) $($(proj_name)_autodepends)
+    @%make echo_cc
+!ifdef bootstrap
+    $(cc) $(cflags) $(c_flags) $(bld_cppflags) $(inc_path) $[@
+!else
+    $(cc) $(cflags) $(c_flags) $(cppflags) $(inc_path) $[@
+!endif
+
+clibexts.obj: clibext.c $(__MAKEFILES__) $($(proj_name)_autodepends)
+    @%make echo_cc
+!ifdef bootstrap
+    $(cc) $(cflags_dll) $(c_flags) $(bld_cppflags) $(extra_cpp_dll_flags) $(inc_path) $[@
+!else
+    $(cc) $(cflags_dll) $(c_flags) $(cppflags) $(extra_cpp_dll_flags) $(inc_path) $[@
+!endif

@@ -1,0 +1,82 @@
+proj_name = wddespy
+
+!ifndef wddespy_autodepends
+wddespy_autodepends = .AUTODEPEND
+!endif
+
+sys_windowed = 1
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include trmem.mif
+
+!include $(commonui_dir)/client.mif
+!include $(wpi_dir)/client.mif
+
+#
+# cflags
+#
+.c: ../c;$(commonui_dir)/c
+
+inc_dirs  = -I. -I"../h" $(commonui_inc_dirs) $(wpi_inc_dirs)
+
+extra_cpp_flags_nt = -DNOUSE3D
+
+extra_c_flags     = -fh
+
+#
+# lflags
+#
+extra_l_flags_win = option stack=7k option heapsize=2k lib ddeml.lib, commdlg.lib
+
+#extra_l_flags_nt_axp = lib ctl3d32.lib
+#extra_l_flags_nt     = $(extra_l_flags_nt_$(host_cpu))
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_prebuild_objs = rcstr.grh
+exetarg_objs          = dde.obj ddeproc.obj ddeglob.obj ddemsg.obj ddebox.obj &
+    ddetrack.obj ddeflter.obj ddecfg.obj ddemisc.obj ddetool.obj ddemem.obj
+exetarg_libs          = $(wpi_lib) $(commonui_lib)
+exetarg_res_version_nt_386 = exever.res
+exetarg_res_version_nt_x64 = exever.res
+exetarg_res           = $(proj_name).res
+exetarg_nt_manif_386  = ntmanif.res
+exetarg_nt_manif_x64  = ntmanif.res
+!include exetarg.mif
+
+#!ifeq host_cpu axp
+#!ifeq release 0
+#    cvpack $^&.exe
+#    @%make echo_wstrip_sym
+#    $(wstrip) $^&.exe $^&.exe $^&.sym
+#!endif
+#!endif
+
+#
+# rc and others
+#
+!include verrc.mif
+
+rc_inc_dirs = $(commonui_inc_dirs) $(wpi_inc_dirs)
+
+$(proj_name).res : ../res/wddespy.rc .AUTODEPEND $(__MAKEFILES__)
+    @%make echo_rc
+    $(rc) $(rc_flags) -ad -zk0 -I"../res" $(rc_inc_path) $[@ -fo=$@
+
+ntmanif.res : ../res/ntmanif.rc
+    @%make echo_rc
+    $(rc) $(rc_flags) -I"../res" $(inc_dirs_sys_nt) $< -fo=$@
+
+rcstr.grh : rcstrmsg.gh $(__MAKEFILES__)
+    @%make echo_awk
+    $(awk) -f $(build_dir)/msgtoh.awk -v OUTFILE=$^. $[@
+
+rcstrmsg.gh : ../res/ddespy.msg $(__MAKEFILES__)
+    @%make echo_cpp
+    $(cpp) $(rc_ui_flags) -o$@ $[@

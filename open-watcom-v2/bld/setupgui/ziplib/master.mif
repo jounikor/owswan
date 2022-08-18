@@ -1,0 +1,64 @@
+proj_name       = ziplib
+
+ziplib_autodepends = .autodepend
+
+ziplib_nofpu = 1
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c: $(libzip_dir)/lib
+
+inc_dirs = -I"$(libzip_dir)/lib" -I"$(zlib_dir)"
+
+# explicit rules
+#################
+
+#
+# LIB
+#
+libtarg_objs = &
+    zadd.obj &
+    zclose.obj &
+    zdelete.obj &
+    zdirent.obj &
+    zentfree.obj &
+    zentnew.obj &
+    zerr2str.obj &
+    zerrget.obj &
+    zerrgets.obj &
+    zerrstr.obj &
+    zerrstre.obj &
+    zfclose.obj &
+    zferrget.obj &
+    zfgetoff.obj &
+    zfopen.obj &
+    zfopenin.obj &
+    zfread.obj &
+    zfree.obj &
+    zstrerr.obj &
+    zgetname.obj &
+    zgetnumf.obj &
+    ziperror.obj &
+    znameloc.obj &
+    znew.obj &
+    zopen.obj &
+    zrename.obj &
+    zreplace.obj &
+    zsetname.obj &
+    zsrcbuff.obj &
+    zsrcfile.obj &
+    zsrcfilp.obj &
+    zsrcfree.obj &
+    zsrcfunc.obj &
+    zsrczip.obj &
+    zstat.obj &
+    zstatind.obj &
+    zuchg.obj &
+    zuchgall.obj &
+    zuchgdat.obj
+!include libtarg.mif

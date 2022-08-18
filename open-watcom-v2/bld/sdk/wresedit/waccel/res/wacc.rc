@@ -1,0 +1,55 @@
+#include <windows.h>
+#include "sysall.rh"
+#include "about.rh"
+#include "banner.h"
+
+#define FIRST_COPYRIGHT_YEAR 2002
+
+#include "sysindep.rc"
+
+"WAccelAccelTable" ACCELERATORS
+BEGIN
+    VK_DELETE,  IDM_ACC_DELETE, VIRTKEY
+    VK_F1,      IDM_HELP,       VIRTKEY
+    "X",        IDM_ACC_CUT,    CONTROL, VIRTKEY
+    "C",        IDM_ACC_COPY,   CONTROL, VIRTKEY
+    "V",        IDM_ACC_PASTE,  CONTROL, VIRTKEY
+END
+
+/* icons */
+"APPLICON"  ICON "waccel.ico"
+
+/* about box bitmap */
+"AboutLogo" BITMAP MOVEABLE DISCARDABLE "logo.bmp"
+
+/* ribbon bitmaps */
+"Clear"      BITMAP "clear.bmp"
+"New"        BITMAP "new.bmp"
+"Open"       BITMAP "open.bmp"
+"Save"       BITMAP "save.bmp"
+
+"Cut"        BITMAP "cut.bmp"
+"Copy"       BITMAP "copy.bmp"
+"Paste"      BITMAP "paste.bmp"
+
+"InsertKey"  BITMAP "inskey.bmp"
+"DeleteKey"  BITMAP "delkey.bmp"
+"PressKey"   BITMAP "presskey.bmp"
+
+STRINGTABLE
+BEGIN
+    #define pick(c,e,j) c, [ e ]
+
+    #include "rcstrmsg.gh"
+    #include "uistrmsg.gh"
+
+    #undef pick
+END
+
+#define sp( a, b ) a
+#include "wacc.men"
+#undef sp
+
+#include "accedit.dlg"
+#include "acckey.dlg"
+#include "about.dlg"

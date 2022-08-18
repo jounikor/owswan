@@ -1,0 +1,15 @@
+proj_name = exe2bin
+
+exe2bin_autodepends = .autodepend
+
+memory_model_i86 = s
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+.c: ..
+
+exetarg_objs = exe2bin.obj
+
+!include exetarg.mif

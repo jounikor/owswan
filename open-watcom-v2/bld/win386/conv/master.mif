@@ -1,0 +1,59 @@
+proj_name = conv
+
+conv_autodepends = .AUTODEPEND
+conv_distrib_lib = 1
+
+additional_clean = dllthk.asm winglue.asm dllthunk.c winglue.inc
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c : ../c
+
+#
+# aflags
+#
+.asm : ../asm
+
+# explicit rules
+#################
+
+#
+# LIB
+#
+libtarg_prebuild_objs = winobjs.lbc ../def/win386
+libtarg_objs          = fldenv.obj
+libtarg_opts          = @winobjs.lbc
+libtarg_name          = win386
+!include libtarg.mif
+
+#
+# rc and others
+#
+def_files = &
+    ../def/clib.def &
+    ../def/commdlg.def &
+    ../def/ddeml.def &
+    ../def/dpmi.def &
+    ../def/lzexpand.def &
+    ../def/mmsystem.def &
+    ../def/odbc.def &
+    ../def/ole.def &
+    ../def/penwin.def &
+    ../def/shell.def &
+    ../def/stress.def &
+    ../def/toolhelp.def &
+    ../def/ver.def &
+    ../def/win31.def &
+    ../def/win31_16.def
+
+winobjs.lbc : ./conv.exe $(def_files) $(__MAKEFILES__)
+    $[@ ../def/win386 ../def -l=$@ -s -q
+
+./conv.exe : conv.c $(__MAKEFILES__)
+    @%make echo_bldcl
+    $(bld_cl) $[@ $(bld_clflags) $(bld_ldflags)

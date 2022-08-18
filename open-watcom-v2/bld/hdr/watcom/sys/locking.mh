@@ -1,0 +1,33 @@
+/*
+ *  sys/locking.h       Flags for locking() function
+ *
+:include crwat.sp
+ */
+#ifndef _SYS_LOCKING_H_INCLUDED
+#define _SYS_LOCKING_H_INCLUDED
+
+:include readonly.sp
+
+:include owrtlink.sp
+
+:include cpluspro.sp
+
+#define _LK_UNLCK   0   /* unlock region of a file */
+#define LK_UNLCK    _LK_UNLCK
+#define _LK_LOCK    1   /* lock a region of a file */
+#define LK_LOCK     _LK_LOCK
+#define _LK_NBLCK   2   /* non-blocking lock */
+#define LK_NBLCK    _LK_NBLCK
+#define _LK_RLCK    3   /* lock for writing */
+#define LK_RLCK     _LK_RLCK
+#define _LK_NBRLCK  4   /* non-blocking lock for writing */
+#define LK_NBRLCK   _LK_NBRLCK
+
+:include locking.sp
+:keep ANSINAME
+:include locking.sp
+:remove ANSINAME
+
+:include cplusepi.sp
+
+#endif

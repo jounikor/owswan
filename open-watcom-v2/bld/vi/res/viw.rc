@@ -1,0 +1,96 @@
+#include "wresdefn.h"
+#include "iconids.rh"
+#include "filelist.rh"
+#include "asavedlg.rh"
+#include "finddlg.rh"
+#include "snoop.rh"
+#include "grep.rh"
+#include "cmd.rh"
+#include "banner.h"
+#include "about.rh"
+#include "usage.rh"
+#include "tagdlg.rh"
+#include "linedlg.rh"
+#include "clrbar.rh"
+#include "ftbar.rh"
+#include "ssbar.rh"
+#include "repdlg.rh"
+#include "rcstr.grh"
+#include "uistr.grh"
+
+#define FIRST_COPYRIGHT_YEAR 1989
+
+/*
+ * hold this order of ICONS
+ * it defines icons index in executable
+ * this index is used for file extensions association by OW installer
+ */
+APPLICON        ICON    viw.ico         /* 0 */
+WATCOMICON      ICON    watcom.ico      /* 1 */
+IDI_CFILE       ICON    cfile.ico       /* 2    used by installer */
+IDI_CPPFILE     ICON    cppfile.ico     /* 3    used by installer */
+IDI_HFILE       ICON    hfile.ico       /* 4    used by installer */
+IDI_HPPFILE     ICON    hppfile.ico     /* 5    used by installer */
+IDI_FORFILE     ICON    forfile.ico     /* 6    used by installer */
+IDI_FIFILE      ICON    fifile.ico      /* 7    used by installer */
+IDI_MAKFILE     ICON    makfile.ico     /* 8    used by installer */
+IDI_TXTFILE     ICON    txtfile.ico     /* 9    used by installer */
+IDI_OBJFILE     ICON    objfile.ico     /* 10   used by installer */
+IDI_RCFILE      ICON    rcfile.ico      /* 11   used by installer */
+IDI_RHFILE      ICON    rhfile.ico      /* 12   used by installer */
+IDI_LIBFILE     ICON    libfile.ico     /* 13   used by installer */
+IDI_AWKFILE     ICON    awkfile.ico     /* 14   used by installer */
+
+BUTTONPATTERN   BITMAP  button.bmp
+SAVE            BITMAP  save.bmp
+COPY            BITMAP  copy.bmp
+CUT             BITMAP  cut.bmp
+PASTE           BITMAP  paste.bmp
+UNDO            BITMAP  undo.bmp
+REDO            BITMAP  redo.bmp
+COMMAND         BITMAP  cmd.bmp
+FIND            BITMAP  finddlg.bmp
+REFIND          BITMAP  refind.bmp
+OPEN            BITMAP  open.bmp
+NEXTFILE        BITMAP  nextfile.bmp
+PREVFILE        BITMAP  prevfile.bmp
+FILES           BITMAP  files.bmp
+HAMMER          BITMAP  hammer.bmp
+NEW             BITMAP  new.bmp
+CLOSEBMP        BITMAP  closebmp.bmp
+BMATCH          BITMAP  bmatch.bmp
+DROPCLR         CURSOR  dropclr.cur
+DROPFT          CURSOR  dropft.cur
+NODROP          CURSOR  nodrop.cur
+STATMOVE        CURSOR  statmove.cur
+DROPSS          CURSOR  dropss.cur
+
+STRINGTABLE PRELOAD DISCARDABLE
+BEGIN
+    #define pick(c,e,j)  c, [ e ]
+
+    #include "rcstrmsg.gh"
+    #include "uistrmsg.gh"
+
+    #undef pick
+END
+
+#include "filelist.dlg"
+#include "fgrep.dlg"
+#include "asavedlg.dlg"
+#include "finddlg.dlg"
+#include "grep.dlg"
+#include "cmd.dlg"
+#include "about.dlg"
+#include "usage.dlg"
+#include "tagdlg.dlg"
+#include "linedlg.dlg"
+#include "clrbar.dlg"
+#include "ftbar.dlg"
+#include "ssbar.dlg"
+#include "repdlg.dlg"
+#include "snoop.dlg"
+
+#include "setfs.dlg"
+#include "setscr.dlg"
+#include "setgen.dlg"

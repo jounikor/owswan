@@ -1,0 +1,111 @@
+proj_name = commonui
+
+!ifndef name
+name = commonui
+!endif
+
+!ifndef commonui_autodepends
+commonui_autodepends = .autodepend
+!endif
+
+sys_windowed = 1
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+!include $(wpi_dir)/client.mif
+
+!include $(wdisasm_dir)/client.mif
+
+#
+# cflags
+#
+.c: ../c;$(watcom_dir)/c
+
+inc_dirs = -I. -I"../h" $(wpi_inc_dirs) $(dis_includes)
+
+extra_cpp_flags     = -DGUI_IS_GUI
+extra_cpp_flags_nt  = -DNOUSE3D
+extra_cpp_flags_os2 = -D__OS2_PM__
+
+extra_c_flags = -fh
+extra_c_flags_i86 = -zu -zc
+extra_c_flags_win_i86 = -zW
+extra_c_flags_win_386 = -zw
+
+#
+# aflags
+#
+.asm: ../asm
+
+# explicit rules
+#################
+
+#
+# LIB
+#
+libtarg_prebuild_objs = uistr.grh
+#                     nt win os2 win...
+#======================================
+!inject about.obj     nt win
+!inject alias.obj     nt win
+!inject bitmap.obj    nt win
+!inject ctl3d32.obj              win386  # shared with gui project
+!inject ctl3dcvr.obj  nt win             # shared with gui project
+!inject dbg386.obj               windbg
+!inject desknt.obj    nt win
+!inject dlgmod.obj    nt win
+!inject font.obj      nt win
+!inject fontstr.obj   nt win             # shared with gui project
+!inject getcsip.obj              windbg
+!inject getsaddr.obj             windbg
+!inject hint.obj      nt win
+!inject inipath.obj   nt win
+!inject intdata.obj              windbg
+!inject inth.obj                 windbg
+!inject ismod32.obj              windbg
+!inject jdlg.obj      nt win
+!inject ldstr.obj     nt win
+!inject loadcc.obj    nt win os2         # shared with gui project
+!inject log.obj       nt win
+!inject mark.obj      nt win
+#!inject cguimem.obj   nt win os2
+!inject memwnd.obj    nt win
+!inject memwndcd.obj  nt win
+!inject mythelp.obj              windbg
+!inject os2dlg.obj           os2         # shared with gui project
+!inject palette.obj   nt win
+!inject pushwin.obj   nt win
+!inject savelbox.obj  nt win
+!inject sdkasm.obj    nt win
+!inject segmem.obj               windbg
+!inject srchmsg.obj   nt win
+!inject statwnd.obj   nt win os2         # shared with gui project
+!inject strsup.obj    nt win
+!inject toolbr.obj    nt win os2         # shared with gui project
+!inject windlg.obj    nt win             # shared with gui project
+!inject wmdisim.obj   nt win os2         # shared with gui project
+!inject wwinhelp.obj  nt win             # shared with gui project
+#
+!ifeq name windbg
+libtarg_objs = $(windbg)
+!else
+libtarg_objs = $($(host_os)) $($(objs_subdir))
+!ifeq host_cpu i86
+libtarg_objs += $($(host_os)dbg)
+!endif
+!endif
+libtarg_name = $(name)
+!include libtarg.mif
+
+#
+# rc and others
+#
+uistr.grh : uistrmsg.gh
+    @%make echo_awk
+    $(awk) -f $(build_dir)/msgtoh.awk -v rcbase=10000 -v basename=MSG_CUI_BASE -v OUTFILE=$^. $[@
+
+uistrmsg.gh : ../res/commonui.msg
+    @%make echo_cpp
+    $(cpp) $(rc_ui_flags) -I"../h" -o$@ $[@

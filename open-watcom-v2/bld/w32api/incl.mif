@@ -1,0 +1,501 @@
+.EXTENSIONS : .rh .gsp .sp .mh
+
+proj_name = w32api
+
+w32api_autodepends  = .autodepend
+w32api_distrib_lib  = 1
+
+!include cproj.mif
+!include defrule.mif
+
+crwatpro_gsp = crwatpro.gsp
+
+additional_clean = $(crwatpro_gsp) depends.dep
+
+mh_dir = $(w32api_dir)/include
+
+!ifeq release 1
+wsplice_extra_opts =
+!else
+wsplice_extra_opts = -d"depends.dep"
+!endif
+
+wsplice_opts     = $(wsplice_extra_opts) -i"$(hdr_dir)" -i"$(mh_dir)" $[@ $@
+wsplice_opts_r   = $(wsplice_extra_opts) -kRESOURCE -i"$(hdr_dir)" -i"$(mh_dir)" $[@ $@
+wsplice_opts_ws2 = $(wsplice_extra_opts) -kWINSOCK2 -i"$(hdr_dir)" -i"$(mh_dir)" $[@ $@
+
+dirs = h h/ddk h/directx h/GL
+
+headers = &
+    h/_w32ials.h           &
+    h/accctrl.h            &
+    h/aclapi.h             &
+    h/aclui.h              &
+    h/adsprop.h            &
+    h/afxres.h             &
+    h/amaudio.h            &
+    h/amstream.h           &
+    h/amvideo.h            &
+    h/audevcod.h           &
+    h/austream.h           &
+    h/aviriff.h            &
+    h/basetsd.h            &
+    h/basetyps.h           &
+    h/batclass.h           &
+    h/bcrypt.h             &
+    h/bdatypes.h           &
+    h/cderr.h              &
+    h/cguid.h              &
+    h/cmnquery.h           &
+    h/comcat.h             &
+    h/commctrl.h           &
+    h/commctrl.rh          &
+    h/commdlg.h            &
+    h/compobj.h            &
+    h/control.h            &
+    h/cpl.h                &
+    h/cplext.h             &
+    h/ctl3d.h              &
+    h/custcntl.h           &
+    h/dbt.h                &
+    h/dde.h                &
+    h/dde.rh               &
+    h/ddeml.h              &
+    h/ddraw.h              &
+    h/ddstream.h           &
+    h/devguid.h            &
+    h/devprdef.h           &
+    h/dhcpcsdk.h           &
+    h/dimm.h               &
+    h/dispatch.h           &
+    h/dispex.h             &
+    h/dlgs.h               &
+    h/docobj.h             &
+    h/dsadmin.h            &
+    h/dsclient.h           &
+    h/dsgetdc.h            &
+    h/dshow.h              &
+    h/dsquery.h            &
+    h/dsrole.h             &
+    h/dvdevcod.h           &
+    h/dvdmedia.h           &
+    h/edevdefs.h           &
+    h/errorrep.h           &
+    h/errors.h             &
+    h/evcode.h             &
+    h/evntprov.h           &
+    h/evntrace.h           &
+    h/exdisp.h             &
+    h/exdispid.h           &
+    h/fci.h                &
+    h/fdi.h                &
+    h/fltdefs.h            &
+    h/guiddef.h            &
+    h/htmlhelp.h           &
+    h/httpext.h            &
+    h/iads.h               &
+    h/icm.h                &
+    h/idispids.h           &
+    h/ifdef.h              &
+    h/ifmib.h              &
+    h/il21dec.h            &
+    h/imagehlp.h           &
+    h/imm.h                &
+    h/in6addr.h            &
+    h/inaddr.h             &
+    h/initguid.h           &
+    h/intshcut.h           &
+    h/ipexport.h           &
+    h/iphlpapi.h           &
+    h/ipifcons.h           &
+    h/ipinfoid.h           &
+    h/ipmib.h              &
+    h/iprtrmib.h           &
+    h/iptypes.h            &
+    h/ipxconst.h           &
+    h/ipxrip.h             &
+    h/ipxrtdef.h           &
+    h/ipxsap.h             &
+    h/ipxtfflt.h           &
+    h/isguids.h            &
+    h/knownfld.h           &
+    h/ks.h                 &
+    h/ksmedia.h            &
+    h/ktmtypes.h           &
+    h/largeint.h           &
+    h/lm.h                 &
+    h/lmaccess.h           &
+    h/lmalert.h            &
+    h/lmapibuf.h           &
+    h/lmat.h               &
+    h/lmaudit.h            &
+    h/lmconfig.h           &
+    h/lmcons.h             &
+    h/lmerr.h              &
+    h/lmerrlog.h           &
+    h/lmjoin.h             &
+    h/lmmsg.h              &
+    h/lmremutl.h           &
+    h/lmrepl.h             &
+    h/lmserver.h           &
+    h/lmshare.h            &
+    h/lmsname.h            &
+    h/lmstats.h            &
+    h/lmsvc.h              &
+    h/lmuse.h              &
+    h/lmuseflg.h           &
+    h/lmwksta.h            &
+    h/lzexpand.h           &
+    h/mapi.h               &
+    h/mciavi.h             &
+    h/mcx.h                &
+    h/mgm.h                &
+    h/mgmtapi.h            &
+    h/mlang.h              &
+    h/mmreg.h              &
+    h/mmstream.h           &
+    h/mmsystem.h           &
+    h/moniker.h            &
+    h/mpegtype.h           &
+    h/mprapi.h             &
+    h/mq.h                 &
+    h/msacm.h              &
+    h/mshtml.h             &
+    h/msi.h                &
+    h/msidefs.h            &
+    h/msiquery.h           &
+    h/mstcpip.h            &
+    h/mswsock.h            &
+    h/msxml.h              &
+    h/naptypes.h           &
+    h/nb30.h               &
+    h/ncrypt.h             &
+    h/nddeapi.h            &
+    h/newdev.h             &
+    h/nldef.h              &
+    h/nspapi.h             &
+    h/ntddndis.h           &
+    h/ntdsapi.h            &
+    h/ntdsbcli.h           &
+    h/ntdsbmsg.h           &
+    h/ntldap.h             &
+    h/ntsecapi.h           &
+    h/ntsecpkg.h           &
+    h/oaidl.h              &
+    h/objarray.h           &
+    h/objbase.h            &
+    h/objidl.h             &
+    h/objsafe.h            &
+    h/objsel.h             &
+    h/ocidl.h              &
+    h/odbcinst.h           &
+    h/ole.h                &
+    h/ole2.h               &
+    h/ole2ver.h            &
+    h/oleacc.h             &
+    h/oleauto.h            &
+    h/olectl.h             &
+    h/olectlid.h           &
+    h/oledlg.h             &
+    h/oleidl.h             &
+    h/packon.h             &
+    h/packoff.h            &
+    h/pbt.h                &
+    h/poppack.h            &
+    h/powrprof.h           &
+    h/profinfo.h           &
+    h/propidl.h            &
+    h/propkdef.h           &
+    h/propsys.h            &
+    h/prsht.h              &
+    h/psapi.h              &
+    h/pshpack1.h           &
+    h/pshpack2.h           &
+    h/pshpack4.h           &
+    h/pshpack8.h           &
+    h/qedit.h              &
+    h/qos.h                &
+    h/ras.h                &
+    h/rasdlg.h             &
+    h/raserror.h           &
+    h/rassapi.h            &
+    h/reason.h             &
+    h/regstr.h             &
+    h/richedit.h           &
+    h/richole.h            &
+    h/routprot.h           &
+    h/rpc.h                &
+    h/rpcasync.h           &
+    h/rpcdce.h             &
+    h/rpcdcep.h            &
+    h/rpcndr.h             &
+    h/rpcnsip.h            &
+    h/rpcnsi.h             &
+    h/rpcnterr.h           &
+    h/rpcproxy.h           &
+    h/rtutils.h            &
+    h/sal.h                &
+    h/schannel.h           &
+    h/schedule.h           &
+    h/schemdef.h           &
+    h/schnlsp.h            &
+    h/scode.h              &
+    h/sddl.h               &
+    h/sdkddkve.h           &
+    h/secext.h             &
+    h/security.h           &
+    h/servprov.h           &
+    h/setupapi.h           &
+    h/shellapi.h           &
+    h/sherrors.h           &
+    h/shldisp.h            &
+    h/shlguid.h            &
+    h/shlobj.h             &
+    h/shlwapi.h            &
+    h/shobjidl.h           &
+    h/shtypes.h            &
+    h/snmp.h               &
+    h/spapidef.h           &
+    h/specstr.h            &
+    h/sql.h                &
+    h/sqlext.h             &
+    h/sqltypes.h           &
+    h/sqlucode.h           &
+    h/sspi.h               &
+    h/stm.h                &
+    h/storage.h            &
+    h/stralign.h           &
+    h/strmif.h             &
+    h/strqcond.h           &
+    h/strquery.h           &
+    h/strsafe.h            &
+    h/subauth.h            &
+    h/svcguid.h            &
+    h/tcpestat.h           &
+    h/tcpmib.h             &
+    h/tlhelp32.h           &
+    h/tmschema.h           &
+    h/tvout.h              &
+    h/udpmib.h             &
+    h/unknwn.h             &
+    h/urlmon.h             &
+    h/userenv.h            &
+    h/usp10.h              &
+    h/uuids.h              &
+    h/uxtheme.h            &
+    h/verrsrc.h            &
+    h/vfw.h                &
+    h/vfwmsgs.h            &
+    h/vidcap.h             &
+    h/vmr9.h               &
+    h/vptype.h             &
+    h/vsstyle.h            &
+    h/vssym32.h            &
+    h/w32api.h             &
+    h/wbemcli.h            &
+    h/wcompres.h           &
+    h/winable.h            &
+    h/winbase.h            &
+    h/winber.h             &
+    h/wincon.h             &
+    h/wincrypt.h           &
+    h/windef.h             &
+    h/windns.h             &
+    h/windot11.h           &
+    h/windows.h            &
+    h/windowsx.h           &
+    h/winefs.h             &
+    h/winerror.h           &
+    h/wingdi.h             &
+    h/wininet.h            &
+    h/winioctl.h           &
+    h/winldap.h            &
+    h/winnetwk.h           &
+    h/winnls.h             &
+    h/winnt.h              &
+    h/winnt.rh             &
+    h/winperf.h            &
+    h/winreg.h             &
+    h/winres.h             &
+    h/winresrc.h           &
+    h/winscard.h           &
+    h/winsdkve.h           &
+    h/winsmcrd.h           &
+    h/winsnmp.h            &
+    h/winsock.h            &
+    h/winsock2.h           &
+    h/winspool.h           &
+    h/winsvc.h             &
+    h/wintrust.h           &
+    h/winuser.h            &
+    h/winuser.rh           &
+    h/winver.h             &
+    h/wlantype.h           &
+    h/wmistr.h             &
+    h/wnnc.h               &
+    h/ws2def.h             &
+    h/ws2ipdef.h           &
+    h/ws2spi.h             &
+    h/ws2tcpip.h           &
+    h/wsipx.h              &
+    h/wsnetbs.h            &
+    h/wtsapi32.h           &
+    h/wtypes.h             &
+    h/xprtdefs.h           &
+    h/zmouse.h             &
+    h/ddk/atm.h            &
+    h/ddk/bugcodes.h       &
+    h/ddk/cfg.h            &
+    h/ddk/cfgmgr32.h       &
+    h/ddk/classpnp.h       &
+    h/ddk/d4drvif.h        &
+    h/ddk/d4iface.h        &
+    h/ddk/dderror.h        &
+    h/ddk/ddkmapi.h        &
+    h/ddk/ddrawint.h       &
+    h/ddk/devioctl.h       &
+    h/ddk/drvspecs.h       &
+    h/ddk/hidclass.h       &
+    h/ddk/hidpi.h          &
+    h/ddk/hidsdi.h         &
+    h/ddk/hidusage.h       &
+    h/ddk/kbdmou.h         &
+    h/ddk/mcd.h            &
+    h/ddk/mce.h            &
+    h/ddk/miniport.h       &
+    h/ddk/minitape.h       &
+    h/ddk/mountdev.h       &
+    h/ddk/mountmgr.h       &
+    h/ddk/ndis.h           &
+    h/ddk/ndisguid.h       &
+    h/ddk/ndistapi.h       &
+    h/ddk/ndiswan.h        &
+    h/ddk/netevent.h       &
+    h/ddk/netpnp.h         &
+    h/ddk/ntdd8042.h       &
+    h/ddk/ntddbeep.h       &
+    h/ddk/ntddcdrm.h       &
+    h/ddk/ntddcdvd.h       &
+    h/ddk/ntddchgr.h       &
+    h/ddk/ntdddisk.h       &
+    h/ddk/ntddk.h          &
+    h/ddk/ntddkbd.h        &
+    h/ddk/ntddmou.h        &
+    h/ddk/ntddpar.h        &
+    h/ddk/ntddpcm.h        &
+    h/ddk/ntddscsi.h       &
+    h/ddk/ntddser.h        &
+    h/ddk/ntddstor.h       &
+    h/ddk/ntddtape.h       &
+    h/ddk/ntddtdi.h        &
+    h/ddk/ntddvdeo.h       &
+    h/ddk/ntddvol.h        &
+    h/ddk/ntdef.h          &
+    h/ddk/ntifs.h          &
+    h/ddk/ntiologc.h       &
+    h/ddk/ntnls.h          &
+    h/ddk/ntpoapi.h        &
+    h/ddk/ntstatus.h       &
+    h/ddk/parallel.h       &
+    h/ddk/pfhook.h         &
+    h/ddk/poclass.h        &
+    h/ddk/srb.h            &
+    h/ddk/scsi.h           &
+    h/ddk/scsiscan.h       &
+    h/ddk/scsiwmi.h        &
+    h/ddk/smbus.h          &
+    h/ddk/storport.h       &
+    h/ddk/tdi.h            &
+    h/ddk/tdiinfo.h        &
+    h/ddk/tdikrnl.h        &
+    h/ddk/tdistat.h        &
+    h/ddk/upssvc.h         &
+    h/ddk/usb.h            &
+    h/ddk/usb100.h         &
+    h/ddk/usb200.h         &
+    h/ddk/usbcamdi.h       &
+    h/ddk/usbdi.h          &
+    h/ddk/usbioctl.h       &
+    h/ddk/usbiodef.h       &
+    h/ddk/usbscan.h        &
+    h/ddk/usbspec.h        &
+    h/ddk/usbuser.h        &
+    h/ddk/video.h          &
+    h/ddk/videoagp.h       &
+    h/ddk/wdm.h            &
+    h/ddk/wdmguid.h        &
+    h/ddk/winddi.h         &
+    h/ddk/wmidata.h        &
+    h/ddk/wmilib.h         &
+    h/ddk/ws2san.h         &
+    h/ddk/xfilter.h        &
+    h/directx/d3d.h        &
+    h/directx/d3d9.h       &
+    h/directx/d3d9caps.h   &
+    h/directx/d3d9type.h   &
+    h/directx/d3dcaps.h    &
+    h/directx/d3drm.h      &
+    h/directx/d3drmdef.h   &
+    h/directx/d3drmobj.h   &
+    h/directx/d3dtypes.h   &
+    h/directx/dinput.h     &
+    h/directx/dsound.h     &
+    h/directx/dvp.h        &
+    h/directx/dxtrans.h    &
+    h/GL/gl.h              &
+    h/GL/glu.h
+
+all : $(dirs) $(headers) .SYMBOLIC
+    @%null
+
+.mh: $(mh_dir)
+.sp: $(hdr_dir)
+
+.mh.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+.mh{h}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+{ddk}.mh{h/ddk}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+{directx}.mh{h/directx}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+{GL}.mh{h/GL}.h:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts)
+
+.mh.rh:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts_r)
+
+.mh{h}.rh:
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts_r)
+
+h/winsock2.h: winsock.mh
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts_ws2)
+
+h/winresrc.h: winresrc.mh
+    @%make echo_wsplice
+    $(wsplice) $(wsplice_opts_r)
+
+.sp.gsp:
+    $(awk) -f $(hdr_dir)/cpyyear.awk -v CPYYEAR=$(curr_year) -v OUTFILE=$@ $[@
+
+$(dirs):
+    mkdir $@
+
+!include $(mh_dir)/deps.mif
+
+clean: .SYMBOLIC
+    rm -f *.h *.rh *.tmp *.lst *.err
+    rm -f $(additional_clean)
+    rm -rf $(dirs)

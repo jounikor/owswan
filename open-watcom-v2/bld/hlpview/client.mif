@@ -1,0 +1,13 @@
+!ifneq sys_windowed 1
+hlpview_objs =	  &
+    help.obj      &
+    vvscroll.obj  &
+    helpopen.obj  &
+    helpio.obj    &
+    helpscan.obj  &
+    dlg.obj       &
+    msgbox.obj    &
+    search.obj    &
+    dialcb.obj
+hlpview_inc_dirs = -I"$(hlpview_dir)/h"
+!endif

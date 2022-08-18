@@ -1,0 +1,102 @@
+/***************************************************************************
+ * FILE: wctype.h/cwctype (Wide character classification functions)
+ *
+:include crwat.sp
+ *
+ * Description: This header is part of the C/C++ standard library. It
+ *              declares functions and types used to classify wide
+ *              characters.
+ ***************************************************************************/
+:segment CNAME
+#ifndef _CWCTYPE_INCLUDED
+#define _CWCTYPE_INCLUDED
+
+:include readonly.sp
+
+:include cpponly.sp
+:elsesegment
+#ifndef _WCTYPE_H_INCLUDED
+#define _WCTYPE_H_INCLUDED
+
+:include readonly.sp
+
+:: The following segment only appears in wctype.h.
+#ifdef __cplusplus
+
+#include <cwctype>
+
+// C99 types in wctype.h
+#ifndef _WINT_T_DEFINED
+#define _WINT_T_DEFINED
+ #define _WINT_T_DEFINED_
+ using std::wint_t;
+#endif
+#ifndef _WCTYPE_T_DEFINED
+#define _WCTYPE_T_DEFINED
+ #define _WCTYPE_T_DEFINED_
+ using std::wctype_t;
+#endif
+
+// C99 functions in wctype.h
+using std::iswalnum;
+using std::iswalpha;
+using std::iswcntrl;
+using std::iswdigit;
+using std::iswgraph;
+using std::iswlower;
+using std::iswprint;
+using std::iswpunct;
+using std::iswspace;
+using std::iswupper;
+using std::iswxdigit;
+using std::iswctype;
+using std::wctype;
+using std::towlower;
+using std::towupper;
+
+:: C99 functions in wctype.h that are currently considered extensions.
+:include extc99.sp
+using std::iswblank;
+:include extepi.sp
+
+#else /* __cplusplus not defined */
+:: End of segment that is only in wctype.h
+:endsegment
+
+:include owrtlink.sp
+
+:: Only need extern "C" in cwctype
+:segment CNAME
+:include cpluspro.sp
+
+:endsegment
+:include weof.sp
+
+:include wint_t.sp
+
+:include wctype_t.sp
+
+:include wctranst.sp
+
+:include wctype.sp
+
+:include ext.sp
+_WCRTLINK extern int        iswascii( __w_wint_t __wc );
+_WCRTLINK extern int        __iswcsymf( __w_wint_t __wc );
+_WCRTLINK extern int        __iswcsym( __w_wint_t __wc );
+#ifndef __FUNCTION_DATA_ACCESS
+:segment !CNAME
+#define iswascii(__c)       ((unsigned)(__c) < 0x80)
+:endsegment
+#define __iswcsymf(__c)     (iswalpha(__c) || ((__c)=='_'))
+#define __iswcsym(__c)      (iswalnum(__c) || ((__c)=='_'))
+#endif
+:include extepi.sp
+
+:segment CNAME
+:include cplusepi.sp
+:elsesegment
+#endif /* __cplusplus not defined */
+:endsegment
+
+#endif

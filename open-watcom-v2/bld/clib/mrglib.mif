@@ -1,0 +1,25 @@
+!include $(clib_dir)/master.mif
+
+!include ../../objects.mif
+!include ../libs.mif
+
+.c : ../../c
+
+all : $(libname).lib .symbolic
+    @%null
+
+$(libname).lib : $(objs) $(libs) $(__MAKEFILES__)
+    $(noecho)%create $^&.lbc
+    @for %i in ($(libs)) do @%append $^&.lbc +%i
+    @for %i in ($(objs)) do @%append $^&.lbc +%i
+    @rm -f export.tmp
+    @rm -f export.gdf
+    @%make echo_lib
+    $(librarian) $(clib_lib_flags) $(clib_linkage_flags) $@ @$^&.lbc
+!ifeq linkage dynamic
+    $(sed) -f $(lib_misc_dir)/sed/export.sed export.tmp > export.gdf
+!endif
+
+!include ../../deps.mif
+
+!include $(clib_dir)/clean.mif

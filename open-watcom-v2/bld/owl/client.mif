@@ -1,0 +1,24 @@
+# OWL library finder.
+# ~~~~~~~~~~~~~~~~~~
+#
+
+!ifdef bootstrap
+owl_lib = $(owl_dir)/$(objs_subdir)/owl.lib
+!else ifeq $(proj_name)_rtdll 1
+#
+# OWL run-time DLL used
+#
+owl_lib = $(owl_dir)/$(objs_subdir).rtd/owl.lib
+!else ifeq $(proj_name)_dll 1
+#
+# OWL DLL used
+#
+owl_lib = $(owl_dir)/$(objs_subdir).dll/owl.lib
+!else
+#
+# OWL library used
+#
+owl_lib = $(owl_dir)/$(objs_subdir)/owl.lib
+!endif
+
+owl_inc_dirs = -I"$(owl_dir)/h"

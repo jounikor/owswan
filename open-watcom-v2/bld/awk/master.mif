@@ -1,0 +1,51 @@
+proj_name = awk
+
+!ifndef awk_autodepends
+awk_autodepends = .autodepend
+!endif
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c: ../c
+
+inc_dirs = -I"../h"
+
+!ifdef __WATCOM_TOOLS__
+extra_c_flags_ytab = -wcd=118 -wcd=202
+!endif
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_objs = &
+    b.obj &
+    main.obj &
+    parse.obj &
+    proctab.obj &
+    tran.obj &
+    lib.obj &
+    run.obj &
+    lex.obj &
+    ytab.obj &
+    missin95.obj
+!include exetarg.mif
+
+#
+# rc and others
+#
+proctab.c : ./maketab.exe ../h/ytab.h
+    $(noecho)copy $]@ ytab.h
+    @%make echo_execute
+    $(noecho)$[@ > proctab.c
+
+./maketab.exe : ../c/maketab.c
+    @%make echo_bldcl
+    $(bld_cl) $[@ -I"../h" $(bld_clflags) $(bld_ldflags)

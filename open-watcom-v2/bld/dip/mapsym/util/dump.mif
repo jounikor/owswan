@@ -1,0 +1,21 @@
+proj_name = symdump
+
+symdump_autodepends = .autodepend
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c: ..
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_objs = symdump.obj
+!include exetarg.mif

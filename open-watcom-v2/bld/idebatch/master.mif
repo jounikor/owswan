@@ -1,0 +1,96 @@
+proj_name = idebatch
+
+idebatch_autodepend = .AUTODEPEND
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+!ifeq host_os os2
+
+.c: ../os2;../c
+
+exetarg_objs = batserv.obj
+exetarg_opts = op stack=16k
+exetarg_name = batserv
+!include exetarg.mif
+
+!else ifeq host_os nt
+
+.c: ../nt;../c
+
+inc_dirs = -I"../nt" -I"../h"
+
+all: batserv.exe tstnt.exe .symbolic
+
+exetarg_objs = batserv.obj batpipe.obj
+exetarg_opts = op stack=32k
+exetarg_name = batserv
+!include exetarg.mif
+
+exetarg_objs = tst.obj batcli.obj batpipe.obj
+exetarg_opts = op stack=32k
+exetarg_name = tstnt
+!include exetarg.mif
+
+!else ifeq host_os dos
+
+.c: ../dos;../c;../os2
+.asm: ../dos
+
+inc_dirs = -I"../dos" -I"../h" -I"../os2"
+
+all: dosserv.exe tstos2.exe .symbolic
+
+exetarg_objs = int.obj link.obj int21.obj
+exetarg_opts = op stack=1500
+exetarg_name = dosserv
+!include exetarg.mif
+
+exetarg_objs = tst.obj batcli.obj
+exetarg_name = tstos2
+!include exetarg.mif
+
+!else ifeq host_os win
+
+subdir_editor = eobjs
+
+.c: ../win;../dos
+
+inc_dirs = -I"../win" -I"../dos"
+
+extra_cpp_flags = -DSERVER
+
+extra_cpp_editor_flags = -D__EDITOR__
+
+extra_c_flags = -zW -zu
+
+extra_l_flags_win = font mem &
+    option stack=10k &
+    segment CLASS 'CODE' PRELOAD FIXED &
+    segment CLASS 'FAR_DATA' PRELOAD FIXED &
+    segment CLASS 'BEGDATA' PRELOAD FIXED &
+    segment CLASS 'DATA' PRELOAD FIXED &
+    segment CLASS 'BSS' PRELOAD FIXED
+
+all : winint.exe wininte.exe .SYMBOLIC
+
+exetarg_objs = winint.obj link.obj
+exetarg_res = winint.res
+exetarg_name = winint
+!include exetarg.mif
+
+exetarg_prebuild_objs = $(subdir_editor)
+exetarg_objs = $(subdir_editor)/winint.obj link.obj
+exetarg_res = wininte.res
+exetarg_name = wininte
+!include exetarg.mif
+
+winint.res wininte.res : ../winint.rc
+    @%make echo_rc
+    $(rc) $(rc_flags) $(inc_dirs) $[@ -fo=$@
+
+defrule_key = editor
+!include defrule.mif
+
+!endif

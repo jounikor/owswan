@@ -1,0 +1,181 @@
+/*
+ *  sys/stat.h  Equates and prototype for fstat, stat functions
+ *
+:include crwat.sp
+ */
+#ifndef _SYS_STAT_H_INCLUDED
+#define _SYS_STAT_H_INCLUDED
+
+:include readonly.sp
+
+:include extposix.sp
+
+:include owrtlink.sp
+
+:segment DOS
+:include lfndos.sp
+
+:endsegment
+:include cpluspro.sp
+
+:segment LINUX
+:include lnxkpack.sp
+
+:elsesegment DOS | RDOS
+:include pshpackl.sp
+
+:endsegment
+/*
+ *  ISO C types
+ */
+:include time_t.sp
+:keep EXTWCHART
+:include wchar_t.sp
+:remove EXTWCHART
+/*
+ *  POSIX 1003.1 types
+ */
+:include off_t.sp
+:segment LINUX
+
+/* Versions of the 'struct stat' data structure.  */
+#define _STAT_VER_LINUX_OLD 1
+#define _STAT_VER_KERNEL    1
+#define _STAT_VER_SVR4      2
+#define _STAT_VER_LINUX     3
+#define _STAT_VER           _STAT_VER_LINUX /* The one defined below.  */
+
+:include incdir.sp
+
+#include _ARCH_INCLUDE(sys/stat.h)
+
+:elsesegment DOS | RDOS
+:include dev_t.sp
+:include ino_t.sp
+:include mode_t.sp
+:include nlink_t.sp
+:include uid_t.sp
+:include gid_t.sp
+
+struct stat {
+    dev_t           st_dev;         /* disk drive file resides on */
+    ino_t           st_ino;         /* this inode's #, not used for DOS */
+    mode_t          st_mode;        /* file mode */
+    nlink_t         st_nlink;       /* # of hard links */
+    uid_t           st_uid;         /* user-id, always 'root' */
+    gid_t           st_gid;         /* group-id, always 'root' */
+    dev_t           st_rdev;        /* should be device type */
+                                    /* but same as st_dev for the time being */
+    off_t           st_size;        /* total file size */
+    time_t          st_atime;       /* should be file last access time */
+    time_t          st_mtime;       /* file last modify time */
+    time_t          st_ctime;       /* should be file last status change time */
+
+    time_t          st_btime;       /* last archived date and time */
+    unsigned long   st_attr;        /* file attributes */
+                                    /* next 4 fields Netware only */
+    unsigned long   st_archivedID;  /* user/object ID that last archived file */
+    unsigned long   st_updatedID;   /* user/object ID that last updated file */
+    unsigned short  st_inheritedRightsMask;
+    unsigned char   st_originatingNameSpace;
+};
+
+:: Extensions MS/Open Watcom
+:include ext.sp
+struct _stat {
+    dev_t           st_dev;         /* disk drive file resides on */
+    ino_t           st_ino;         /* this inode's #, not used for DOS */
+    mode_t          st_mode;        /* file mode */
+    nlink_t         st_nlink;       /* # of hard links */
+    uid_t           st_uid;         /* user-id, always 'root' */
+    gid_t           st_gid;         /* group-id, always 'root' */
+    dev_t           st_rdev;        /* should be device type */
+                                    /* but same as st_dev for the time being */
+    off_t           st_size;        /* total file size */
+    time_t          st_atime;       /* should be file last access time */
+    time_t          st_mtime;       /* file last modify time */
+    time_t          st_ctime;       /* should be file last status change time */
+
+    time_t          st_btime;       /* last archived date and time */
+    unsigned long   st_attr;        /* file attributes */
+                                    /* next 4 fields Netware only */
+    unsigned long   st_archivedID;  /* user/object ID that last archived file */
+    unsigned long   st_updatedID;   /* user/object ID that last updated file */
+    unsigned short  st_inheritedRightsMask;
+    unsigned char   st_originatingNameSpace;
+};
+:segment DOS
+
+struct _stati64 {
+    dev_t           st_dev;         /* disk drive file resides on */
+    ino_t           st_ino;         /* this inode's #, not used for DOS */
+    mode_t          st_mode;        /* file mode */
+    nlink_t         st_nlink;       /* # of hard links */
+    uid_t           st_uid;         /* user-id, always 'root' */
+    gid_t           st_gid;         /* group-id, always 'root' */
+    dev_t           st_rdev;        /* should be device type */
+                                    /* but same as st_dev for the time being */
+    __int64         st_size;        /* total file size */
+    time_t          st_atime;       /* should be file last access time */
+    time_t          st_mtime;       /* file last modify time */
+    time_t          st_ctime;       /* should be file last status change time */
+
+    time_t          st_btime;       /* last archived date and time */
+    unsigned long   st_attr;        /* file attributes */
+                                    /* next 4 fields Netware only */
+    unsigned long   st_archivedID;  /* user/object ID that last archived file */
+    unsigned long   st_updatedID;   /* user/object ID that last updated file */
+    unsigned short  st_inheritedRightsMask;
+    unsigned char   st_originatingNameSpace;
+};
+:endsegment
+:include extepi.sp
+
+:endsegment
+:include modedef.sp
+
+#define S_ISFIFO(__m) (((__m)&S_IFMT)==S_IFIFO)    /* Test for FIFO (pipe)        */
+#define S_ISCHR(__m)  (((__m)&S_IFMT)==S_IFCHR)    /* Test for char special file  */
+#define S_ISDIR(__m)  (((__m)&S_IFMT)==S_IFDIR)    /* Test for directory file     */
+#define S_ISBLK(__m)  (((__m)&S_IFMT)==S_IFBLK)    /* Test for block specl file   */
+#define S_ISREG(__m)  (((__m)&S_IFMT)==S_IFREG)    /* Test for regular file       */
+#define S_ISLNK(__m)  (((__m)&S_IFMT)==S_IFLNK)    /* Test for symbolic link      */
+#define S_ISNAM(__m)  (((__m)&S_IFMT)==S_IFNAM)    /* Test for special named file */
+#define S_ISSOCK(__m) (((__m)&S_IFMT)==S_IFSOCK)   /* Test for socket             */
+
+/*
+ *  POSIX 1003.1 Prototypes.
+ */
+:include chmod.sp
+:include umask.sp
+:include mkdir.sp
+:segment LINUX
+_WCRTLINK extern int        fchmod( int __fildes, mode_t __mode );
+_WCRTLINK extern int        mkfifo( const char *__path, mode_t __mode );
+_WCRTLINK extern int        mknod( const char *__path, mode_t __mode, int __dev );
+:endsegment
+:include stat.sp
+::
+:: Extensions MS/Open Watcom
+:segment DOS | LINUX | RDOS
+:include ext.sp
+:keep ANSINAME
+:include mkdir.sp
+:include stat.sp
+:remove ANSINAME
+:keep WIDE
+:segment DOS
+:include mkdir.sp
+:include stat.sp
+:endsegment
+:remove WIDE
+:include extepi.sp
+:endsegment
+
+:include poppack.sp
+
+:include cplusepi.sp
+
+:include extepi.sp
+
+#endif

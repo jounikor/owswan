@@ -1,0 +1,9 @@
+hello.obj
+hello
+../macros/hello.tmp hello.c hello.boo
+../macros/hello.tmp hello.c hello.boo
+hello.c
+../macros/ . .
+hello
+hello.obj
+hello

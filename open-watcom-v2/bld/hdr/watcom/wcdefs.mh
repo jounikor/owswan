@@ -1,0 +1,29 @@
+//
+//  wcdefs.h   Definitions for the WATCOM Container Classes
+//
+:keep CPP_HDR
+:include crwat.sp
+//
+#ifndef _WCDEFS_H_INCLUDED
+#define _WCDEFS_H_INCLUDED
+
+:include readonly.sp
+
+:include cpponly.sp
+
+:include owrtlink.sp
+
+#ifndef _EXCEPT_H_INCLUDED
+ #include <except.h>
+#endif
+
+typedef int             WCbool;
+
+#ifndef TRUE
+ #define TRUE           ((WCbool)1)
+ #define FALSE          ((WCbool)0)
+#endif
+
+:include size_t.sp
+
+#endif

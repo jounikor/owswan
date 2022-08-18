@@ -1,0 +1,14 @@
+target_cpu = jvm
+
+imp_objs = &
+        jvmaddr.obj &
+        jvmctrl.obj &
+        jvmtypes.obj &
+        jvmreg.obj &
+        jvmcall.obj &
+        jvmdisas.obj &
+        jvmtrace.obj
+
+extra_incs = -I"$(javasdk)/include" -I"$(javasdk)/include/win32" -I"$(java_src_dir)/src/win32/java/include"
+
+!include ../../master.mif

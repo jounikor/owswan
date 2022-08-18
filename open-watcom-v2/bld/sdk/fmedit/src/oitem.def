@@ -1,0 +1,2 @@
+extern INT_CREATE_RTN OItemCreate;
+extern void     InitOItem( void );

@@ -1,0 +1,50 @@
+proj_name = cwc
+
+cwc_autodepends = .AUTODEPEND
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c : ../../c;$(watcom_dir)/c
+.asm : ../../asm
+
+inc_dirs = -I.
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_prebuild_objs = copystub.gh decstub.gh
+exetarg_objs          = cwc.obj
+!include exetarg.mif
+
+#
+# rc and others
+#
+copystub.tmp : copystub.asm
+    @%make echo_aslink
+    $(noecho)*bwasm -zq -fo=$^&.obj $[@
+    $(noecho)*bwlink system bin op quiet file $^&.obj name $@
+
+copystub.gh : ./mkcode.exe copystub.tmp
+    @%make echo_execute
+    $(noecho)$[@ -b $]@ $@
+
+decstub.tmp : decstub.asm
+    @%make echo_aslink
+    $(noecho)*bwasm -zq -fo=$^&.obj $[@
+    $(noecho)*bwlink system bin op quiet file $^&.obj name $@
+
+decstub.gh : ./mkcode.exe decstub.tmp
+    @%make echo_execute
+    $(noecho)$[@ -b $]@ $@
+
+./mkcode.exe: mkcode.c
+    @%make echo_bldcl
+    $(bld_cl) $[@ $(bld_clflags) $(bld_ldflags)

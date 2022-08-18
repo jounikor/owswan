@@ -1,0 +1,60 @@
+proj_name = idelib
+name      = ide
+
+!ifndef idelib_autodepends
+idelib_autodepends = .AUTODEPEND
+!endif
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+!include $(wclass_dir)/client.mif
+
+#
+# cflags
+#
+.cpp : ../cpp
+
+inc_dirs = -I. -I"../h" $(wclass_inc_dirs) -I"$(lib_misc_dir)/h"
+
+!ifdef __WATCOM_TOOLS__
+extra_c_flags_i86 = -zc -zm
+!endif
+
+# explicit rules
+#################
+
+#
+# LIB
+#
+libtarg_objs = &
+    contfile.obj &
+    maccel.obj &
+    maction.obj &
+    mactset.obj &
+    mc2swtch.obj &
+    mcommand.obj &
+    mcompon.obj &
+    mconfig.obj &
+    mcstate.obj &
+    mcswitch.obj &
+    mfamily.obj &
+    mitem.obj &
+    mproject.obj &
+    mrstate.obj &
+    mrswitch.obj &
+    mrule.obj &
+    mstate.obj &
+    mswitch.obj &
+    msymbol.obj &
+    mtarget.obj &
+    mtool.obj &
+    mtoolitm.obj &
+    mtypo.obj &
+    mvstate.obj &
+    mvswitch.obj &
+    mworkfil.obj
+libtarg_name = $(name)
+!include libtarg.mif
+

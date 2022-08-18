@@ -1,0 +1,234 @@
+pick( MSTR_NIL,
+    "",
+    "" )
+pick( MSTR_BYTE,
+    "&Byte",
+    "j&Byte" )
+pick( MSTR_WORD,
+    "&Word",
+    "j&Word" )
+pick( MSTR_DWORD,
+    "&DWord",
+    "j&DWord" )
+pick( MSTR_LWORD,
+    "LWo&rd",
+    "jLWo&rd" )
+pick( MSTR_QWORD,
+    "&QWord",
+    "j&QWord" )
+pick( MSTR_CHAR,
+    "&Char",
+    "j&Char" )
+pick( MSTR_SHORT,
+    "&Short",
+    "j&Short" )
+pick( MSTR_LONG,
+    "&Long",
+    "j&Llong" )
+pick( MSTR_UCHAR,
+    "Unsigned Cha&r",
+    "jUnsigned Cha&r" )
+pick( MSTR_USHORT,
+    "Unsigned Shor&t",
+    "jUnsigned Shor&t" )
+pick( MSTR_ULONG,
+    "Unsigned Lon&g",
+    "jUnsigned Lon&g" )
+pick( MSTR_N16_PTR,
+    "&0:16 pointer",
+    "j&0:16 pointer" )
+pick( MSTR_F16_PTR,
+    "16:1&6 pointer",
+    "j16:1&6 pointer" )
+pick( MSTR_N32_PTR,
+    "0:3&2 pointer",
+    "j0:3&2 pointer" )
+pick( MSTR_F32_PTR,
+    "16:&32 pointer",
+    "j16:&32 pointer" )
+pick( MSTR_FLOAT,
+    "&Float",
+    "j&Float" )
+pick( MSTR_DOUBLE,
+    "D&ouble",
+    "jD&ouble" )
+pick( MSTR_EXTENDED,
+    "&Extended Float",
+    "j&Extended Float" )
+pick( MSTR_MUPPER,
+    "&Upper",
+    "j&Upper" )
+pick( MSTR_MINSIDE,
+    "&Inside",
+    "j&Inside" )
+pick( MSTR_UPPER,
+    "Upper",
+    "Upper" ) // do not translate
+pick( MSTR_LOWER,
+    "Lower",
+    "Lower" ) // do not translate
+pick( MSTR_INSIDE,
+    "Inside",
+    "Inside" ) // do not translate
+pick( MSTR_OUTSIDE,
+    "Outside",
+    "Outside" ) // do not translate
+pick( MSTR_FAR,
+    "far",
+    "jfar" )
+pick( MSTR_NEAR,
+    "near",
+    "jnear" )
+pick( MSTR_INTERRUPT,
+    "interrupt",
+    "jinterrupt" )
+pick( MSTR_CPU,
+    "CPU registers",
+    "jCPU registers" )
+pick( MSTR_FPU,
+    "FPU registers",
+    "jFPU registers" )
+pick( MSTR_NONE,
+    "none",
+    "jnone" )
+pick( MSTR_EMULATOR,
+    "emulator",
+    "jemulator" )
+pick( MSTR_MHEX,
+    "&Hex",
+    "j&Hex" )
+pick( MSTR_HEX,
+    "Hexadecimal",
+    "Hexadecimal" ) // do not translate
+pick( MSTR_DECIMAL,
+    "Decimal",
+    "Decimal" ) // do not translate
+pick( MSTR_MEXTENDED,
+    "&Extended",
+    "j&Extended" )
+pick( MSTR_REG_EXTENDED,
+    "Extended",
+    "Extended" ) // do not translate
+pick( MSTR_REG_NORMAL,
+    "Normal",
+    "Normal" ) // do not translate
+pick( MSTR_VALID,
+    "Valid",
+    "jValid" )
+pick( MSTR_ZERO,
+    "Zero",
+    "jZero" )
+pick( MSTR_SPECIAL,
+    "Special",
+    "jSpecial" )
+pick( MSTR_EMPTY,
+    "Empty",
+    "jEmpty" )
+pick( MSTR_PCZERO,    //Unused
+    "0",
+    "0" )
+pick( MSTR_PCSINGLE,
+    "single",
+    "jsingle" )
+pick( MSTR_PCDOUBLE,
+    "double",
+    "jdouble" )
+pick( MSTR_PCEXTENDED,
+    "extended",
+    "jextended" )
+pick( MSTR_NEAREST,
+    "nearest",
+    "jnearest" )
+pick( MSTR_DOWN,
+    "down",
+    "jdown" )
+pick( MSTR_UP,
+    "up",
+    "jup" )
+pick( MSTR_CHOP,
+    "chop",
+    "jchop" )
+pick( MSTR_PROJECTIVE,
+    "projective",
+    "jprojective" )
+pick( MSTR_AFFINE,
+    "affine",
+    "jaffine" )
+pick( MSTR_F_FLOAT,
+    "F flo&ating",
+    "jF flo&ating" )
+pick( MSTR_G_FLOAT,
+    "G floa&ting",
+    "jG floa&ting" )
+pick( MSTR_D_FLOAT,
+    "&D floating",
+    "j&D floating" )
+pick( MSTR_MVAX,
+    "&Vax",
+    "j&Vax" )
+pick( MSTR_VAX,
+    "Vax",
+    "Vax" )
+pick( MSTR_IEEE,
+    "IEEE",
+    "IEEE" )
+pick( MSTR_MSYMBOLIC,
+    "&Symbolic names",
+    "j&Symbolic names" )
+pick( MSTR_REG_SYMBOLIC,
+    "Symbolic",
+    "jSymbolic" )
+pick( MSTR_REG_NUMERIC,
+    "Numeric",
+    "jNumeric" )
+pick( MSTR_UNSIGNED64,
+    "Unsigned __int6&4",
+    "Unsigned __int6&4" )
+pick( MSTR_INT64,
+    "&__int64",
+    "&__int64" )
+pick( MSTR_MPSEUDOINS,
+    "&Pseudo instructions",
+    "j&Pseudo instructions" )
+pick( MSTR_PSEUDOINS,
+    "Pseudo_instructions",
+    "jPseudo_instructions" )
+pick( MSTR_RAWINS,
+    "Raw_instructions",
+    "jRaw_instructions" )
+pick( MSTR_N64_PTR,
+    "0:6&4 pointer",
+    "j0:6&4 pointer" )
+pick( MSTR_MOS,
+    "&OS",
+    "j&OS" )
+pick( MSTR_REG_OS,
+    "OS",
+    "jOS" )
+pick( MSTR_REG_USER,
+    "User",
+    "jUser" )
+pick( MSTR_HWORD,
+    "&HWord",
+    "j&HWord" )
+pick( MSTR_MMX,
+    "MMX Registers",
+    "jMMX Registers" )
+pick( MSTR_XMM,
+    "XMM Registers",
+    "jXMM Registers" )
+pick( MSTR_UNSIGNED,
+    "&Unsigned",
+    "j&Unsigned" )
+pick( MSTR_SIGNED,
+    "&Signed",
+    "j&Signed" )
+pick( MSTR_INT,
+    "&Int",
+    "j&Int" )
+pick( MSTR_HALF,
+    "&Halfword",
+    "j&Halfword" )
+pick( MSTR_DBLW,
+    "&Doubleword",
+    "j&Doubleword" )

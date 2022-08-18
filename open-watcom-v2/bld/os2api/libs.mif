@@ -1,0 +1,50 @@
+#-------------------------------------------
+#                           libs286 libs386
+#-------------------------------------------
+!inject lib/os2.lib         libs286
+!inject lib/os2386.lib              libs386
+!inject lib/rexx.lib                libs386
+!inject lib/tcpip32.lib             libs386
+!inject lib/ftpapi.lib              libs386
+!inject lib/opengl.lib              libs386
+!inject lib/glut.lib                libs386
+!inject lib/libtk.lib               libs386
+!inject lib/libaux.lib              libs386
+!inject lib/mmpm2.lib               libs386
+!inject lib/rtmidi.lib              libs386
+!inject lib/upm32.lib               libs386
+!inject lib/libuls.lib              libs386
+!inject lib/libconv.lib             libs386
+
+#--------------------------------------------------------------
+#                           comp286 comp386 comprexx compmmpm2
+#--------------------------------------------------------------
+!inject ansicall.lbc        comp286
+!inject bdcalls.lbc                 comp386
+!inject doscalls.lbc        comp286 comp386
+!inject helpmgr.lbc                 comp386
+!inject kbdcalls.lbc        comp286 comp386
+!inject moncalls.lbc        comp286 comp386
+!inject moucalls.lbc        comp286 comp386
+!inject msg.lbc             comp286 comp386
+!inject nampipes.lbc        comp286 comp386
+!inject nls.lbc             comp286 comp386
+!inject os2sm.lbc           comp286
+!inject pmctls.lbc                  comp386
+!inject pmdrag.lbc                  comp386
+!inject pmgpi.lbc           comp286 comp386
+!inject pmspl.lbc                   comp386
+!inject pmshapi.lbc         comp286 comp386
+!inject pmviop.lbc          comp286 comp386
+!inject pmwin.lbc           comp286 comp386
+!inject pmwp.lbc                    comp386
+!inject quecalls.lbc        comp286 comp386
+!inject sesmgr.lbc          comp286 comp386
+!inject viocalls.lbc        comp286 comp386
+!inject rexx.lbc                            comprexx
+!inject rexxapi.lbc                         comprexx
+!inject dive.lbc                                     compmmpm2
+!inject mciapi.lbc                                   compmmpm2
+!inject mdm.lbc                                      compmmpm2
+!inject mmio.lbc                                     compmmpm2
+!inject sw.lbc                                       compmmpm2

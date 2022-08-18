@@ -1,0 +1,27 @@
+proj_name = exedmp
+
+exedmp_autodepends = .AUTODEPEND
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c: ../c
+
+inc_dirs = -I"../h"
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_objs = &
+    main.obj &
+    read.obj &
+    format.obj &
+    param.obj
+!include exetarg.mif

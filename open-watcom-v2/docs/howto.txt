@@ -1,0 +1,354 @@
+Open Watcom Documentation Guide
+===============================
+
+This document provides a brief overview of the Open Watcom documentation
+system and lists most of the steps necessary for editing and producing
+online or printed documents.
+
+It is useful to note that the online documentation is almost, but not quite,
+independent of the rest of the Open Watcom compilers and tools. The one
+important exception is online help files for Open Watcom GUI tools. Formatting
+online documentation generates include files containing #defines designating
+help entries. These are used during building of the tools binaries. If the
+binaries are not built with the right header files, the online help will
+be out of sync and will not be all that helpful.
+
+
+How to Set it up
+================
+
+Some platform limitation exist for documentation building.
+Therefore setup is specific for each platform used for build.
+
+Bellow is list of tools used by documentation build which have some limitation.
+
+- WGML OW tool is still only available as DOS and OS/2 version.
+  It is running only on DOS, 16 and 32-bit Windows and OS/2.
+  On Linux it can be run in DOSEMU.
+  On 64-bit Windows it can be run in DOSBOX.
+
+- Windows Help Compiler is available from Miscosoft 
+  ( http://support.microsoft.com/kb/171958/en-us or ftp://ftp.microsoft.com/softlib/mslfiles/hcwsetup.exe )
+  It is running only on 32/64-bit Windows.
+  On Linux it can be run in WINE environment.
+
+- Windows Html Help Compiler is available from Miscosoft. 
+  ( http://www.microsoft.com/en-us/download/details.aspx?id=21138 )
+  It is running only on 32/64-bit Windows.
+  On Linux it can be run in WINE environment.
+
+- Post Script to PDF convertor(GhostScript). 
+  It is not available for DOS.
+
+In following table is summarized what is possible to build.
+
+                      host OS
+Doc type       DOS  WIN32 WIN64  OS2  LINUX
+-------------- ---  ----- -----  ---  -----
+DOS help       yes   yes   yes   yes   yes
+Win32 help     no    yes   yes   no    yes
+Win Html help  no    yes   yes   no    yes
+Win16 help     yes   yes   yes   yes   yes
+OS/2 help      yes   yes   yes   yes   yes
+PDF doc        no    yes   yes   yes   yes
+PS doc         yes   yes   yes   yes   yes
+Html help      yes   yes   yes   yes   yes
+
+
+DOS
+----
+  You don't need to install or setup anything.
+  
+OS/2
+----
+  You must install 
+  - GhostScript
+  You must setup following environment variables in your copy of setvars.cmd
+  - OWGHOSTSCRIPTPATH to path where your GhostScript installation is located
+  
+Windows 32-bit
+--------------
+  You must install 
+  - Windows "Help Compiler"
+  - Window "Html Help Compiler".
+  - GhostScript
+  You must setup following environment variables in your copy of setvars.bat
+  - OWHHC must point to "Html Help Compiler" (hhc.exe)
+  - OWWIN95HC must point to "Help Compiler" (hcrtf.exe)
+  - OWGHOSTSCRIPTPATH to path where your GhostScript installation is located
+
+  Note: for some type of 32-bit Windows WGML utility doesn't work with Windows
+  DOS emulator (DOSX). In this case DOSBOX installation is recommended.
+  If you use DOSBOX you must setup OWDOSBOX environment variable to point your 
+  DOSBOX emulator executable (dosbox.exe).
+
+Windows 64-bit
+--------------
+  You must install
+  - DOSBOX emulator
+  - Windows "Help Compiler"
+  - Window "Html Help Compiler".
+  - GhostScript
+  You must setup following environment variables in your copy of setvars.bat
+  - OWHHC must point to "Html Help Compiler" (hhc.exe)
+  - OWWIN95HC must point to "Help Compiler" (hcrtf.exe)
+  - OWGHOSTSCRIPTPATH to path where your GhostScript installation is located
+  - OWDOSBOX must point to DOSBOX executable (dosbox.exe)
+
+Linux x86/x64
+-------------
+  You must install
+  - DOSEMU with FreeDOS
+  - WINE
+  - Windows "Help Compiler" (under WINE)
+  - Window "Html Help Compiler" (under WINE)
+  - GhostScript
+  You must setup following environment variables in your copy of setvars.sh
+  - OWHHC must point to "Html Help Compiler" (hhc.exe)
+  - OWWIN95HC must point to "Help Compiler" (hcrtf.exe)
+  - OWGHOSTSCRIPTPATH to path where your GhostScript installation is located
+
+A Win32/64, OS/2 or Linux x86/x64 system can be used to produce most of 
+the documentation. Win32/64 or Linux x86/x64(with WINE) system is needed for 
+producing Windows help files (unless you can run the required Windows help 
+compilers under your host OS).
+DOS may work too but it is untested at this time.
+
+The environment variable "OWROOT" must point to the root of the OW
+tree. Add %OWROOT%\docs\cmds to your PATH. Your PATH must also contain the 
+Watcom C/C++ binary directories appropriate for your host platform (for wmake).
+This is taken care of automatically by using setvars.cmd/setvars.bat.
+
+
+How it is organized
+===================
+
+Under the main documentation directory are number of sub-directories.
+
+gml       It is main directory for GML SCRIPT. It contains all GML support files.
+
+doc       Main documentation source directory.
+
+cmds      It contains arbitrary files for creating on-line help version (help compilers etc.).
+
+mif       Contains makefiles for the documentation building system.
+
+dos os2 win nt Here on-line help version are created for each operating system.
+
+ps        Here the post script documentation is created.
+
+html      Html version of the documentation is there.
+
+htmlhelp  Windows Html version of the documentation is there.
+
+pdf       Here the PDF documentation is created.
+
+
+How to Build Postscript Versions of the Documentation
+=====================================================
+
+Here are the steps to formatting a book for printing on a Postscript
+printer.
+
+You can run command  
+
+    builder rel docps
+
+from documentation main directory to build all books.
+
+If you want only one or a few books then you must go into ps sub-directory and
+run command
+
+    wmake hbook=<bn>
+
+where <bn> is one of
+
+        c_readme            C/C++ Read Me First
+        cguide              C/C++ User's Guide
+        cguideq             C/C++ User's Guide for QNX
+        clib                C Library Reference (for all systems except QNX)
+        clib_nec            C Library Reference Kanji Functions subset
+        clibnt              C Library Reference for Win32 (Power++)
+        clibqnx             C Library Reference for QNX (stale)
+        clbtst              C Library Reference (for testing a subset of doc)
+        clr                 C Language Reference
+        cpplib              C++ Class Library Reference (current)
+        cw                  CauseWay User's Guide
+        devguide            Developer's Guide
+        f_readme            F77 Read Me First
+        f77graph            F77 Graphics Library Reference
+        f77lr               FORTRAN 77 Language Reference
+        fpguide             F77 Programmer's Guide
+        ftools              F77 Tools User's Guide
+        fuguide             F77 User's Guide
+        guitool             Graphical Tools User's Guide
+        lguide              Linker User's Guide
+        pguide              C/C++ Programmer's Guide
+        tools               C/C++ Tools User's Guide
+        vi                  VI Editor
+        wasaxp              AXP Assembler User's Guide (obsolete)
+        wd                  Debugger User's Guide
+        wgmlref             Watcom Script/GML Tutorial and Reference Manual
+        wipfc               OS/2 Help Compiler Reference Manual
+
+        cgdoc               Code Generator
+        wddoc               Debugger
+
+The output file is of type ".ps". You should be able to send this to
+any PostScript printer or view in GhostScript or convert to PDF or
+whatever it is you do with PostScript files.
+
+
+How to Build Online Help Versions of the Documentation
+======================================================
+
+For Microsoft Windows Help formats:
+
+    All help files can be created by following commands.
+    
+    For win16 .hlp format by
+
+        builder rel docwin
+
+    files are created in the docs\win directory.
+
+    or for win32 .hlp format by
+
+        builder rel docnt
+
+    files are created in the docs\nt directory.
+
+    or for win32 .chm format by
+
+        builder rel dochtmlhelp
+
+    files are created in the docs\htmlhelp directory.
+
+
+For Watcom Help format (for Watcom WHELP command):
+
+    Run 
+
+        builder rel docdos
+
+    to create all online help.
+
+
+    The WHELP format help files (*.ihp) are copied to the
+    docs\dos directory.
+
+For OS/2 Help format:
+
+    Run 
+
+        builder rel docos2
+
+    to create all online help.
+
+    The OS/2 Help format help files (*.inf) are copied to the
+    docs\os2 directory.
+
+Note:
+    If you want build only one book than you must change current directory to
+    appropriate sub-directory and you can use command
+
+        wmake hbook=<book>
+
+    where <book> is book code.
+
+
+How to Update the Documentation
+===============================
+
+All the documentation is stored in ASCII text files with the file
+extension "GML". The files are annotated with a combination of Script
+and GML (Generalized Markup Language) tags.
+
+The Script tags are of the form ".tag" (i.e., they begin with a period
+and are followed by two or more letters or digits). Script tags will
+be most familiar to anyone who has ever used Waterloo Script or IBM
+Script. The tagged format is also similar in idea to other tagged
+formatting systems like RUNOFF or ROFF.
+
+The GML tags are of the form ":TAG." (i.e., they begin with a colon,
+followed by some letters and digits and end with a period). GML tags
+will be most familiar to anyone who has ever used IBM GML or Waterloo
+GML. This tag set is a variant of SGML. The most familiar SGML tag
+format is "<TAG>". In Watcom GML, the "<" and ">" are replaced by the
+":" and ".".
+
+The tag set includes a base set of predefined tags. In addition to
+this base set, you can define an extended tag set using the built-in
+macro language. The base Script tag set employs two letters (e.g.,
+.dm, .if, .se, .cp, .us). The user-defined (extended set) can employ
+two, three, four or more letters (e.g. .chapter, .section, .beglevel).
+For a good example of user-defined Script tags, see
+%doc_root%\doc\gml\fmtmacro.gml. GML tags can also be defined. For a
+good example of user-defined GML tags, see %doc_root%\doc\gml\cppextra.gml.
+
+These tags are described here for you, not so that you can begin defining
+your own tags, but so that you will recognize them in the ASCII text
+that comprises the documentation. But of course no-one's stopping you
+from defining your own tags if you feel so inclined.
+
+Here's a snippet from one of the doc files.
+
+    .np
+    The recommended options for generating the fastest 16-bit Intel code
+    are:
+    .ix 'fastest 16-bit code'
+    .begnote
+    .note Pentium Pro
+    &sw.oneatx &sw.oh &sw.oi+ &sw.ei &sw.zp8 &sw.6 &sw.fpi87 &sw.fp6
+    .note Pentium
+    &sw.oneatx &sw.oh &sw.oi+ &sw.ei &sw.zp8 &sw.5 &sw.fpi87 &sw.fp5
+    .note 486
+    &sw.oneatx &sw.oh &sw.oi+ &sw.ei &sw.zp8 &sw.4 &sw.fpi87 &sw.fp3
+    .note 386
+    &sw.oneatx &sw.oh &sw.oi+ &sw.ei &sw.zp8 &sw.3 &sw.fpi87 &sw.fp3
+    .note 286
+    &sw.oneatx &sw.oh &sw.oi+ &sw.ei &sw.zp8 &sw.2 &sw.fpi87 &sw.fp2
+    .note 186
+    &sw.oneatx &sw.oh &sw.oi+ &sw.ei &sw.zp8 &sw.1 &sw.fpi87
+    .note 8086
+    &sw.oneatx &sw.oh &sw.oi+ &sw.ei &sw.zp8 &sw.0 &sw.fpi87
+    .endnote
+    .np
+    The recommended options for generating the fastest 32-bit Intel code
+    are:
+
+The ".np" is a user-defined tag for "start a new paragraph". The ".ix"
+creates an index entry in the index. It doesn't appear with the text.
+In on-line help, this index entry becomes a searchable item. The
+".begnote", ".note", and ".endnote" user-defined tags are used to
+create an unordered list. Every piece of text entered into the source
+file is identified by tags like these.
+
+The best way to understand what the tags do is to look at a printed
+copy of the document and see what it looks like.
+
+The WATCOM GML program (WGML) is a compiler/interpreter that reads the
+document's source files to produce an output file. In our case, we
+want PostScript for printing and we want another form for generation
+of online help. This second form is a non-printable form that is
+suitable for post-processing to turn it into IPF for the OS/2 IPF
+compiler, RTF for the WinHelp tools, special Watcom-defined format
+for use with a DOS-based help tool (WHELP) or the ever-popular HTML.
+
+If you are a programmer, you'll be somewhat comfortable with the whole
+process of turning ASCII text into documentation. WGML is a text
+processor (compiler) that reads a source file (GML) which, in turn,
+imbeds other source files, and produces an output file (the object
+file). WGML is very fast. It was very fast in the old 20MHz 386 days
+and is, of course, much faster with today's processors. The C Library
+Reference comprising 1,241 pages takes 2 1/2 minutes to format into
+Postscript on a 400 MHz Pentium-II.
+
+
+Diagnostic Messages
+===================
+
+If you see ***WARNING*** messages issued by WGML, you can ignore them.
+If you see ***ERROR*** messages, you cannot ignore them.
+
+Good Luck!

@@ -1,0 +1,19 @@
+proj_name=libwsc
+
+.EXTENSIONS: .gas
+
+#libwsc_dir = ../../bld/libwsc
+
+libwsc_host_cpu_086=i86
+host_cpu = $(libwsc_host_cpu_$(processor))
+
+libwsc_host_os_msdos      =dos
+host_os=$(libwsc_host_os_$(system))
+
+!include cproj.mif
+
+!include $(libwsc_dir)/flags.mif
+!include $(libwsc_dir)/include.mif
+!include $(libwsc_dir)/rules.mif
+!include $(libwsc_dir)/librules.mif
+

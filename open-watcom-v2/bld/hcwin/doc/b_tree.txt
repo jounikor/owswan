@@ -1,0 +1,83 @@
+WINHELP B-TREES
+===============
+
+To help the WinHelp program locate help text, many of the WinHelp internal
+files are lookup tables stored as modified B-Trees.  The directory file as
+well as the |TTLBTREE, |CONTEXT, and |KWBTREE files all have this format.
+A B-tree file consists of a B-tree header, followed by one or more
+pages of fixed length, each page representing a tree node.  A page is 2KB,
+except in the directory where a page is 1KB.
+
+B-Tree Headers
+--------------
+After the 9-byte file header, a b-tree file will have a header.
+There are only four b-tree files in a .HLP file, with different setup for
+each type of b-tree file, so this isn't going to present much of a difficulty.
+
+Layout of b-tree header is as follows:
+
+        Bytes           Meaning
+        -----------------------
+        0-1             0x293B magic
+        2-3             bit 0x0002 always 1, bit 0x0400 1 if directory
+        4-5             0x0400=1k if directory, 0x0800=2k else, or 4k
+        6-21            string[16] describing format of data
+                                'L' = long (indexed)
+                                'F' = NUL-terminated string (indexed)
+                                'i' = NUL-terminated string (indexed)
+                                '2' = short
+                                '4' = long
+                                'z' = NUL-terminated string
+                                '!' = long count value, count/8 * record
+                                        long filenumber
+                                        long TopicOffset
+        22-23           Constant Value: 0x0000
+        24-25           Number of page splits suffered by this b-tree
+        26-27           index # of the root page.
+        28-29           Constant Value: 0xFFFF
+        30-31           Number of pages in this b-tree
+        32-33           Depth of the b-tree
+        34-37           Total # of 'leaf' entries in the tree.
+
+Following this header are the pages of the tree, in order.  Links within the
+tree are represented by two-byte indices instead of four-bytes file offsets;
+thus the first page is always referred to as 0x0000, the second as 0x0001,
+and so on.
+
+There are two type of pages:  index pages and leaf pages.  Pages in every
+level except the last are (naturally) index pages, while the last level
+consists of leaf pages.
+
+Index Pages
+-----------
+
+An index page begins with a 4-byte header:
+        Bytes           Meaning
+        -----------------------
+        0-1             Signature Word
+        2-3             Number of entries in this page.
+
+The remaining space in the page stores the index data, which consists of
+two-byte page indices alternated with key values.  The keys may be fixed
+length (as in |TTLBTREE or |CONTEXT) or zero-terminated ASCII strings (as
+in the directory and |KWBTREE ).  The page indices 'point' to pages lower
+in the tree.
+
+Leaf Pages
+----------
+
+A leaf page has a slightly different header than an index page:
+        Bytes           Meaning
+        -----------------------
+        0-1             Signature Word
+        2-3             Number of entries in this page
+        4-5             Index of the previous leaf page, in order
+        6-7             Index of the next leaf page, in order.
+
+The last two words form a linked list of the leaf pages in the tree,
+providing another way to traverse the tree's data:  go to the left-most
+leaf page and the follow the linked list to read the data in order.  (The
+null value for these indices is 0xFFFF ).
+
+The rest of a leaf page stores the data, which consists of fixed or variable
+length records packed together.  The nature of the data depends on the tree.

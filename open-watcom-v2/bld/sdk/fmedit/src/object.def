@@ -1,0 +1,45 @@
+#ifndef _OBJECT_DEF_INCLUDED
+#define _OBJECT_DEF_INCLUDED
+
+#include "list.def"
+
+/* there are a maximum of 16 internal objects currently reserved, see constant.def file */
+
+#define pick_OBJECTS() \
+    pick( NONE,     NULL ) \
+    pick( EATOM,    EAtomCreate ) \
+    pick( ITEM,     OItemCreate ) \
+    pick( CURROBJ,  CurrObjCreate ) \
+    pick( CURRITEM, CurrItemCreate )
+
+enum {
+    #define pick(e,p) O_##e,
+    pick_OBJECTS()
+    #undef pick
+};
+
+extern void         InitializeObjects( CREATE_TABLE );
+extern void         SetCurrObject( OBJPTR );
+extern void         AddCurrObject( OBJPTR );
+extern void         DeleteCurrObject( OBJPTR );
+extern void         DeleteCurrObjptr( OBJPTR );
+extern bool         DeleteCurrItem( OBJPTR );
+extern void         MarkCurrObject( void );
+extern void         ObjMark( OBJPTR );
+extern OBJPTR       GetCurrObjptr( OBJPTR );
+extern void         SetPrimaryObject( OBJPTR );
+extern OBJPTR       GetPrimaryObject( void );
+extern void         UndoMove( OBJPTR );
+extern void         RemoveFromParent( OBJPTR );
+extern OBJPTR       GetEditCurrObject( void );
+extern OBJPTR       GetNextEditCurrObject( OBJPTR );
+extern OBJPTR       GetObjptr( OBJPTR );
+extern bool         GetAnchor( OBJPTR, POINT * );
+extern void         InitEditMenu( HWND, int );
+extern void         InitEditMenu( HWND, int );
+extern bool         RequestScrollRect( RECT * );
+extern bool         IsMarkValid( OBJPTR );
+extern void         EndCurrObjMod( void );
+extern void         StartCurrObjMod( void );
+
+#endif

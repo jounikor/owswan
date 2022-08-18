@@ -1,0 +1,82 @@
+@echo off
+if not exist lib.mif goto wrongdir
+if exist tags del tags
+ctags -v -y -a -f.\tags .\h\*.h
+ctags -v -y -a -f.\tags .\ALPHA\a\*.asm
+ctags -v -y -a -f.\tags .\ALPHA\c\*.c
+ctags -v -y -a -f.\tags .\ALPHA\h\*.h
+ctags -v -y -a -f.\tags .\BIOS\a\*.asm
+ctags -v -y -a -f.\tags .\BIOS\c\*.c
+ctags -v -y -a -f.\tags .\BIOS\h\*.h
+ctags -v -y -a -f.\tags .\CGSUPP\a\*.asm
+ctags -v -y -a -f.\tags .\CGSUPP\c\*.c
+ctags -v -y -a -f.\tags .\CGSUPP\h\*.h
+ctags -v -y -a -f.\tags .\CHAR\c\*.c
+ctags -v -y -a -f.\tags .\CHAR\h\*.h
+ctags -v -y -a -f.\tags .\CONIO\c\*.c
+ctags -v -y -a -f.\tags .\CONVERT\c\*.c
+ctags -v -y -a -f.\tags .\DEFWIN\a\*.asm
+ctags -v -y -a -f.\tags .\DEFWIN\c\*.c
+ctags -v -y -a -f.\tags .\DEFWIN\h\*.h
+ctags -v -y -a -f.\tags .\DIRECT\c\*.c
+ctags -v -y -a -f.\tags .\ENVIRON\a\*.asm
+ctags -v -y -a -f.\tags .\ENVIRON\c\*.c
+ctags -v -y -a -f.\tags .\ENVIRON\h\*.h
+ctags -v -y -a -f.\tags .\FILE\c\*.c
+ctags -v -y -a -f.\tags .\FILE\h\*.h
+ctags -v -y -a -f.\tags .\FPU\a\*.asm
+ctags -v -y -a -f.\tags .\FPU\c\*.c
+ctags -v -y -a -f.\tags .\HANDLEIO\c\*.c
+ctags -v -y -a -f.\tags .\HEAP\a\*.asm
+ctags -v -y -a -f.\tags .\HEAP\c\*.c
+ctags -v -y -a -f.\tags .\HEAP\h\*.h
+ctags -v -y -a -f.\tags .\INTEL\a\*.asm
+ctags -v -y -a -f.\tags .\INTEL\c\*.c
+ctags -v -y -a -f.\tags .\KANJI\c\*.c
+ctags -v -y -a -f.\tags .\KANJI\h\*.h
+ctags -v -y -a -f.\tags .\LIBRARY\c\*.c
+ctags -v -y -a -f.\tags .\LIBWIN32\c\*.c
+ctags -v -y -a -f.\tags .\MATH\a\*.asm
+ctags -v -y -a -f.\tags .\MATH\c\*.c
+ctags -v -y -a -f.\tags .\MATH\h\*.h
+ctags -v -y -a -f.\tags .\MBYTE\c\*.c
+ctags -v -y -a -f.\tags .\MBYTE\h\*.h
+ctags -v -y -a -f.\tags .\MEMORY\a\*.asm
+ctags -v -y -a -f.\tags .\MEMORY\c\*.c
+ctags -v -y -a -f.\tags .\MISC\c\*.c
+ctags -v -y -a -f.\tags .\MISC\h\*.h
+ctags -v -y -a -f.\tags .\MTHREAD\a\*.asm
+ctags -v -y -a -f.\tags .\MTHREAD\c\*.c
+ctags -v -y -a -f.\tags .\MTHREAD\h\*.h
+ctags -v -y -a -f.\tags .\PPC\a\*.asm
+ctags -v -y -a -f.\tags .\PPC\c\*.c
+ctags -v -y -a -f.\tags .\PROCESS\a\*.asm
+ctags -v -y -a -f.\tags .\PROCESS\c\*.c
+ctags -v -y -a -f.\tags .\PROCESS\h\*.h
+ctags -v -y -a -f.\tags .\SEARCH\c\*.c
+ctags -v -y -a -f.\tags .\STARTUP\a\*.asm
+ctags -v -y -a -f.\tags .\STARTUP\c\*.c
+ctags -v -y -a -f.\tags .\STARTUP\h\*.h
+ctags -v -y -a -f.\tags .\STREAMIO\a\*.asm
+ctags -v -y -a -f.\tags .\STREAMIO\c\*.c
+ctags -v -y -a -f.\tags .\STREAMIO\h\*.h
+ctags -v -y -a -f.\tags .\STRING\a\*.asm
+ctags -v -y -a -f.\tags .\STRING\c\*.c
+ctags -v -y -a -f.\tags .\STRING\h\*.h
+ctags -v -y -a -f.\tags .\TCHAR\c\*.c
+ctags -v -y -a -f.\tags .\TIME\a\*.asm
+ctags -v -y -a -f.\tags .\TIME\c\*.c
+ctags -v -y -a -f.\tags .\TIME\h\*.h
+ctags -v -y -a -f.\tags .\WIN386\a\*.asm
+ctags -v -y -a -f.\tags .\WIN386\c\*.c
+ctags -v -y -a -f.\tags .\WIN386\h\*.h
+ctags -v -y -a -f.\tags .\_DOS\a\*.asm
+ctags -v -y -a -f.\tags .\_DOS\c\*.c
+ctags -v -y -a -f.\tags ..\lib_misc\c\*.c
+ctags -v -y -a -f.\tags ..\lib_misc\h\*.h
+ctags -v -y -a -f.\tags ..\lib_misc\h\*.inc
+copy .\tags ..\lib_misc\tags
+goto end
+:wrongdir
+echo This must be run in BLD\CLIB
+:end

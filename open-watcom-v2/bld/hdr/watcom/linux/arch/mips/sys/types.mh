@@ -1,0 +1,21 @@
+/*
+ *  arch/mips/sys/types.h
+ *
+:include crwatcnt.sp
+ */
+
+/*
+ *  POSIX 1003.1 types
+ */
+:include dev_t.sp
+:include ino_t.sp
+:include mode_t.sp
+:include nlink_t.sp
+:include uid_t.sp
+:include gid_t.sp
+:include blksizet.sp
+:include blkcnt_t.sp
+:include id_t.sp
+
+typedef char            *caddr_t;
+typedef long            daddr_t;

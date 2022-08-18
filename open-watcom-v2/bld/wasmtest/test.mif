@@ -1,0 +1,23 @@
+alt_error = 00
+
+!include testenv.mif
+
+test : .symbolic start start_test $(dis_objs) $(objs) test_set_result
+    $(noecho)%make common_set_result_check
+
+test_set_result : .symbolic ./chk_exec.exe
+    -%write error.out OK
+    -$< exec.out >>error.out
+
+check_result : .procedure
+    -diff -b error.out ../error.chk
+
+start_test : .symbolic
+    @set ERROR_MSG=unknown failure
+
+clean : .procedure
+    @%make echo_clean
+    @if exist failure $(noecho)rm failure
+    @if exist *.dis $(noecho)rm -f *.dis
+    @if exist *.dib $(noecho)rm -f *.dib
+    $(noecho)%make common_clean

@@ -1,0 +1,30 @@
+proj_name = wbind
+
+!ifndef wbind_autodepends
+wbind_autodepends = .AUTODEPEND
+!endif
+
+memory_model_i86 = c
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c : ..
+
+inc_dirs = -I"../../h"
+
+extra_l_flags_dos = op stack=8k
+extra_l_flags_os2 = op stack=12k,heap=8k,newfile
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_objs = wbind.obj
+!include exetarg.mif

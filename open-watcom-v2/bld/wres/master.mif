@@ -1,0 +1,48 @@
+#
+#  Makefile for   WRes library
+#
+# path names used in the script
+
+proj_name = wres
+
+wres_autodepends = .AUTODEPEND
+wres_distrib_lib = 1
+
+!ifdef model
+memory_model_i86 = $(model)
+memory_model_386 = $(model)
+!endif
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+!include $(wres_dir)/wrobjs.mif
+
+#
+# cflags
+#
+.c : $(wres_dir)/c
+
+inc_dirs = -I"$(wres_dir)/h"
+
+!ifeq convention stack
+extra_c_flags_386 = -3s
+!else
+extra_c_flags_386 = -3r
+!endif
+
+extra_c_flags_os2_i86 = -zdp
+extra_c_flags_win_i86 = -zw-zu
+
+# where to look for various files
+
+# explicit rules
+#################
+
+#
+# LIB
+#
+libtarg_objs = $(wres_core_objs) $(wres_more_objs)
+!include libtarg.mif
+

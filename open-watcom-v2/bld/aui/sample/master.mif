@@ -1,0 +1,81 @@
+# AUI sample project makefile
+proj_name = auisample
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include win386.mif
+
+!include $(aui_dir)/client.mif
+!include $(gui_dir)/client.mif
+!include $(ui_dir)/client.mif
+!include wres.mif
+
+#
+# cflags
+#
+.c: ../c
+
+inc_dirs = -I"../h" $(aui_inc_dirs) $(gui_inc_dirs) $(ui_inc_dirs)
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_objs = app.obj util.obj window1.obj window2.obj window3.obj &
+    window4.obj window5.obj window6.obj window7.obj window8.obj &
+    menus.obj appcolor.obj dlgcmd.obj dlgoptn.obj password.obj
+exetarg_libs = $(aui_lib) $(gui_lib) $(ui_lib) $(wres_lib)
+!ifeq sys_windowed 1
+exetarg_res = app.res
+#exetarg_res = appj.res
+!else
+exetarg_res_wresui = wresui.res
+#exetarg_res_wresui = wresuij.res
+!endif
+exetarg_name = app
+!include exetarg.mif
+
+#
+# rc and others
+#
+rc_inc_dirs = -I"../res" -I"../h" $(aui_rc_inc_dirs) $(gui_rc_inc_dirs)
+rcui_inc_dirs = -I"../res" -I"../h" $(aui_rc_inc_dirs) $(gui_rc_inc_dirs)
+
+rcfiles_os2 = ../res/appcomm2.rc ../res/dlgoptn2.dlg ../res/dui2.ico ../res/word2.ico
+rcfiles_win = ../res/appcomm.rc ../res/dlgoptn.dlg ../res/japoptn.dlg ../res/dui.ico ../res/words.ico
+rcfiles_nt  = ../res/appcomm.rc ../res/dlgoptn.dlg ../res/japoptn.dlg ../res/dui.ico ../res/words.ico
+
+rcfiles = &
+    $(gui_dir)/h/gui.rc &
+    $(aui_dialogs) &
+    ../../res/aui.rc &
+    ../h/dlgoptn.rh &
+    ../res/one.bmp &
+    ../res/two.bmp &
+    ../res/three.bmp &
+    ../res/four.bmp &
+    ../res/five.bmp &
+    ../res/source1.bmp &
+    ../res/source2.bmp &
+    ../res/stop1.bmp &
+    ../res/stop2.bmp &
+    $(rcfiles_$(host_os))
+
+app.res : ../res/app.rc $(rcfiles)
+    @%make echo_rc
+    $(rc) $(rc_flags) $(rc_inc_path) $[@ -fo=$@
+
+appj.res : ../res/app.rc $(rcfiles)
+    @%make echo_rc
+    $(rc) -DJAPANESE $(rc_flags) $(rc_inc_path) $[@ -fo=$@
+
+wresui.res : ../res/appui.rc ../res/app.rc $(rcfiles)
+    @%make echo_rc
+    $(rcui)
+
+wresuij.res : ../res/appui.rc ../res/app.rc $(rcfiles)
+    @%make echo_rc
+    $(rcui) -DJAPANESE

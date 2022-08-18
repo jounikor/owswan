@@ -1,0 +1,23 @@
+!include $(libwsc_dir)/master.mif
+
+!include ../../../objects.mif
+!include $(libwsc_dir)/lib.mif
+
+.c   : ../../../c
+.asm .gas : ../../../a
+
+all : $(objfiles) $(libname).lib  .symbolic
+    @%null
+
+$(libname).lib : $(objs) $(__MAKEFILES__)
+    @rm -f export.tmp
+    @rm -f export.gdf
+    @%make echo_lib
+    $(librarian) $(libwsc_lib_flags) $@ $(objs) $(libs)
+
+
+!if exist(../../../deps.mif)
+!   include ../../../deps.mif
+!endif
+
+!include $(libwsc_dir)/clean.mif

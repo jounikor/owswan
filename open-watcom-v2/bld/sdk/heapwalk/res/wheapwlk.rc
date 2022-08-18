@@ -1,0 +1,52 @@
+#include <windows.h>
+#include "banner.h"
+#include "about.rh"
+#include "selinfo.rh"
+#include "hdlinfo.rh"
+#include "heapwalk.rh"
+
+
+#define FIRST_COPYRIGHT_YEAR 1993
+
+"APPLICON" ICON "wheapwlk.ico"
+
+#ifdef JAPANESE
+ #define sp( s1, s2 ) s2
+#else
+ #define sp( s1, s2 ) s1
+#endif
+#include "menu.rc"
+#undef sp
+
+STRINGTABLE PRELOAD DISCARDABLE
+BEGIN
+  #ifdef JAPANESE
+    #define pick(c,e,j) c, [ j ]
+  #else
+    #define pick(c,e,j) c, [ e ]
+  #endif
+
+    #include "rcstrmsg.gh"
+    #include "uistrmsg.gh"
+
+    #undef pick
+END
+
+NUMBER_OF_STRINGS RCDATA
+BEGIN
+    STR_THIS_IS_THE_LAST_STRING_IN_THE_LIST
+END
+
+#include "heapwlk.dlg"
+#include "memman.dlg"
+#include "heapinfo.dlg"
+#include "lclinfo.dlg"
+#include "menu.dlg"
+#include "add.dlg"
+#include "alloc.dlg"
+#include "freen.dlg"
+#include "code.dlg"
+#include "config.dlg"
+//#include "exsort.dlg"
+#include "memwnd.rc"
+#include "about.dlg"

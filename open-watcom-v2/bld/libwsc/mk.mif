@@ -1,0 +1,16 @@
+!include $(libwsc_dir)/master.mif
+
+!include ../../../objects.mif
+!include $(libwsc_dir)/lib.mif
+
+.c   : ../../../c
+.asm .gas : ../../../a
+
+all : $(objfiles) .symbolic
+    @%null
+
+!if exist(../../../deps.mif)
+!   include ../../../deps.mif
+!endif
+
+!include $(libwsc_dir)/clean.mif

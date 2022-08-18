@@ -1,0 +1,32 @@
+proj_name = wscromtool
+
+wscromtool_autodepends = .autodepend
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c: ../c
+
+inc_dirs = -I"../h" -I"$(dip_dir)/watcom/h"
+
+#
+# lflags
+#
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_objs = &
+    wscromtool.obj &
+    rom.obj &
+    fs.obj
+
+!include exetarg.mif
+

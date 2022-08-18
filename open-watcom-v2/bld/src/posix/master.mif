@@ -1,0 +1,49 @@
+proj_name = posix
+posix_autodepends = .autodepend
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+inc_dirs = -I"../h"
+
+.c: ../c
+
+util_lib = ../lib/$(objs_subdir)/util.lib
+
+all : cat.exe      &
+      cmp.exe      &
+      compress.exe &
+      false.exe    &
+      sleep.exe    &
+      tee.exe      &
+      true.exe     &
+      wc.exe       &
+      which.exe
+
+cat.exe : cat.obj $(util_lib)
+        $(cl) $(clflags) $< $(ldflags)
+
+cmp.exe : cmp.obj $(util_lib)
+        $(cl) $(clflags) $< $(ldflags)
+
+compress.exe : compress.obj $(util_lib)
+        $(cl) $(clflags) $< $(ldflags)
+
+true.exe : true.obj
+        $(cl) $(clflags) $< $(ldflags)
+
+false.exe : false.obj
+        $(cl) $(clflags) $< $(ldflags)
+
+sleep.exe : sleep.obj $(util_lib)
+        $(cl) $(clflags) $< $(ldflags)
+
+tee.exe : tee.obj $(util_lib)
+        $(cl) $(clflags) $< $(ldflags)
+
+wc.exe : wc.obj $(util_lib)
+        $(cl) $(clflags) $< $(ldflags)
+
+which.exe : which.obj $(util_lib)
+        $(cl) $(clflags) $< $(ldflags)

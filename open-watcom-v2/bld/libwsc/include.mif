@@ -1,0 +1,37 @@
+include_default = -I"../../../h" -I"$(libwsc_dir)/h"
+include_watcom  = -I"$(watcom_dir)/h" -I"$(lib_misc_dir)/h" -I"$(comp_cfg_dir)/h"
+
+# include_c_(system)
+#include_c_wsc      = $(inc_dirs_lang_wsc)
+include_c_kanji    = $(inc_dirs_lang_dos)
+include_c_msdos    = $(inc_dirs_lang_dos)
+include_c_nw_clib  = $(inc_dirs_lang_netware) $(inc_dirs_lang_dos)
+include_c_nw_clibl = $(inc_dirs_lang_netware) $(inc_dirs_lang_dos)
+# we need to include libc path below
+include_c_nw_libc  = $(inc_dirs_lang_dos)
+include_c_nw_libcl = $(inc_dirs_lang_dos)
+include_c_os2      = $(inc_dirs_lang_dos) $(inc_dirs_sys_os2)
+include_c_qnx      = $(inc_dirs_lang_qnx)
+include_c_linux    = $(inc_dirs_lang_linux)
+include_c_windows  = $(inc_dirs_lang_dos) $(inc_dirs_sys_win)
+include_c_winnt    = $(inc_dirs_lang_dos) $(inc_dirs_sys_nt)
+include_c_rdos     = $(inc_dirs_lang_rdos)
+include_c_rdosdev  = $(inc_dirs_lang_rdos)
+
+include_c_path = $(include_default) $(include_c_$(system)) $(include_watcom)
+
+# include_a_(system)
+include_a_wsc      =
+include_a_kanji    =
+include_a_msdos    =
+include_a_nw_clib  =
+include_a_nw_clibl =
+include_a_nw_libc  =
+include_a_nw_libcl =
+include_a_os2      =
+include_a_qnx      =
+include_a_windows  =
+include_a_winnt    =
+include_a_linux    =
+
+include_a_path = $(include_default) $(include_a_$(system)) $(include_watcom)

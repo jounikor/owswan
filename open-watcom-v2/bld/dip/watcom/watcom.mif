@@ -1,0 +1,25 @@
+!ifdef %OWUSE_FILENAME_VERSION
+dllname = watcom$(bld_ver)
+!else
+dllname = watcom
+!endif
+
+imp_objs = &
+        wataddr.obj &
+        watdmnd.obj &
+        watgbl.obj &
+        watlcl.obj &
+        watldsym.obj &
+        watlnum.obj &
+        watloc.obj &
+        watmisc.obj &
+        watmod.obj &
+        wattype.obj &
+        demangle.obj
+
+extra_incs = -I"$(lib_misc_dir)/h"
+extra_srcs = $(lib_misc_dir)/c
+
+extra_dllbase = $(dip_dllbase_$(host_os)_$(host_cpu)_watcom)
+
+!include ../../master.mif

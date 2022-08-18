@@ -1,0 +1,41 @@
+proj_name = cvpack
+
+cvpack_autodepends = .autodepend
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.cpp : ../cpp
+.hpp : ../hpp
+
+inc_dirs = -I"../hpp"
+
+extra_cxx_flags = -xs
+
+#
+# lflags
+#
+extra_l_flags   = #op eliminate
+
+# explicit rules
+#################
+
+exetarg_objs = &
+    cvpack.obj &
+    retrieve.obj &
+    cverror.obj &
+    packtype.obj &
+    subsect.obj &
+    cssymbol.obj &
+    makeexe.obj &
+    symdis.obj &
+    typemap.obj &
+    typearay.obj &
+    typercrd.obj &
+    common.obj
+!include exetarg.mif
+

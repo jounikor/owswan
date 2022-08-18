@@ -1,0 +1,37 @@
+__cifx__ =$(system).$(processor)/$(libsubdir)
+
+!ifdef profile
+dll_libs = $+ &
+    $(clib_dir)/library/$(system).$(processor)/$(model)_rp/clib3$(dllname_$(convention)).lib &
+    $-
+!else
+dll_libs = $+ &
+    $(clib_dir)/library/$(__cifx__)/clib3$(dllname_$(convention)).lib &
+    $-
+!endif
+
+dll_def = $+ &
+    $(clib_dir)/library/$(__cifx__)/export.gdf &
+    $(clib_dir)/intel/export.def &
+    $(clib_dir)/startup/export.def &
+    $(clib_dir)/startup/$(convention).def &
+    $(clib_dir)/startup/library/$(system).$(processor)/$(convention).def &
+    $-
+
+!ifdef profile
+dll_objs = $+ &
+    $(clib_dir)/startup/library/$(__cifx__)/clibdwnt.obj &
+    $(clib_dir)/startup/library/$(__cifx__)/segdefns.obj &
+    $(clib_dir)/intel/library/$(__cifx__)/p5prof2.obj &
+    $(clib_dir)/intel/library/$(__cifx__)/prfalloc.obj &
+    $(clib_dir)/intel/library/$(__cifx__)/profilog.obj &
+    $-
+!else
+dll_objs = $+ &
+    $(clib_dir)/startup/library/$(__cifx__)/clibdwnt.obj &
+    $-
+!endif
+
+!include ../../static.mif
+
+__cifx__ =

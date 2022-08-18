@@ -1,0 +1,246 @@
+proj_name = w32api
+
+w32api_autodepends  = .autodepend
+w32api_distrib_lib  = 1
+
+.EXTENSIONS : .lbc .def .gdf .mh
+
+!include cproj.mif
+!include defrule.mif
+
+inc_dirs = -I"../nt/h/ddk" -I"../nt/h/directx"
+
+dirs = lib lib/ddk lib/directx ddk directx
+
+libs =                       &
+    lib/aclui.lib            &
+    lib/adsiid.lib           &
+    lib/advapi32.lib         &
+    lib/bcrypt.lib           &
+    lib/cabinet.lib          &
+    lib/comctl32.lib         &
+    lib/comdlg32.lib         &
+    lib/credui.lib           &
+    lib/crypt32.lib          &
+    lib/cryptnet.lib         &
+    lib/ctl3d32.lib          &
+    lib/dbghelp.lib          &
+    lib/ddraw.lib            &
+    lib/dflayout.lib         &
+    lib/dhcpcsvc.lib         &
+    lib/dnsapi.lib           &
+    lib/dsprop.lib           &
+    lib/dsuiext.lib          &
+    lib/faultrep.lib         &
+    lib/gdi32.lib            &
+    lib/glu32.lib            &
+    lib/htmlhelp.lib         &
+    lib/icm32.lib            &
+    lib/icmui.lib            &
+    lib/imagehlp.lib         &
+    lib/imm32.lib            &
+    lib/iphlpapi.lib         &
+    lib/kernel32.lib         &
+    lib/ksuser.lib           &
+    lib/largeint.lib         &
+    lib/lz32.lib             &
+    lib/mapi32.lib           &
+    lib/mfuuid.lib           &
+    lib/mgmtapi.lib          &
+    lib/mpr.lib              &
+    lib/mprapi.lib           &
+    lib/mqrt.lib             &
+    lib/msacm32.lib          &
+    lib/mscms.lib            &
+    lib/msi.lib              &
+    lib/msimg32.lib          &
+    lib/mswsock.lib          &
+    lib/ncrypt.lib           &
+    lib/nddeapi.lib          &
+    lib/netapi32.lib         &
+    lib/newdev.lib           &
+    lib/normaliz.lib         &
+    lib/ntdsapi.lib          &
+    lib/ntdsbcli.lib         &
+    lib/odbc32.lib           &
+    lib/odbccp32.lib         &
+    lib/ole32.lib            &
+    lib/oleacc.lib           &
+    lib/oleaut32.lib         &
+    lib/olecli32.lib         &
+    lib/oledlg.lib           &
+    lib/olepro32.lib         &
+    lib/olesvr32.lib         &
+    lib/opengl32.lib         &
+    lib/powrprof.lib         &
+    lib/propsys.lib          &
+    lib/psapi.lib            &
+    lib/qosname.lib          &
+    lib/quartz.lib           &
+    lib/rasapi32.lib         &
+    lib/rasdlg.lib           &
+    lib/rassapi.lib          &
+    lib/rpcns4.lib           &
+    lib/rpcrt4.lib           &
+    lib/rtm.lib              &
+    lib/rtutils.lib          &
+    lib/scarddlg.lib         &
+    lib/secur32.lib          &
+    lib/setupapi.lib         &
+    lib/shdocvw.lib          &
+    lib/shell32.lib          &
+    lib/shfolder.lib         &
+    lib/shlwapi.lib          &
+    lib/snmpapi.lib          &
+    lib/strmiids.lib         &
+    lib/strquery.lib         &
+    lib/th32.lib             &
+    lib/url.lib              &
+    lib/urlmon.lib           &
+    lib/user32.lib           &
+    lib/userenv.lib          &
+    lib/usp10.lib            &
+    lib/uuid.lib             &
+    lib/uxtheme.lib          &
+    lib/version.lib          &
+    lib/vfw32.lib            &
+    lib/wbemuuid.lib         &
+    lib/wininet.lib          &
+    lib/winmm.lib            &
+    lib/winscard.lib         &
+    lib/winspool.lib         &
+    lib/wintrust.lib         &
+    lib/wldap32.lib          &
+    lib/ws2_32.lib           &
+    lib/wsnmp32.lib          &
+    lib/wsock32.lib          &
+    lib/wtsapi32.lib         &
+    lib/ddk/battc.lib        &
+    lib/ddk/cfgmgr32.lib     &
+    lib/ddk/classpnp.lib     &
+    lib/ddk/clfs.lib         &
+    lib/ddk/dxapi.lib        &
+    lib/ddk/hal.lib          &
+    lib/ddk/hid.lib          &
+    lib/ddk/hidparse.lib     &
+    lib/ddk/ks.lib           &
+    lib/ddk/ksecdd.lib       &
+    lib/ddk/mcd.lib          &
+    lib/ddk/ndis.lib         &
+    lib/ddk/ntdll.lib        &
+    lib/ddk/ntoskrnl.lib     &
+    lib/ddk/pshed.lib        &
+    lib/ddk/rtlver.lib       &
+    lib/ddk/scsiport.lib     &
+    lib/ddk/storport.lib     &
+    lib/ddk/tape.lib         &
+    lib/ddk/tdi.lib          &
+    lib/ddk/usbcamd.lib      &
+    lib/ddk/videoprt.lib     &
+    lib/ddk/wdmguid.lib      &
+    lib/ddk/win32k.lib       &
+    lib/ddk/wmilib.lib       &
+    lib/directx/d3d9.lib     &
+    lib/directx/d3drm.lib    &
+    lib/directx/dinput.lib   &
+    lib/directx/dinput8.lib  &
+    lib/directx/dsound.lib   &
+    lib/directx/dxguid.lib
+
+vfw32_lbcs =         &
+        avicap32.lbc &
+        avifil32.lbc &
+        msvfw32.lbc
+
+all : $(dirs) $(libs) .SYMBOLIC
+    @%null
+
+.def: ../lib
+.c: ../lib
+.mh: ../lib
+
+.mh.gdf:
+    $(wsplice) -k$(host_cpu) $[@ $@
+
+.gdf.lbc:
+    $(awk) -v cpu=$(host_cpu) -f ../def2lbc.awk -v OUTFILE=$^. $[@
+
+.def.lbc:
+    $(awk) -v cpu=$(host_cpu) -f ../def2lbc.awk -v OUTFILE=$^. $[@
+
+.lbc.lib: $(__MAKEFILES__)
+    @%make echo_lib
+    $(librarian) $(libflags) @$[@
+
+.lbc{lib}.lib: $(__MAKEFILES__)
+    @%make echo_lib
+    $(librarian) $(libflags) @$[@
+
+.obj.lib: $(__MAKEFILES__)
+    @%make echo_lib
+    $(librarian) $(libflags) $[@
+
+.obj{lib}.lib: $(__MAKEFILES__)
+    @%make echo_lib
+    $(librarian) $(libflags) $[@
+
+{ddk}.def{ddk}.lbc:
+    $(awk) -v cpu=$(host_cpu) -f ../def2lbc.awk -v OUTFILE=ddk/$^. $[@
+
+{ddk}.lbc{lib/ddk}.lib: $(__MAKEFILES__)
+    @%make echo_lib
+    $(librarian) $(libflags) @$[@
+
+{ddk}.obj{lib/ddk}.lib: $(__MAKEFILES__)
+    @%make echo_lib
+    $(librarian) $(libflags) $[@
+
+{directx}.def{directx}.lbc:
+    $(awk) -v cpu=$(host_cpu) -f ../def2lbc.awk -v OUTFILE=directx/$^. $[@
+
+{directx}.lbc{lib/directx}.lib: $(__MAKEFILES__)
+    @%make echo_lib
+    $(librarian) $(libflags) @$[@
+
+{directx}.obj{lib/directx}.lib: $(__MAKEFILES__)
+    @%make echo_lib
+    $(librarian) $(libflags) $[@
+
+vfw32.lbc: $(vfw32_lbcs) vfwuuid.obj
+    @for %i in ($(vfw32_lbcs)) do @%append $@ @ %i
+    @%append $@ +vfwuuid.obj
+
+ws2_32.lbc: ws2_32.def ws2_cons.obj
+    $(awk) -v cpu=$(host_cpu) -f ../def2lbc.awk -v OUTFILE=$^. $[@
+    @%append $@ +ws2_cons.obj
+
+directx/dinput.lbc: directx/dinput.def directx/dinpstat.obj
+    $(awk) -v cpu=$(host_cpu) -f ../def2lbc.awk -v OUTFILE=directx/$^. $[@
+    @%append $@ +directx/dinpstat.obj
+
+directx/dinput8.lbc: directx/dinput8.def directx/dinpstat.obj
+    $(awk) -v cpu=$(host_cpu) -f ../def2lbc.awk -v OUTFILE=directx/$^. $[@
+    @%append $@ +directx/dinpstat.obj
+
+ddk/rtlver.obj: ddk/rtlver.c
+    @%make echo_cc
+    $(cc) $(cflags) $(c_flags) $(extra_c_flags_$[&) $(inc_path) -fo=$@ $[@
+
+ddk/wdmguid.obj: ddk/wdmguid.c
+    @%make echo_cc
+    $(cc) $(cflags) $(c_flags) $(extra_c_flags_$[&) $(inc_path) -fo=$@ $[@
+
+directx/dinpstat.obj: directx/dinpstat.c
+    @%make echo_cc
+    $(cc) $(cflags) $(c_flags) $(extra_c_flags_$[&) $(inc_path) -fo=$@ $[@
+
+directx/dxguid.obj: directx/dxguid.c
+    @%make echo_cc
+    $(cc) $(cflags) $(c_flags) $(extra_c_flags_$[&) $(inc_path) -fo=$@ $[@
+
+$(dirs):
+    mkdir $@
+
+clean: .SYMBOLIC
+    rm -f *.obj *.lbc *.tmp *.err *.pch *.gdf
+    rm -rf $(dirs)

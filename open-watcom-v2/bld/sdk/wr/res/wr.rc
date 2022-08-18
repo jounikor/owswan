@@ -1,0 +1,26 @@
+/* UTF-8 encoding, ¥ */
+
+#include <windows.h>
+#include "wr.rh"
+#include "selft.rh"
+#include "selimage.rh"
+#include "memflags.rh"
+#include "editsym.rh"
+#include "addsym.rh"
+#include "wrmsg.rh"
+
+STRINGTABLE
+BEGIN
+    #define pick(c,e,j) c, [ e ]
+
+    #include "wr.msg"
+    #include "rc.msg"
+
+    #undef pick
+END
+
+#include "selft.dlg"
+#include "selimage.dlg"
+#include "memflags.dlg"
+#include "editsym.dlg"
+#include "addsym.dlg"

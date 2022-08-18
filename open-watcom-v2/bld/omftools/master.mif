@@ -1,0 +1,42 @@
+proj_name = omftools
+omftools_autodepends = .autodepend
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include exerule.mif
+
+#
+# cflags
+#
+.c: ../c
+
+inc_dirs = -I"../h"
+
+# explicit rules
+#################
+
+all: objchg.exe objfind.exe objlist.exe objxdef.exe objxref.exe .SYMBOLIC
+
+#
+# EXE's
+#
+exetarg_objs = objchg.obj hashtab.obj misc.obj
+exetarg_name = objchg
+!include exetarg.mif
+
+exetarg_objs = objfind.obj hashtab.obj misc.obj
+exetarg_name = objfind
+!include exetarg.mif
+
+exetarg_objs = objlist.obj misc.obj
+exetarg_name = objlist
+!include exetarg.mif
+
+exetarg_objs = objxdef.obj misc.obj
+exetarg_name = objxdef
+!include exetarg.mif
+
+exetarg_objs = objxref.obj hashtab.obj misc.obj
+exetarg_name = objxref
+!include exetarg.mif

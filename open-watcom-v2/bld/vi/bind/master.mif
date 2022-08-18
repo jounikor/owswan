@@ -1,0 +1,15 @@
+proj_name = edbind
+
+edbind_autodepends = .AUTODEPEND
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+.c : ../../c
+
+inc_dirs = -I"../../h"
+
+exetarg_objs = edbind.obj myio.obj
+
+!include exetarg.mif

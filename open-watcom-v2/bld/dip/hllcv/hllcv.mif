@@ -1,0 +1,23 @@
+!ifdef %OWUSE_FILENAME_VERSION
+dllname = hllcv$(bld_ver)
+!else
+dllname = hllcv
+!endif
+
+imp_objs = &
+        hllmisc.obj &
+        hllld.obj &
+        hllmod.obj &
+        hlltype.obj &
+        hllsym.obj &
+        hllcue.obj &
+        hllvirt.obj &
+        hllloc.obj &
+        demangle.obj
+
+extra_incs = -I"$(lib_misc_dir)/h"
+extra_srcs = $(lib_misc_dir)/c
+
+extra_dllbase = $(dip_dllbase_$(host_os)_$(host_cpu)_hllcv)
+
+!include ../../master.mif

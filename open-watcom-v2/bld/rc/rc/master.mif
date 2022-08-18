@@ -1,0 +1,257 @@
+proj_name = wrc
+
+!ifndef wrc_autodepends
+wrc_autodepends = .AUTODEPEND
+!endif
+
+wrc_trmem = 1
+
+# Base DLL name needs to be 8 chars or less on OS/2, argh! Additionally,
+# internal module name may be required to match file name on some platforms.
+!ifdef bootstrap
+exetarg_name = bwrc
+dlltarg_name = bwrcd
+!else
+exetarg_name = wrc
+dlltarg_name = wrcd
+!endif
+
+win_yacc_prefix = winy
+os2_yacc_prefix = os2y
+
+win_yacc_file = $(win_yacc_prefix)tab
+os2_yacc_file = $(os2_yacc_prefix)tab
+
+additional_clean = $(os2_yacc_file).* $(win_yacc_file).* *.uni
+
+!include cproj.mif
+!include defrule.mif
+!include dllrule.mif
+!include dllbase.mif
+!include deftarg.mif
+!include trmem.mif
+!include wres.mif
+
+!include $(cpp_dir)/client.mif
+
+#
+# cflags
+#
+.c : .;../c;$(cpp_c_dirs);$(trmem_dir);$(watcom_dir)/c
+
+inc_dirs = -I. -I"../h" $(wres_inc_dirs) -I"$(fe_misc_dir)/h" $(cpp_inc_dirs)
+
+parser_defines = -DYYDEBUG -DSCANDEBUG
+
+extra_cpp_flags   = -D_STANDALONE_ $(parser_defines)
+!ifdef bootstrap
+extra_cpp_flags   += -DINCL_MSGTEXT
+!endif
+!ifndef wrc_dll
+extra_cpp_flags   += -DIDE_PGM
+!endif
+
+extra_cpp_flags_rcmem    = $(trmem_cpp_flags)
+!ifdef trmem_objs
+extra_cpp_flags_rcmem    = -DRC_USE_TRMEM
+!else ifeq release 0
+extra_cpp_flags_rcalloc0 = -DRCMEM_DEBUG
+extra_cpp_flags_rcalloc1 = -DRCMEM_DEBUG
+!endif
+extra_cpp_flags_idedrv   = -DSTATIC_LINKAGE
+extra_cpp_flags_maindrv  = -DDLL_NAME=$(dlltarg_name)
+
+extra_c_flags_rcmem    = $(trmem_cover_cflags)
+
+#
+# lflags
+#
+extra_l_flags_dll     = option implib $(wrc_dllbase_$(host_os)_$(host_cpu))
+
+extra_l_flags_dll_nt  = initinstance terminstance op modname='$(dlltarg_name).dll'
+extra_l_flags_dll_os2 = initinstance terminstance op manyautodata op modname='$(dlltarg_name)'
+
+# explicit rules
+#################
+
+common_objs = &
+    $(_subdir_)$(win_yacc_file).obj &
+    $(_subdir_)$(os2_yacc_file).obj &
+    $(_subdir_)keywordw.obj &
+    $(_subdir_)keyword2.obj &
+    $(_subdir_)rcerrors.obj &
+    $(_subdir_)exeobj.obj &
+    $(_subdir_)exeresw.obj &
+    $(_subdir_)exeres2.obj &
+    $(_subdir_)exerespe.obj &
+    $(_subdir_)exereslx.obj &
+    $(_subdir_)exelxobj.obj &
+    $(_subdir_)exeseg.obj &
+    $(_subdir_)exeutil.obj &
+    $(_subdir_)global.obj &
+    $(_subdir_)layer0.obj &
+    $(_subdir_)mergedir.obj &
+    $(_subdir_)param.obj &
+    $(_subdir_)pass2.obj &
+    $(_subdir_)rc.obj &
+    $(_subdir_)rcio.obj &
+    $(_subdir_)rcmem.obj &
+    $(_subdir_)rcstr.obj &
+    $(_subdir_)ppalloc.obj &
+    $(_subdir_)pprcenv.obj &
+    $(_subdir_)scanw.obj &
+    $(_subdir_)scan2.obj &
+    $(_subdir_)semacclw.obj &
+    $(_subdir_)semantic.obj &
+    $(_subdir_)semantcw.obj &
+    $(_subdir_)semdiagw.obj &
+    $(_subdir_)semmenuw.obj &
+    $(_subdir_)semverw.obj &
+    $(_subdir_)semtbarw.obj &
+    $(_subdir_)semantc2.obj &
+    $(_subdir_)semdiag2.obj &
+    $(_subdir_)semmenu2.obj &
+    $(_subdir_)semsngl2.obj &
+    $(_subdir_)semstr2.obj &
+    $(_subdir_)semaccl2.obj &
+    $(_subdir_)semhelp2.obj &
+    $(_subdir_)semraw.obj &
+    $(_subdir_)semsnglw.obj &
+    $(_subdir_)semstrw.obj &
+    $(_subdir_)dbtable.obj &
+    $(_subdir_)unitable.obj &
+    $(_subdir_)preproc.obj &
+    $(_subdir_)ppexpr.obj &
+    $(_subdir_)ppmacro.obj &
+    $(_subdir_)tmpctl.obj &
+    $(_subdir_)autodep.obj &
+    $(_subdir_)rcldstr.obj &
+    $(_subdir_)sharedio.obj &
+    $(_subdir_)semresfl.obj &
+    $(_subdir_)semutil.obj &
+    $(_subdir_)leadbyte.obj &
+    $(_subdir_)ideentry.obj &
+    $(_subdir_)idemsgpr.obj &
+    $(_subdir_)pathlist.obj &
+    $(_subdir_)rcspawn.obj
+
+misc_objs = &
+    1250.uni &
+    1251.uni &
+    1252.uni &
+    936.uni &
+    949.uni &
+    950.uni &
+    kanji.uni
+
+!ifdef trmem_objs
+rc_template = $(common_objs) $(trmem_objs)
+!else
+rc_template = $(common_objs) $(_subdir_)rcalloc1.obj $(_subdir_)rcalloc0.obj
+!endif
+
+objs_drv = maindrv.obj idedrv.obj idemsgfm.obj
+_subdir_ = $(dll_subdir)/
+objs_dll = $+$(rc_template)$-
+_subdir_ =
+objs_exe = $+$(rc_template)$- $(objs_drv)
+
+#
+# EXE
+#
+!ifdef bootstrap
+prebuild_objs = usage.gh rcmsg.grh $(os2_yacc_file).c $(win_yacc_file).c &
+    keyword2.gh keywordw.gh to932.uni
+!else
+prebuild_objs = usage.gh rcmsg.grh $(os2_yacc_file).c &
+    $(win_yacc_file).c keyword2.gh keywordw.gh to932.uni
+!endif
+!ifdef wrc_dll
+exetarg_prebuild_objs = $(misc_objs) $(dlltarg_name).dll
+exetarg_objs          = $(objs_drv)
+exetarg_libs          = $(dlltarg_name).lib
+!else
+exetarg_prebuild_objs = $(misc_objs) $(prebuild_objs)
+exetarg_objs          = $(objs_exe)
+exetarg_libs          = $(wres_lib)
+!ifndef bootstrap
+exetarg_qnx_res       = usage.u
+exetarg_res_wresui    = wresui.res
+!endif
+!endif
+!ifndef bootstrap
+exetarg_res_version_nt_386 = exever.res
+exetarg_res_version_nt_x64 = exever.res
+!endif
+!include exetarg.mif
+
+#
+# DLL
+#
+dlltarg_prebuild_objs = $(dll_subdir) $(prebuild_objs)
+dlltarg_objs          = $(objs_dll)
+dlltarg_libs          = $(wres_lib)
+!ifndef bootstrap
+dlltarg_res_wresui    = wresui.res
+!endif
+dlltarg_res_version_nt_386 = version.res
+dlltarg_res_version_nt_x64 = version.res
+!include dlltarg.mif
+
+#
+# rc and others
+#
+verrc_exe = $(exetarg_name)
+verrc_dll = $(dlltarg_name)
+!include verrc.mif
+
+rc_defines    = -D_STANDALONE_ $(parser_defines)
+
+wresui.res : ../rc.rc rcmsg.grh .AUTODEPEND
+    @%make echo_rc
+    $(rcui8) -ad $(rc_defines)
+
+win_yacc_options = -b $(win_yacc_prefix) -d -dd -db -de
+os2_yacc_options = -b $(os2_yacc_prefix) -d -dd -db -de
+
+$(win_yacc_file).c : ../y/rcwin.y ../y/yydrivrw.c
+    @%make echo_yacc
+    $(yacc) $(win_yacc_options) $< >$(nulldevice)
+
+$(os2_yacc_file).c : ../y/rcos2.y ../y/yydrivr2.c
+    @%make echo_yacc
+    $(yacc) $(os2_yacc_options) $< >$(nulldevice)
+
+keywordw.gh : ../hash/rcwin.key
+    @%make echo_findhash
+    $(noecho)findhash -q -s w -m $<
+
+keyword2.gh : ../hash/rcos2.key
+    @%make echo_findhash
+    $(noecho)findhash -q -s 2 -m $<
+
+rcmsg.grh : ../h/rc.msg
+    @%make echo_awk
+    $(awk) -v base=MSG_RC_BASE -f $(build_dir)/makemsg.awk -v OUTFILE=$^. $[@
+
+$(misc_objs):
+    cat ../$@ >$@
+
+!ifdef exetarg_qnx_res
+optencod_opt_qnx = -u=$(exetarg_qnx_res)
+!endif
+optencod_targets = $(host_os)
+!ifeq release 0
+optencod_targets += dbg
+!endif
+
+usage.gh $(exetarg_$(host_os)_res) : ../h/options.gml $(__MAKEFILES__)
+    @%make echo_optencod
+    $(optencod) -rc=MSG_USAGE_BASE -utf8 $(optencod_opt_$(host_os)) $[@ . . $@ $(optencod_targets)
+
+./cvttable.exe: ../c/cvttable.c $(watcom_dir)/h/cp932uni.h $(__MAKEFILES__)
+    @%make echo_bldcl
+    $(bld_cl) $[@ -D_STANDALONE_ -I"../h" $(bld_clflags) $(bld_ldflags)
+
+to932.uni : ./cvttable.exe $(__MAKEFILES__)
+    $[@ $@

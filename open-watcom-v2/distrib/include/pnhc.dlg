@@ -1,0 +1,5 @@
+# UTF-8 encoding, ¥
+include=previous.dlg
+include=next.dlg
+include=help.dlg
+include=cancel.dlg

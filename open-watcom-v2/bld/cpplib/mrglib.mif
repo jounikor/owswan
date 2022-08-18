@@ -1,0 +1,32 @@
+proj_name = cpplib
+
+additional_clean = *.gdf
+
+!include $(cpplib_dir)/master.mif
+
+!include $(cpplib_dir)/libs.mif
+
+libs : .symbolic $(target_lib) $(target_lib_x)
+    @%null
+
+$(target_lib) : $(libs) $(__MAKEFILES__)
+    $(noecho)%create $^&.lbc
+    @for %i in ($(libs)) do @%append $^&.lbc +%i
+    @rm -f export.tmp
+    @rm -f export.gdf
+    @%make echo_lib
+    $(librarian) $(plib_lib_flags) $(plib_linkage_flags) $@ @$^&.lbc
+!ifeq linkage dynamic
+    $(sed) -f $(lib_misc_dir)/sed/export.sed export.tmp > export.gdf
+!endif
+
+$(target_lib_x) : $(libsx) $(__MAKEFILES__)
+    $(noecho)%create $^&.lbc
+    @for %i in ($(libsx)) do @%append $^&.lbc +%i
+    @rm -f exportx.tmp
+    @rm -f exportx.gdf
+    @%make echo_lib
+    $(librarian) $(plib_lib_flags) $(plibx_linkage_flags) $@ @$^&.lbc
+!ifeq linkage dynamic
+    $(sed) -f $(lib_misc_dir)/sed/export.sed exportx.tmp > exportx.gdf
+!endif

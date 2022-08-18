@@ -1,0 +1,85 @@
+:INCLUDE file='mspslay.gml'
+:LAYOUT.
+:PC
+    pre_skip = 1
+:TOC
+    toc_levels = 4
+:APPENDIX
+    header = yes
+:BANNER
+        left_adjust=0
+        right_adjust=0
+        depth=2
+        place=botodd
+        docsect=body
+:BANREGION
+        indent=0
+        hoffset=left
+        width=extend
+        voffset=1
+        depth=1
+        font=17
+        refnum=1
+        region_position=right
+        pouring=last
+        script_format=no
+        contents="&amp.$htext2".
+:eBANREGION
+:BANREGION
+        indent=0
+        hoffset=right
+        width='.4i'
+        voffset=1
+        depth=1
+        font=17
+        refnum=2
+        region_position=right
+        pouring=last
+        contents=pgnuma
+:eBANREGION
+:eBANNER
+:BANNER
+        left_adjust=0
+        right_adjust=0
+        depth=2
+        place=boteven
+        docsect=body
+:BANREGION
+        indent=0
+        hoffset=left
+        width='.4i'
+        voffset=1
+        depth=1
+        font=17
+        refnum=1
+        region_position=left
+        pouring=last
+        contents=pgnuma
+:eBANREGION
+:BANREGION
+        indent=0
+        hoffset=right
+        width=extend
+        voffset=1
+        depth=1
+        font=17
+        refnum=2
+        region_position=left
+        pouring=last
+        script_format=no
+        contents="&amp.$htext2".
+:eBANREGION
+:eBANNER
+:BANNER
+        place=botodd
+        docsect=head1
+        refplace=botodd
+        refdoc=body
+:eBANNER
+:BANNER
+        place=boteven
+        docsect=head1
+        refplace=boteven
+        refdoc=body
+:eBANNER
+:eLAYOUT.

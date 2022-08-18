@@ -1,0 +1,9 @@
+pfx__ =../../../
+__sfx =/library/$(system).$(processor)/$(libsubdir)/$(libname).lib
+
+libs = $+ &
+    $(pfx__)kanji$(__sfx) &
+    $-
+
+pfx__ =
+__sfx =

@@ -1,0 +1,77 @@
+proj_name = wfl
+
+!ifndef wfl_autodepends
+wfl_autodepends = .AUTODEPEND
+!endif
+
+wfl_trmem = 1
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include trmem.mif
+!include wres.mif
+
+#
+# cflags
+#
+.c: ../../c;$(trmem_dir)
+
+inc_dirs = -I. -I.. -I"../../h" -I"$(comp_cfg_dir)/h"
+
+#
+# lflags
+#
+
+# explicit rules
+#################
+
+exename_i86 = wfl
+exename_386 = wfl386
+exename_axp = wflaxp
+exetarg_name = $(exename_$(target_cpu))
+
+#
+# EXE
+#
+exetarg_prebuild_objs = wflmsgs.grh usage.gh
+exetarg_objs = wfl.obj $(trmem_objs)
+exetarg_libs          = $(wres_lib)
+exetarg_res_version_nt_386 = exever.res
+exetarg_res_version_nt_x64 = exever.res
+exetarg_res_wresui    = wresui.res
+!include exetarg.mif
+
+#
+# rc and others
+#
+verrc_exe = $(exetarg_name)
+!include verrc.mif
+
+rcui_inc_dirs = -I. -I.. -I"../.." -I"../../../h" -I"$(comp_cfg_dir)/h"
+
+wresui.res : ../../h/wfl.rc wflmsgs.gh wflmsgs.grh
+    @%make echo_rc
+    $(rcui8)
+
+#msgencod_enc_linux = -utf8
+
+wflmsgs.gh wflmsgs.grh : ../../gml/wflmsgs.gml
+    @%make echo_msgencod
+    $(msgencod) -s -ip -rc=MSG_LANG_BASE -utf8 $(msgencod_enc_$(host_os)) $[@ wflmsgs.gh wflmsgs.grh . .
+
+
+# optencod options and targets for various hosts
+!ifdef exetarg_qnx_res
+optencod_opt_qnx    = -u=$(exetarg_qnx_res)
+!endif
+#optencod_enc_linux  = -utf8
+optencod_targets_i86 = targ2
+optencod_targets = $(target_cpu) $(host_os) targ1 $(optencod_targets_$(target_cpu))
+!ifeq release 0
+optencod_targets += dbg
+!endif
+
+usage.gh $(exetarg_$(host_os)_res) : ../../../gml/wfxopts.gml $(__MAKEFILES__)
+    @%make echo_optencod
+    $(optencod) -rc=MSG_USAGE_BASE -utf8 $(optencod_opt_$(host_os)) $[@ . . $@ $(optencod_targets)

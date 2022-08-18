@@ -1,0 +1,178 @@
+  
+
+******************************* FSTREAMBASE **********************************
+
+Filename: fsbconde.cpp
+Declaration: 
+    std::fstreambase::fstreambase()
+Semantics: Default constructor.
+
+
+Filename: fsbconnm.cpp
+Declaration: 
+    std::fstreambase::fstreambase( char const *name, ios::openmode mode, int prot )
+Semantics: Construct an fstreambase that is initialized and attached to the
+           named file.
+
+
+Filename: fsbconfd.cpp
+Declaration: 
+    std::fstreambase::fstreambase( filedesc fd )
+Semantics: Construct an fstreambase that is initialized and attached to the
+	   specified file.
+
+
+Filename: fsbconsf.cpp
+Declaration: 
+    std::fstreambase::fstreambase( filedesc fd, char *buf, streamsize len )
+Semantics: Construct an fstreambase that is initialized and attached to the
+	   specified file, using the specified buf.
+
+
+Filename: fsbdestr.cpp
+Declaration: 
+    std::fstreambase::~fstreambase()
+Semantics: Destroy an fstreambase.
+
+
+Filename: fsbattac.cpp
+Declaration: 
+    void std::fstreambase::attach( filedesc fd )
+Semantics: Attach the file associated with "fd" to the fstreambase object.
+
+
+Filename: fsbclose.cpp
+Declaration: 
+    void std::fstreambase::close()
+Semantics: Close the file associated with the fstreambase object.
+
+
+Filename: fsbopen.cpp
+Declaration:
+    void std::fstreambase::open( char const *name, ios::openmode mode, int prot )
+Semantics: Open the named file.
+
+
+Filename: fsbsetbf.cpp
+Declaration: 
+    void std::fstreambase::setbuf( char *buf, streamsize len )
+Semantics: Attempt filebuf::setbuf()
+
+
+
+******************************* IFSTREAM *************************************
+
+Filename: ifsconde.cpp
+Declaration: 
+    std::ifstream::ifstream()
+Semantics: Default constructor.
+
+
+Filename: ifsconnm.cpp
+Declaration: 
+    std::ifstream::ifstream( char const *name, ios::openmode mode, int prot )
+            : fstreambase( name,
+        		      (mode&(ios::in|ios::out) ? mode : mode|ios::in),
+        		      prot )
+Semantics: Construct an ifstream that is initialized and attached to the
+           named file.
+
+
+Filename: ifsconfd.cpp
+Declaration: 
+    std::ifstream::ifstream( filedesc fd ) : fstreambase( fd )
+Semantics: Construct an ifstream that is initialized and attached to the
+	   specified file.
+
+
+Filename: ifsconsf.cpp
+Declaration: 
+    std::ifstream::ifstream( filedesc fd, char *buf, streamsize len )
+            : fstreambase( fd, buf, len )
+Semantics: Construct an ifstream that is initialized and attached to the
+	   specified file, using the specified buf.
+
+
+Filename: ifsdestr.cpp
+Declaration: 
+    std::ifstream::~ifstream()
+Semantics: Destroy an ifstream.
+
+
+******************************* OFSTREAM *************************************
+
+Filename: ofsconde.cpp
+Declaration: 
+    std::ofstream::ofstream()
+Semantics: Default constructor.
+
+
+Filename: ofsconnm.cpp
+Declaration: 
+    std::ofstream::ofstream( char const *name, ios::openmode mode, int prot )
+            : fstreambase( name,
+        		      (mode&(ios::in|ios::out) ? mode : mode|ios::out),
+        		      prot )
+Semantics: Construct an ofstream that is initialized and attached to the
+	   specified file, using the specified buf.
+
+
+Filename: ofsconfd.cpp
+Declaration: 
+    std::ofstream::ofstream( filedesc fd ) : fstreambase( fd )
+Semantics: Construct an ofstream that is initialized and attached to the
+	   specified file.
+
+
+Filename: ofsconsf.cpp
+Declaration: 
+    std::ofstream::ofstream( filedesc fd, char *buf, streamsize len )
+            : fstreambase( fd, buf, len )
+Semantics: Construct an ofstream that is initialized and attached to the
+	   specified file, using the specified buf.
+
+
+Filename: ofsdestr.cpp 
+Declaration: 
+    std::ofstream::~ofstream()
+Semantics: Destroy an ofstream.
+
+
+******************************* FSTREAM **************************************
+
+Filename: fstconde.cpp
+Declaration: 
+    std::fstream::fstream()
+Semantics: Default constructor.
+
+
+Filename: fstconnm.cpp
+Declaration: 
+    std::fstream::fstream( char const *name, ios::openmode mode, int prot )
+           : fstreambase( name,
+        		     (mode&(ios::in|ios::out) ? mode : mode|ios::in|ios::out),
+        		      prot )
+Semantics: Construct an fstream that is initialized and attached to the
+	   specified file, using the specified buf.
+
+
+Filename: fstconfd.cpp
+Declaration: 
+    std::fstream::fstream( filedesc fd ) : fstreambase( fd )
+Semantics: Construct an fstream that is initialized and attached to the
+	   specified file.
+
+
+Filename: fstconsf.cpp
+Declaration: 
+    std::fstream::fstream( filedesc fd, char *buf, streamsize len )
+           : fstreambase( fd, buf, len )
+Semantics: Construct an fstream that is initialized and attached to the
+	   specified file, using the specified buf.
+
+
+Filename: fstdestr.cpp
+Declaration: 
+    std::fstream::~fstream()
+Semantics: Destroy an fstream.
+

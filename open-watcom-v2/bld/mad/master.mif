@@ -1,0 +1,105 @@
+#
+# Master makefile for creating MADs (Machine Architecture Descriptions)
+#
+
+proj_name = mad
+
+!ifndef mad_autodepends
+mad_autodepends = .autodepend
+!endif
+
+mad_nofpu = 1
+
+!ifeq host_cpu x64
+sys_dll = 1
+!endif
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include dllbase.mif
+
+!include $(disasm_dir)/dis.mif
+
+#
+# cflags
+#
+.c: ../c;../../c;$(dis_srcs);$(extra_srcs)
+
+inc_dirs = -I. -I"../h" -I"../../h" -I"$(dig_dir)/h" $(dis_includes) $(extra_incs)
+
+extra_cpp_flags = -DMD_$(target_cpu) -DNDIS_$(target_cpu)
+!ifdef %OWUSE_FILENAME_VERSION
+extra_cpp_flags += -DUSE_FILENAME_VERSION=$(bld_ver)
+!endif
+
+extra_c_flags_i86 = -zu
+extra_c_flags_win = -zc
+
+!ifdef __WATCOM_TOOLS__
+extra_c_flags_madimp = -zlf -os     # -os ensures byte align for code
+!endif
+
+#
+# lflags
+#
+lflags_dll_dos_386   = sys rex_dos
+lflags_dll_linux_386 = sys rex_linux
+lflags_dll_qnx_386   = sys rex_qnx
+lflags_dll_win_i86   = sys windows
+
+extra_l_flags_dll         = $(mad_dllbase_$(host_os)_$(host_cpu))
+extra_l_flags_dll_nt_axp  = op dosseg
+extra_l_flags_dll_nt = $(extra_l_flags_dll_nt_$(host_cpu))
+
+#
+# names
+#
+!ifdef %OWUSE_FILENAME_VERSION
+dlltarg_name = mad$(target_cpu)$(bld_ver)
+!else
+dlltarg_name = mad$(target_cpu)
+!endif
+
+verrc_dll = $(dlltarg_name)
+!include verrc.mif
+
+dlltarg_ext_os2_386   = .d32
+dlltarg_ext_qnx_386   = .mad
+dlltarg_ext_linux_386 = .mad
+dlltarg_ext_dos_386   = .mad
+
+!ifdef dlltarg_ext_$(host_os)_$(host_cpu)
+dlltarg_ext = $(dlltarg_ext_$(host_os)_$(host_cpu))
+!endif
+!ifndef __WATCOM_TOOLS__
+!ifdef ext_lib_shared
+dlltarg_ext = $(ext_lib_shared)
+!endif
+!endif
+!ifdef dlltarg_ext
+additional_clean = *$(dlltarg_ext)
+!endif
+
+# explicit rules
+##################
+
+#
+# DLL
+#
+dlltarg_prebuild_objs = $(dis_prereq)
+dlltarg_objs          = madimp.obj $(dis_objs) $(imp_objs)
+dlltarg_res_version_nt_386 = version.res
+dlltarg_res_version_nt_x64 = version.res
+!include dlltarg.mif
+
+#
+# rc and others
+#
+distbls.gh : ./disbuild.exe
+    @%make echo_execute
+    $(noecho)$[@
+
+./disbuild.exe : $(disasm_dir)/core/c/disbuild.c $(disbuild_headers)
+    @%make echo_bldcl
+    $(bld_cl) $[@ -DNDIS_$(target_cpu) -I"../h" $(dis_includes) $(bld_clflags) $(bld_ldflags)

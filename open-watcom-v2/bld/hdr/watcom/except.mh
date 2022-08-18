@@ -1,0 +1,29 @@
+//
+//  except.h -- C++ default exception handlers
+//
+:keep CPP_HDR
+:include crwat.sp
+//
+#ifndef _EXCEPT_H_INCLUDED
+#define _EXCEPT_H_INCLUDED
+
+:include readonly.sp
+
+:include cpponly.sp
+
+:include owrtlink.sp
+
+:include cpppfv.sp
+
+:include watexc.sp
+
+:include except.sp
+
+using std::terminate_handler;
+using std::terminate;
+using std::set_terminate;
+using std::unexpected_handler;
+using std::unexpected;
+using std::set_unexpected;
+
+#endif

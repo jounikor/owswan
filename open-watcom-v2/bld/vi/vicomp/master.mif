@@ -1,0 +1,37 @@
+proj_name = vicomp
+
+!ifndef vicomp_autodepends
+vicomp_autodepends = .autodepend
+!endif
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+.c : ../../c
+
+inc_dirs_dos = -I"../../dos"
+
+inc_dirs = -I. -I"../../h" -I"$(posix_dir)/h"
+
+extra_cpp_flags = -DVICOMP
+
+exetarg_objs = &
+    vicomp.obj &
+    addstr.obj &
+    srcgen.obj &
+    srclabel.obj &
+    printf.obj &
+    srccs.obj &
+    srcdata.obj &
+    pdata.obj &
+    exdata.obj &
+    mapkey.obj &
+    dat.obj &
+    clset.obj &
+    llrtns.obj &
+    srcvar.obj &
+    parse.obj &
+    myio.obj
+
+!include exetarg.mif

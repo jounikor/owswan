@@ -1,0 +1,278 @@
+/*
+ *  process.h   Process spawning and related routines
+ *
+:include crwatqnx.sp
+ */
+#ifndef _PROCESS_H_INCLUDED
+#define _PROCESS_H_INCLUDED
+
+:include readonly.sp
+
+:include owrtlink.sp
+
+:segment DOS
+:include lfndos.sp
+
+:endsegment
+:segment QNX
+:include systypes.sp
+
+:endsegment
+:include cpluspro.sp
+
+:segment DOS
+/*
+ *  ISO C types
+ */
+:include wchar_t.sp
+:endsegment
+:segment DOS | LINUX | RDOS
+/*
+ *  POSIX 1003.1 types
+ */
+:include pid_t.sp
+
+:endsegment
+::
+:: Start of extension section
+::
+:include ext.sp
+
+:segment QNX
+/*
+ *  Spawn flags passed to qnx_spawn()
+ *  These are unique to QNX
+ */
+#define _SPAWN_DEBUG        0x0001
+#define _SPAWN_HOLD         0x0002
+#define _SPAWN_BGROUND      0x0004
+#define _SPAWN_NEWPGRP      0x0008
+#define _SPAWN_TCSETPGRP    0x0010
+#define _SPAWN_NOZOMBIE     0x0020
+#define _SPAWN_XCACHE       0x0040
+#define _SPAWN_SIGCLR       0x0080
+#define _SPAWN_SETSID       0x0100
+#define _SPAWN_NOHUP        0x0200
+
+:endsegment
+/* mode flags for spawnxxx routines */
+:segment DOS
+_WCRTDATA extern int __p_overlay;
+
+:endsegment
+#define _P_WAIT             0
+#define _P_NOWAIT           1
+:segment DOS
+#define _P_OVERLAY          __p_overlay
+:elsesegment
+#define _P_OVERLAY          2
+:endsegment
+#define _P_NOWAITO          3
+:segment DOS
+#ifdef __NT__
+#define _P_DETACH           4
+#endif
+:endsegment
+#define _OLD_P_OVERLAY      2
+
+#define P_WAIT              _P_WAIT
+#define P_NOWAIT            _P_NOWAIT
+#define P_OVERLAY           _P_OVERLAY
+#define P_NOWAITO           _P_NOWAITO
+:segment DOS
+#ifdef __NT__
+#define P_DETACH            _P_DETACH
+#endif
+:endsegment
+#define OLD_P_OVERLAY       _OLD_P_OVERLAY
+
+:segment DOS | RDOS
+/* values for __action_code used with cwait() */
+
+#define WAIT_CHILD          0
+#define WAIT_GRANDCHILD     1
+
+:endsegment
+:include extepi.sp
+::
+:: End of extension section
+::
+
+/*
+ *  POSIX 1003.1 Prototypes
+ */
+:include pxexec.sp
+
+:: These functions from the standard library need to be in namspace std
+:: in C++ to avoid conflicts on using declarations if standard headers
+:: are also included.
+#ifdef __cplusplus
+namespace std {
+#endif
+:include abort.sp
+:include exit.sp
+:include getenv.sp
+:include system.sp
+#ifdef __cplusplus
+} // namespace std
+using std::abort;
+using std::exit;
+using std::getenv;
+using std::system;
+#endif /* __cplusplus not defined */
+
+:include _exit.sp
+:include _pxexit.sp
+
+:include setenv.sp
+:include putenv.sp
+
+:include getpid.sp
+
+:include wait.sp
+
+::
+:: Start of extension section
+::
+:include ext.sp
+
+:include msexec.sp
+
+:keep ANSINAME
+:include pxexec.sp
+:include msexec.sp
+:remove ANSINAME
+
+:keep WIDE
+:segment DOS
+:include pxexec.sp
+:include msexec.sp
+
+:endsegment
+:remove WIDE
+:segment QNX
+struct _proc_spawn;     /* for C++ */
+
+extern pid_t qnx_spawn( int __mode, struct _proc_spawn *__msgbuf, nid_t __node,
+                 int __prio, int __sched_algo, int __flags,
+                 const char *__path, char **__argv, char **__envp,
+                 char *__iov, int __ctfd );
+
+#ifdef __386__
+extern pid_t tfork( char *__stk_addr, unsigned __stk_size, int (*__func)(void*), void *__arg, int __flags );
+#endif
+
+:endsegment
+:segment RDOS
+ _WCRTLINK extern int  _beginthread(
+                void (_WCCALLBACK *__start_address)(void *), int __prio,
+                const char *__thread_name,
+                unsigned __stack_size, void *__arglist );
+ #pragma intrinsic(_beginthread)
+ _WCRTLINK extern void  _endthread( void );
+:elsesegment LINUX | QNX
+#ifdef __386__
+ _WCRTLINK extern int   _beginthread( void (_WCCALLBACK *__start_address)(void *),
+     void *__stack_bottom, unsigned __stack_size, void *__arglist );
+ #pragma intrinsic(_beginthread)
+ _WCRTLINK extern void  _endthread( void );
+#endif
+:elsesegment DOS
+#ifdef _M_I86
+ _WCRTLINK extern int _WCFAR  _beginthread(
+    void (_WCCALLBACK _WCFAR *__start_address)(void _WCFAR *),
+    void _WCFAR *__stack_bottom, unsigned __stack_size, void _WCFAR *__arglist );
+ #pragma intrinsic(_beginthread)
+ _WCRTLINK extern void _WCFAR _endthread( void );
+ _WCRTLINK extern void _WCFAR *__chkstack( void _WCFAR * );
+ #ifndef __SW_ZU
+  #define _beginthread( __sa, __sb, __ss, __al )    _beginthread( __sa, __chkstack(__sb), __ss, __al )
+ #endif
+#else
+ #ifdef __NT__
+  _WCRTLINK extern unsigned long _beginthread(
+                void (_WCCALLBACK *__start_address)(void *),
+                unsigned __stack_size, void *__arglist );
+  _WCRTLINK extern unsigned long _beginthreadex( void *__security,
+                unsigned __stack_size,
+                unsigned (__stdcall *__start_address)(void *),
+                void *__arglist, unsigned __initflag, unsigned *__thrdaddr );
+  #pragma intrinsic(_beginthread,_beginthreadex)
+  _WCRTLINK extern void     _endthreadex( unsigned __retval );
+:include thrdhndl.sp
+ #else
+  _WCRTLINK extern int  _beginthread( void (_WCCALLBACK *__start_address)(void *),
+                        void *__stack_bottom, unsigned __stack_size, void *__arglist );
+  #pragma intrinsic(_beginthread)
+ #endif
+ _WCRTLINK extern void      _endthread( void );
+#endif
+:endsegment
+
+:segment DOS | RDOS
+:: MS deprecated
+_WCRTLINK extern int        cwait( int *__status, int __process_id, int __action_code );
+::
+_WCRTLINK extern int        _cwait( int *__status, int __process_id, int __action_code );
+
+:endsegment
+:segment LINUX | QNX
+#if !(defined(SYSV) || defined(BSD) || defined(XENIX) || defined(_UNIX_H_INCLUDED))
+:endsegment
+_WCRTLINK extern char       *getcmd( char *__buffer );
+_WCRTLINK extern int        _bgetcmd( char *__buffer, int __len );
+_WCRTLINK extern char       *_cmdname( char *__name );
+:segment LINUX | QNX
+#endif
+:endsegment
+
+:include msspawn.sp
+
+:keep ANSINAME
+:include msspawn.sp
+
+:include putenv.sp
+
+:include getpid.sp
+:remove ANSINAME
+
+:keep WIDE
+:segment DOS
+:include getenv.sp
+:include putenv.sp
+:include setenv.sp
+:include system.sp
+
+:include msspawn.sp
+
+:endsegment
+:remove WIDE
+:segment DOS | RDOS
+:segment DOS
+#ifdef __NT__
+ // For use when access to the DLL startup is required.
+ // this function pointer will be called after the C library startup
+ // and before the C++ library startup.
+ #ifdef _WINDOWS_
+  extern BOOL (WINAPI   *_pRawDllMain)( HANDLE, DWORD, LPVOID );
+ #else
+:endsegment
+  extern int (__stdcall *_pRawDllMain)( void *, unsigned, void * );
+:segment DOS
+ #endif
+#endif
+:endsegment
+
+:endsegment
+:segment LINUX
+_WCRTLINK extern pid_t      gettid( void );
+
+:endsegment
+:include extepi.sp
+::
+:: End of extension section
+::
+
+:include cplusepi.sp
+
+#endif

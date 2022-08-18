@@ -1,0 +1,84 @@
+#include <windows.h>
+#include "about.rh"
+#include "banner.h"
+#include "wre.rh"
+
+#define FIRST_COPYRIGHT_YEAR 1984
+
+STRINGTABLE
+BEGIN
+    #define pick(c,e) c, [ e ]
+
+    #include "rcstrmsg.gh"
+    #include "uistrmsg.gh"
+
+    #undef pick
+END
+
+#define sp( a, b ) a
+#include "wre.men"
+#undef sp
+
+"WREAccelTable" ACCELERATORS
+BEGIN
+    VK_DELETE,    IDM_DELETE,       VIRTKEY
+    VK_F1,        IDM_HELP,         VIRTKEY
+    VK_RETURN,    IDM_RES_EDIT,     VIRTKEY
+    "X",          IDM_CUT,          CONTROL, VIRTKEY
+    "C",          IDM_COPY,         CONTROL, VIRTKEY
+    "V",          IDM_PASTE,        CONTROL, VIRTKEY
+    "N",          IDM_NEW,          CONTROL, VIRTKEY
+    "O",          IDM_OPEN,         CONTROL, VIRTKEY
+    "S",          IDM_SAVE,         CONTROL, VIRTKEY
+END
+
+/*
+ * hold this order of ICONS
+ * it defines icons index in executable
+ * this index is used for file extensions association by OW installer
+ */
+"APPLICON"  ICON "wre.ico"          /* 0 */
+"ResIcon"   ICON "restext.ico"      /* 1    used by installer */
+
+/* private clipboard format bitmap */
+"PrivateFmt"    BITMAP "clip.bmp"
+
+/* aboutbox bitmap */
+"AboutLogo"     BITMAP "logo4.bmp"
+
+/* ribbon bitmaps */
+"New"           BITMAP "new.bmp"
+"Open"          BITMAP "open.bmp"
+"Save"          BITMAP "save.bmp"
+
+"Cut"           BITMAP "cut.bmp"
+"Copy"          BITMAP "copy.bmp"
+"Paste"         BITMAP "paste.bmp"
+
+/* resource type toolbar bitmaps */
+"AccelU"        BITMAP "accel.bmp"
+"AccelD"        BITMAP "acceld.bmp"
+"BitmapU"       BITMAP "bmp.bmp"
+"BitmapD"       BITMAP "bmpd.bmp"
+"CursorU"       BITMAP "cur.bmp"
+"CursorD"       BITMAP "curd.bmp"
+"DialogU"       BITMAP "dlg.bmp"
+"DialogD"       BITMAP "dlgd.bmp"
+"FontU"         BITMAP "font.bmp"
+"FontD"         BITMAP "fontd.bmp"
+"IconU"         BITMAP "icon.bmp"
+"IconD"         BITMAP "icond.bmp"
+"MenuU"         BITMAP "menu.bmp"
+"MenuD"         BITMAP "menud.bmp"
+"StringU"       BITMAP "str.bmp"
+"StringD"       BITMAP "strd.bmp"
+"UPUser"        BITMAP "user.bmp"
+"UserD"         BITMAP "userd.bmp"
+
+#include "splash.dlg"
+#include "del.dlg"
+#include "paste.dlg"
+#include "renam.dlg"
+#include "res.dlg"
+
+#include "about.dlg"

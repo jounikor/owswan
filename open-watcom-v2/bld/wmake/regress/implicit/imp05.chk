@@ -1,0 +1,23 @@
+compile hello.obj from hello.c
+link hello.exe from hello.obj
+sleep 2
+sleep 2
+change hello0.h
+hello.obj will be built because of hello0.h
+compile hello.obj from hello.c
+hello.exe will be built because of hello.obj
+link hello.exe from hello.obj
+sleep 2
+change hello1.h
+hello.obj will be built because of hello1.h
+compile hello.obj from hello.c
+hello.exe will be built because of hello.obj
+link hello.exe from hello.obj
+sleep 2
+change hello0.h
+change hello1.h
+hello.obj will be built because of hello0.h
+hello.obj will be built because of hello1.h
+compile hello.obj from hello.c
+hello.exe will be built because of hello.obj
+link hello.exe from hello.obj

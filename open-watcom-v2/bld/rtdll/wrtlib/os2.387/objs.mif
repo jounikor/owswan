@@ -1,0 +1,42 @@
+__cifx__ =$(system).386/$(libsubdir)
+__mifx__ =$(system).387/$(libsubdir).dll
+__pifx__ =$(system).386/mf_$(dllname_$(convention))mt$(dllname_debug)
+
+dll_libs = $+ &
+    $(clib_dir)/library/$(__cifx__)/clib3$(dllname_$(convention)).lib &
+    $(mathlib_dir)/library/$(__mifx__)/math387$(dllname_$(convention)).lib &
+    $(cpplib_dir)/library/$(__pifx__).dll/plbxmt3$(dllname_$(convention)).lib &
+    $(cpplib_dir)/library/$(__pifx__)/plbxmt3$(dllname_$(convention)).lib &
+    $-
+
+dll_def = $+ &
+    $(clib_dir)/library/$(__cifx__)/export.gdf &
+    $(clib_dir)/intel/export.def &
+    $(clib_dir)/startup/export.def &
+    $(clib_dir)/startup/$(convention).def &
+#    $(clib_dir)/startup/library/$(system).386/export.def &
+    $(mathlib_dir)/library/$(__mifx__)/export.gdf &
+    $(mathlib_dir)/export.387 &
+    $(mathlib_dir)/$(convention).387 &
+    $(cpplib_dir)/runtime/os2386.def &
+    $(cpplib_dir)/library/$(__pifx__).dll/exportx.gdf &
+    $-
+
+dll_objs = $+ &
+    $(clib_dir)/startup/library/$(__cifx__)/clibdo32.obj &
+    $-
+
+targdir = $(cpplib_dir)/runtime/$(__pifx__).dll/
+!include $(cpplib_dir)/runtime/static.mif
+objs_tmp = $+ $(static_objs) $-
+targdir = $(cpplib_dir)/iostream/$(__pifx__).dll/
+!include $(cpplib_dir)/iostream/static.mif
+objs_tmp += $+ $(static_objs) $-
+targdir =
+!include $(clib_dir)/rtdll/static.mif
+objs_tmp += $+ $(static_objs) $-
+static_objs = $+ $(objs_tmp) $-
+
+__cifx__ =
+__mifx__ =
+__pifx__ =

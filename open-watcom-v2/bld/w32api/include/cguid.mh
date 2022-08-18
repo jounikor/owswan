@@ -1,0 +1,15 @@
+/*
+ *  cguid.h     COM GUIDs
+ *
+:include crwatcnt.sp
+ */
+
+#ifndef __CGUID_H__
+#define __CGUID_H__
+
+:include readonly.sp
+
+/* GUIDs */
+EXTERN_C const IID  __cdecl GUID_NULL;
+
+#endif /* __CGUID_H__ */

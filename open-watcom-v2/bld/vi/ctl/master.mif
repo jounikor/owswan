@@ -1,0 +1,24 @@
+proj_name = victl
+
+!ifndef vicomp_autodepends
+victl_autodepends = .autodepend
+!endif
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include exerule.mif
+
+.c : ..;../../c
+
+inc_dirs = -I.. -I"../../h"
+
+all : parsectl.exe parsedyn.exe .SYMBOLIC
+
+exetarg_name = parsectl
+exetarg_objs = parsectl.obj myio.obj
+!include exetarg.mif
+
+exetarg_name = parsedyn
+exetarg_objs = parsedyn.obj myio.obj
+!include exetarg.mif

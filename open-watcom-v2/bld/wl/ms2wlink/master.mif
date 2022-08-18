@@ -1,0 +1,34 @@
+proj_name = ms2wlink
+
+ms2wlink_autodepends = .AUTODEPEND
+
+ms2wlink_trmem = 1
+
+memory_model_i86 = c
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include trmem.mif
+
+#
+# cflags
+#
+.c: ../c;$(trmem_dir)
+
+inc_dirs = -I"../h"
+
+extra_cpp_flags_mem = $(trmem_cpp_flags)
+
+extra_c_flags_mem   = $(trmem_cover_cflags)
+
+#
+# lflags
+#
+extra_l_flags_os2 = op stack=8k
+
+#
+# EXE
+#
+exetarg_objs = fileio.obj keyword.obj mem.obj ms2wlink.obj parsems.obj utils.obj $(trmem_objs)
+!include exetarg.mif

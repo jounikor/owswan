@@ -1,0 +1,119 @@
+#######################
+# DOS and Windows 3.x
+#
+[ DEFAULT dir="binw" cond="doshost winhost |" where="c jc" ]
+type="s" usr="unicode.850"      old="binb"
+type="s" usr="unicode.437"      old="binb"
+type="s" usr="unicode.852"
+type="s" usr="unicode1.250"
+type="s" usr="unicode1.252"
+
+#######################
+# OS/2
+#
+[ DEFAULT dir="binp" cond="os2host" where="c jc" ]
+type="s" usr="unicode.850"
+type="s" usr="unicode.437"
+type="s" usr="unicode.852"
+type="s" usr="unicode1.250"
+type="s" usr="unicode1.252"
+
+#######################
+# Windows NT - 386
+#
+[ DEFAULT dir="binnt" cond="wnthost" where="c jc" ]
+type="s" usr="unicode.850"
+type="s" usr="unicode.437"
+type="s" usr="unicode.852"
+type="s" usr="unicode1.250"
+type="s" usr="unicode1.252"
+
+#######################
+# Windows NT - AXP
+#
+[ DEFAULT dir="axpnt" cond="alphahost" where="ac" ]
+type="s" usr="unicode.850"
+type="s" usr="unicode.437"
+type="s" usr="unicode.852"
+type="s" usr="unicode1.250"
+type="s" usr="unicode1.252"
+
+#######################
+# Windows NT - X64
+#
+[ DEFAULT dir="binnt64" cond="wnt64host" where="c jc" keys="ntx64" ]
+type="s" usr="unicode.850"
+type="s" usr="unicode.437"
+type="s" usr="unicode.852"
+type="s" usr="unicode1.250"
+type="s" usr="unicode1.252"
+
+#######################
+# Linux - 386
+#
+[ DEFAULT dir="binl" cond="lnxhost" where="c jc" ]
+type="s" usr="unicode.850"
+type="s" usr="unicode.437"
+type="s" usr="unicode.852"
+type="s" usr="unicode1.250"
+type="s" usr="unicode1.252"
+
+#######################
+# Linux - X64
+#
+[ DEFAULT dir="binl64" cond="lnx64host" where="c jc" keys="lx64" ]
+type="s" usr="unicode.850"
+type="s" usr="unicode.437"
+type="s" usr="unicode.852"
+type="s" usr="unicode1.250"
+type="s" usr="unicode1.252"
+
+#######################
+# F77 Resources
+#
+[ DEFAULT type="l" where="f77 jf77" desc="Miscelaneous Fortran Resource Libraries" ]
+dir="lib386/dos"        usr="wresf.lib"     cond="dostarg 3r"
+dir="lib386/dos"        usr="wresfs.lib"    cond="dostarg 3s"
+dir="lib386/netware"    usr="wresf.lib"     cond="nlmtarg 3r"
+dir="lib386/netware"    usr="wresfs.lib"    cond="nlmtarg 3s"
+dir="lib386/linux"      usr="wresf.lib"     cond="lnxtarg 3r"
+dir="lib386/linux"      usr="wresfs.lib"    cond="lnxtarg 3s"
+dir="lib386/nt"         usr="wresf.lib"     cond="wnttarg 3r"
+dir="lib386/nt"         usr="wresfs.lib"    cond="wnttarg 3s"
+dir="lib386/os2"        usr="wresf.lib"     cond="os2targ 3r"
+dir="lib386/os2"        usr="wresfs.lib"    cond="os2targ 3s"
+dir="lib386/win"        usr="wresf.lib"     cond="wintarg 3r"
+dir="lib386/win"        usr="wresfs.lib"    cond="wintarg 3s"
+
+dir="lib286"            usr="wresm.lib"     cond="dostarg mm"
+dir="lib286"            usr="wresl.lib"     cond="dostarg ml"
+
+
+# "Miscellaneous junk" component of install manifest
+
+[ DEFAULT desc="Miscelaneous files" ]
+
+type="s"                        dir="."         usr="watcom.ico"        cond="os2host"  where="c jc f77 jf77"   desc="Icon for program group/folder"
+
+#type="s"                       dir="."         usr="wf77.res"                                          where="f77 jf77"   desc="FORTRAN 77 run-time error message resource file"
+#type="s"                       dir="."         usr="wf77386.prf"       cond="wkframe"                  where="f77 jf77"   desc="FORTRAN 77 profile for WorkFrame/2"
+#type="s"                       dir="."         usr="wcc386.prf"        cond="wkframe"                  where="c jc"    desc="Watcom C profile for WorkFrame/2"
+#type="s"                       dir="."         usr="wpp386.prf"        cond="wkframe cplusplus"        where="c jc"    desc="Watcom C++ profile for WorkFrame/2"
+
+#type="e"                       dir="binw"      usr="dbglib.rex"        cond="doshost winhost |"        where="c jc f77 jf77"   desc="Rational DOS extender debugging extension"        old="bin"
+type="e"                        dir="binw"      usr="techinfo.exe"      cond="doshost winhost wnthost | |"        where="c jc f77 jf77"   old="binb"
+type="e"                        dir="binp"      usr="techinfo.exe"      cond="os2host"                  where="c jc f77 jf77"   old="binb"
+
+#type="e"       redist="X"      dir="binw"      usr="ftui.dll"          cond="winhost wnthost |"        where="c jc f77 jf77"
+#type="e"       redist="X"      dir="binw"      usr="ftengine.dll"      cond="winhost wnthost |"        where="c jc f77 jf77"
+#type="e"       redist="X"      dir="binw"      usr="mvapi.dll"         cond="winhost wnthost |"        where="c jc f77 jf77"
+
+#type="e"                       dir="binw"      usr="cfig386.exe"       cond="doshost winhost |"        where="c jc f77 jf77"   desc="PharLap DOS extender configuration utility"       old="bin"
+#type="e"                       dir="binw"      usr="privatxm.exe"      cond="doshost winhost |"        where="c jc f77 jf77"           old="bin"
+
+#type="e"                       dir="binnt"     usr="api32wh.hlp"       cond="wnttarg helpfiles"        where="jc jf77"
+#type="e"                       dir="binnt"     usr="api32wh.ind"       cond="wnttarg helpfiles"        where="jc jf77"
+
+# Miscellaneous files required by the installer
+
+type="s" usr="license.txt"       dir="."         where="c ac f77"

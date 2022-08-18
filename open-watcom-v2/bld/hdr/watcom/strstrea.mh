@@ -1,0 +1,202 @@
+///////////////////////////////////////////////////////////////////////////
+// FILE: strstream/strstream.h (strstream support)
+//
+:keep CPP_HDR
+:include crwat.sp
+//
+// Description: This header is part of the C++ standard library. It
+//              defines the necessary classes for strstream support.
+///////////////////////////////////////////////////////////////////////////
+:segment !CNAME
+#ifndef _STRSTREAM_H_INCLUDED
+#define _STRSTREAM_H_INCLUDED
+
+:include readonly.sp
+
+#ifndef _STRSTREAM_INCLUDED
+ #include <strstream>
+#endif
+using std::strstreambuf;
+using std::strstreambase;
+using std::istrstream;
+using std::ostrstream;
+using std::strstream;
+
+// All included names should also be in the global namespace.
+#ifndef _IOSTREAM_H_INCLUDED
+ #include <iostream.h>
+#endif
+
+#endif
+:elsesegment
+#ifndef _STRSTREAM_INCLUDED
+#define _STRSTREAM_INCLUDED
+
+:include readonly.sp
+
+:include cpponly.sp
+
+:include owrtlink.sp
+
+#ifndef _IOSTREAM_INCLUDED
+ #include <iostream>
+#endif
+
+:include nsstd.sp
+  // **************************** STRSTREAMBUF *******************************
+
+:include pshpackl.sp
+  class _WPRTLINK strstreambuf : public streambuf {
+  public:
+    strstreambuf();
+    strstreambuf( streamsize __allocation_size );
+    strstreambuf( void *(_WCCALLBACK *__alloc_fn)( long ), void (_WCCALLBACK *__free_fn)( void * ) );
+    strstreambuf( char *__str, streamsize __size, char *__pstart = NULL );
+   ~strstreambuf();
+
+    streamsize alloc_size_increment( streamsize __increment );
+    void       freeze( int __freeze = 1 );
+    char      *str();
+
+    virtual int        overflow( int = EOF );
+    virtual int        underflow();
+    virtual streambuf *setbuf( char *__ignored, streamsize __allocation_size );
+    virtual streampos  seekoff( streamoff     __offset,
+                                ios::seekdir  __direction,
+                                ios::openmode __mode );
+    virtual int        sync();
+
+  protected:
+    virtual int doallocate();
+
+  private:
+    void  __strstreambuf( char *, streamsize, char * );
+
+    void *(_WCCALLBACK *__alloc_fn)( long );
+    void  (_WCCALLBACK *__free_fn)( void * );
+    streamsize __allocation_size;
+    int   __minbuf_size;
+    unsigned  __frozen    : 1;
+    unsigned  __dynamic   : 1;
+    unsigned  __unlimited : 1;
+  };
+:include poppack.sp
+
+  inline strstreambuf::strstreambuf() {
+    __strstreambuf( NULL, 0, NULL );
+  }
+
+  inline strstreambuf::strstreambuf( char *__ptr,
+                                     streamsize __size,
+                                     char *__pstart ) {
+    __strstreambuf( __ptr, __size, __pstart );
+  }
+
+  inline streamsize strstreambuf::alloc_size_increment( streamsize __increment ) {
+    __lock_it( __b_lock );
+    streamsize __old_allocation_size = __allocation_size;
+    __allocation_size        += __increment;
+    return( __old_allocation_size );
+  }
+
+  inline void strstreambuf::freeze( int __freeze ) {
+    __frozen = __freeze ? 1 : 0;
+  }
+
+  // **************************** STRSTREAMBASE ******************************
+
+:include pshpackl.sp
+  class _WPRTLINK strstreambase : public virtual ios {
+  public:
+    strstreambuf *rdbuf() const;
+
+  protected:
+    strstreambase();
+    strstreambase( char *__str, streamsize __size, char *__pstart = NULL );
+    ~strstreambase();
+
+  private:
+    strstreambuf __strstrmbuf;
+  };
+:include poppack.sp
+
+  inline strstreambuf *strstreambase::rdbuf() const {
+    return( (strstreambuf *) ios::rdbuf() );
+  }
+
+  // ***************************** ISTRSTREAM ********************************
+
+:include pshpackl.sp
+  class _WPRTLINK istrstream : public strstreambase, public istream {
+  public:
+    istrstream(          char *__str );
+    istrstream(   signed char *__str );
+    istrstream( unsigned char *__str );
+    istrstream(          char *__str, streamsize __size );
+    istrstream(   signed char *__str, streamsize __size );
+    istrstream( unsigned char *__str, streamsize __size );
+   ~istrstream();
+  };
+:include poppack.sp
+
+  // ***************************** OSTRSTREAM ********************************
+
+:include pshpackl.sp
+  class _WPRTLINK ostrstream : public strstreambase, public ostream {
+  public:
+    ostrstream();
+    ostrstream( char          *__str,
+                int            __size,
+                ios::openmode  __mode = ios::out );
+    ostrstream( signed char   *__str,
+                int            __size,
+                ios::openmode  __mode = ios::out );
+    ostrstream( unsigned char *__str,
+                int            __size,
+                ios::openmode  __mode = ios::out );
+    ~ostrstream();
+
+    int   pcount() const;
+    char *str();
+  };
+:include poppack.sp
+
+  inline char *ostrstream::str() {
+    __lock_it( __i_lock );
+    return( rdbuf()->str() );
+  }
+
+  inline int ostrstream::pcount() const {
+    __lock_it( __i_lock );
+    return( rdbuf()->out_waiting() );
+  }
+
+  // ***************************** STRSTREAM *********************************
+
+:include pshpackl.sp
+  class _WPRTLINK strstream : public strstreambase, public iostream {
+  public:
+    strstream();
+    strstream( char          *__str,
+               int            __size,
+               ios::openmode  __mode = ios::in|ios::out );
+    strstream( signed char   *__str,
+               int            __size,
+               ios::openmode  __mode = ios::in|ios::out );
+    strstream( unsigned char *__str,
+               int            __size,
+               ios::openmode  __mode = ios::in|ios::out );
+    ~strstream();
+
+    char *str();
+  };
+:include poppack.sp
+
+  inline char *strstream::str() {
+    __lock_it( __i_lock );
+    return( rdbuf()->str() );
+  }
+:include nsstdepi.sp
+
+#endif
+:endsegment

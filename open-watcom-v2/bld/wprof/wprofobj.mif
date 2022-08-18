@@ -1,0 +1,46 @@
+srcmgt_obj = srcmgt.obj
+
+!ifeq release 0
+debug_objs = dumpmem.obj
+!endif
+
+objs = &
+    $(trmem_objs) &
+    $(debug_objs) &
+    $(srcmgt_obj) &
+    aboutmsg.obj &
+    clrsamps.obj &
+    dipinter.obj &
+    diginter.obj &
+    dlgcnvt.obj &
+    dlgoptn.obj &
+    dlgsamp.obj &
+    getsamps.obj &
+    madinter.obj &
+    memutil.obj &
+    msg.obj &
+    msgstr.obj &
+    rptsamps.obj &
+    setsamps.obj &
+    support.obj &
+    utils.obj &
+    wndimain.obj &
+    wpasmfil.obj &
+    wpavals.obj &
+    wpbar.obj &
+    wpcnvt.obj &
+    wpdriver.obj &
+    wpgather.obj &
+    wpgetrow.obj &
+    wphelp.obj &
+    wpmain.obj &
+    wpnumrow.obj &
+    wppushin.obj &
+    wpsamp.obj &
+    wpsort.obj &
+    wpstart.obj &
+    wpsrcfil.obj &
+    pathlist.obj &
+    wpwind.obj &
+    autoenv.obj &
+    $(dip_objs) $(mad_objs) $(dig_objs)

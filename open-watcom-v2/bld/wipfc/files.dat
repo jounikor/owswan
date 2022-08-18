@@ -1,0 +1,45 @@
+# WIPFC component of install manifest
+
+[ DEFAULT cond="os2targ" type="e" where="c f77 jc jf77" desc="OS/2 IPFC help compiler" ]
+dir="binw"      usr="wipfc.exe" conda="doshost winhost |"
+dir="binp"      usr="wipfc.exe" conda="os2host"
+dir="binnt"     usr="wipfc.exe" conda="wnthost"     wherea="ac"
+dir="binnt64"   usr="wipfc.exe" conda="wnt64host"                   keys="ntx64"
+dir="axpnt"     usr="wipfc.exe" conda="alphahost"   where="ac"
+dir="binl"      usr="wipfc"     conda="lnxhost"
+dir="binl64"    usr="wipfc"     conda="lnx64host"                   keys="lx64"
+
+[ DEFAULT dir="wipfc" cond="os2targ" type="s" where="c f77 jc jf77 ac" desc="OS/2 IPFC help compiler support files" ]
+#
+# WIPFC NLS config file
+#
+usr="nlsconf.txt"
+#
+# WIPFC SBCS/DBCS data files
+#
+usr="de_DE.nls"
+usr="en_GB.nls"
+usr="en_US.nls"
+usr="fr_CA.nls"
+usr="fr_FR.nls"
+usr="ja_JA.nls"
+usr="xx_YY.nls"
+usr="entity.txt"
+usr="enti0932.txt"
+usr="enti0934.txt"
+usr="enti0938.txt"
+#
+usr="ibm437.cnv"
+usr="ibm850.cnv"
+usr="ibm852.cnv"
+usr="ibm943.cnv"
+#
+# WIPFC UTF-8 data files
+#
+usr="deDEUTF8.nls"
+usr="enGBUTF8.nls"
+usr="enUSUTF8.nls"
+usr="frCAUTF8.nls"
+usr="frFRUTF8.nls"
+usr="jaJAUTF8.nls"
+usr="enti0000.txt"

@@ -1,0 +1,157 @@
+/****************************************************************************
+*
+*                            Open Watcom Project
+*
+* Copyright (c) 2002-2021 The Open Watcom Contributors. All Rights Reserved.
+*    Portions Copyright (c) 1983-2002 Sybase, Inc. All Rights Reserved.
+*
+*  ========================================================================
+*
+*    This file contains Original Code and/or Modifications of Original
+*    Code as defined in and that are subject to the Sybase Open Watcom
+*    Public License version 1.0 (the 'License'). You may not use this file
+*    except in compliance with the License. BY USING THIS FILE YOU AGREE TO
+*    ALL TERMS AND CONDITIONS OF THE LICENSE. A copy of the License is
+*    provided with the Original Code and Modifications, and is also
+*    available at www.sybase.com/developer/opensource.
+*
+*    The Original Code and all software distributed under the License are
+*    distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
+*    EXPRESS OR IMPLIED, AND SYBASE AND ALL CONTRIBUTORS HEREBY DISCLAIM
+*    ALL SUCH WARRANTIES, INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF
+*    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR
+*    NON-INFRINGEMENT. Please see the License for the specific language
+*    governing rights and limitations under the License.
+*
+*  ========================================================================
+*
+* Description:  cp memory handler.
+*
+****************************************************************************/
+
+
+#include "cp.h"
+#if defined( _M_I86 )
+    #include <malloc.h>
+#endif
+
+
+long near_allocs;
+long far_allocs;
+
+/*
+ * MemInit - initialize memory
+ */
+void MemInit( void )
+{
+#if defined( _M_I86 )
+    _nheapgrow();
+#endif
+    near_allocs=0L;
+    far_allocs=0L;
+
+} /* MemInit */
+
+
+/*
+ * MemFini - memory cleanup
+ */
+void MemFini( void )
+{
+    if( near_allocs != 0L ) {
+        printf("\n%ld unfreed near blocks!\n", near_allocs );
+    }
+    if( far_allocs != 0L ) {
+        printf("\n%ld unfreed far blocks!\n", far_allocs );
+    }
+
+} /* MemFini */
+
+#if !defined( _M_I86 )
+/*
+ * FarAlloc - allocate from far heap
+ */
+void *FarAlloc( size_t size )
+{
+    void        *ptr;
+
+    ptr = malloc( size );
+    if( ptr == NULL ) {
+        return( NULL );
+    }
+
+    far_allocs++;
+    return( ptr );
+} /* FarAlloc */
+/*
+ * FarFree - free some far memory
+ */
+void FarFree( void *ptr )
+{
+    free( ptr );
+    far_allocs--;
+
+} /* FarFree */
+#else
+/*
+ * FarAlloc - allocate from far heap
+ */
+void __far *FarAlloc( size_t size )
+{
+    void        __far *tmp;
+
+    tmp = _fmalloc( size );
+    if( tmp == (void __far *)NULL ) {
+        return( (void __far *)NULL );
+    }
+
+    if( _FP_SEG( tmp ) == _FP_SEG( (void __far *)&tmp ) ) {
+        _ffree( tmp );
+        return( (void __far *)NULL );
+    }
+
+    far_allocs++;
+    return( tmp );
+
+} /* FarAlloc */
+
+/*
+ * FarFree - free some far memory
+ */
+void FarFree( void __far *ptr )
+{
+    _ffree( ptr );
+    far_allocs--;
+
+} /* FarFree */
+#endif
+
+/*
+ * NearAlloc - allocation of memory; flush mem if we run out
+ */
+void *NearAlloc( size_t size )
+{
+    void        *tmp;
+
+    tmp = malloc( size );
+    if( tmp == NULL ) {
+        FlushMemoryBlocks();
+        tmp = malloc( size );
+        if( tmp == NULL ) {
+            Die( OutOfMemory );
+        }
+    }
+    near_allocs++;
+    return( tmp );
+
+} /* NearAlloc */
+
+/*
+ * NearFree - release near memory
+ */
+void NearFree( void *ptr )
+{
+    free( ptr );
+    near_allocs--;
+
+} /* NearFree */

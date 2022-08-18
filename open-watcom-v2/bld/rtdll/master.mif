@@ -1,0 +1,124 @@
+proj_name = rtdll
+
+rtdll_autodepends = .AUTODEPEND
+
+additional_clean = *.ilb
+
+rtdll_host_cpu_086=i86
+rtdll_host_cpu_286=i86
+rtdll_host_cpu_287=i86
+rtdll_host_cpu_386=386
+rtdll_host_cpu_387=386
+rtdll_host_cpu_axp=axp
+rtdll_host_cpu_ppc=ppc
+host_cpu = $(rtdll_host_cpu_$(processor))
+
+rtdll_host_os_generic =dos
+rtdll_host_os_msdos   =dos
+rtdll_host_os_netware =nov
+rtdll_host_os_os2     =os2
+rtdll_host_os_qnx     =qnx
+rtdll_host_os_windows =win
+rtdll_host_os_winnt   =nt
+rtdll_host_os_linux   =linux
+host_os=$(rtdll_host_os_$(system))
+
+!ifdef profile
+rtdll_nosymfile = 1
+!else ifeq release 0
+rtdll_nosymfile = 1
+!endif
+
+!ifeq component clib
+br_suffix=1
+!else ifeq component wlib
+br_suffix=1
+!else
+br_suffix=0
+!endif
+
+!ifndef patch_level
+patch_level=0
+!endif
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include dllbase.mif
+!include libsubdi.mif
+
+!include $(rtdll_dir)/dllname.mif
+
+!include ../objs.mif
+
+#
+# lflags
+#
+extra_l_flags_dll = option impfile=$(dllname).ilb reference __DLLstart_ disable 121 $(rtdll_dllbase_$(system)_$(host_cpu)_$(component))
+!ifeq release 0
+extra_l_flags_dll += option mangle,artificial,verbose
+!endif
+
+extra_l_flags_dll_os2 = initinstance terminstance op manyautodata
+extra_l_flags_dll_nt = initinstance terminstance
+
+#
+# libflags
+#
+!ifeq release 0
+extra_lib_flags = -irn
+!else
+extra_lib_flags = -irn -s-t-zld
+!endif
+
+# explicit rules
+#################
+
+target_lib = $(libdllname).lib
+!ifeq component plib
+target_lib += $(libdllname)x.lib
+!endif
+
+all: $(target_lib) .SYMBOLIC
+
+#
+# LIB's
+#
+libtarg_prebuild_objs = $(dllname).lbc
+libtarg_opts          = @$(dllname).lbc
+libtarg_name          = $(libdllname)
+!include libtarg.mif
+
+libtarg_name          = $(libdllname)x
+!include libtarg.mif
+
+#
+# DLL
+#
+dlltarg_objs          = $(dll_objs)
+dlltarg_libs          = $(dll_libs)
+dlltarg_res_version_nt_386 = version.res
+dlltarg_res_version_nt_x64 = version.res
+dlltarg_res_version_nt_axp = version.res
+dlltarg_export        = $(dll_def)
+!ifeq component wlib
+!ifeq convention register
+dlltarg_opts          = alias __HugeValue_br=__HugeValue, __IsTable_br=__IsTable
+!else
+dlltarg_opts          = alias _HugeValue_br=_HugeValue, _IsTable_br=_IsTable
+!endif
+!endif
+dlltarg_name          = $(dllname)
+!include dlltarg.mif
+
+#
+# rc and others
+#
+verrc_dll_skel = ../verinfo.rc
+verrc_dll      = $(dllname)
+!include verrc.mif
+
+$(dllname).lbc : $(dllname).dll $(rtdll_dir)/proclbc.awk $(static_objs)
+    @%make echo_awk
+    $(awk) -f $(rtdll_dir)/proclbc.awk -v OS=$(host_os) -v BR=$(br_suffix) -v "LSTFILE=$(rtdll_dir:\=/)/brfunc.dat" -v OUTFILE=$^. $(dllname).ilb
+    @for %i in ($(static_objs)) do @%append $@ +%i

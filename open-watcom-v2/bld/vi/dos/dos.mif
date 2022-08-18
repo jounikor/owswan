@@ -1,0 +1,23 @@
+objdostimeroot = &
+    int.obj
+
+objdossizeroot = &
+    dosmain.obj
+
+objdossize = &
+    dosmouse.obj &
+    dossys.obj &
+    dosdir.obj &
+    doschk.obj &
+    doschkx.obj &
+    time.obj  &
+    spawn.obj
+
+!ifeq host_cpu i86
+objdossize += getspcmd.obj
+!endif
+
+extraobjs = $(objdossize)
+extraobjsroot = $(objdostimeroot) $(objdossizeroot)
+
+inc_dirs_dos += -I"$(vi_dir)/dos"

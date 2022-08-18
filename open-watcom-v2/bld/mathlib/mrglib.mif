@@ -1,0 +1,23 @@
+!include $(mathlib_dir)/master.mif
+
+!include ../../../objects.mif
+!include $(mathlib_dir)/libs.mif
+
+.c   : ../../../c
+.asm : ../../../a;$(fpuemu_dir)/i86/asm;$(fpuemu_dir)/386/asm
+
+all : $(objfiles) $(libname).lib .symbolic
+    @%null
+
+$(libname).lib : $(objs) $(libs) $(__MAKEFILES__)
+    @rm -f export.tmp
+    @rm -f export.gdf
+    @%make echo_lib
+    $(librarian) $(mlib_lib_flags) $(mlib_linkage_flags) $@ $(objs) $(libs)
+!ifeq linkage dynamic
+    $(sed) -f $(lib_misc_dir)/sed/export.sed export.tmp > export.gdf
+!endif
+
+!include ../../../deps.mif
+
+!include $(mathlib_dir)/clean.mif

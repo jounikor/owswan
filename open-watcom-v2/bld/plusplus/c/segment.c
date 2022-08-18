@@ -1,0 +1,1504 @@
+/****************************************************************************
+*
+*                            Open Watcom Project
+*
+* Copyright (c) 2002-2019 The Open Watcom Contributors. All Rights Reserved.
+*    Portions Copyright (c) 1983-2002 Sybase, Inc. All Rights Reserved.
+*
+*  ========================================================================
+*
+*    This file contains Original Code and/or Modifications of Original
+*    Code as defined in and that are subject to the Sybase Open Watcom
+*    Public License version 1.0 (the 'License'). You may not use this file
+*    except in compliance with the License. BY USING THIS FILE YOU AGREE TO
+*    ALL TERMS AND CONDITIONS OF THE LICENSE. A copy of the License is
+*    provided with the Original Code and Modifications, and is also
+*    available at www.sybase.com/developer/opensource.
+*
+*    The Original Code and all software distributed under the License are
+*    distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
+*    EXPRESS OR IMPLIED, AND SYBASE AND ALL CONTRIBUTORS HEREBY DISCLAIM
+*    ALL SUCH WARRANTIES, INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF
+*    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR
+*    NON-INFRINGEMENT. Please see the License for the specific language
+*    governing rights and limitations under the License.
+*
+*  ========================================================================
+*
+* Description:  WHEN YOU FIGURE OUT WHAT THIS FILE DOES, PLEASE
+*               DESCRIBE IT HERE!
+*
+****************************************************************************/
+
+
+#include "plusplus.h"
+#include "compcfg.h"
+#include "tgtenv.h"
+#include "cgfront.h"
+#include "cgback.h"
+#include "cgdata.h"
+#include "codegen.h"
+#include "ring.h"
+#include "vbuf.h"
+#include "memmgr.h"
+#include "pragdefn.h"
+#include "pcheader.h"
+#include "dbgsupp.h"
+#include "initdefs.h"
+#include "cgbackut.h"
+
+#include "clibext.h"
+
+
+typedef struct pc_segment PC_SEGMENT;
+PCH_struct pc_segment {                     // PC_SEGMENT -- segment on PC
+    PC_SEGMENT      *next;                  // - next in ring
+    PC_SEGMENT      *sibling;               // - related segment
+    char            *class_name;            // - class name
+    SYMBOL          label;                  // - symbol for label in segment
+    unsigned        attrs;                  // - attributes
+    fe_seg_id       segid;                  // - id for segment
+    target_offset_t align;                  // - alignment
+    target_size_t   offset;                 // - offset within segment
+#if _INTEL_CPU
+    hw_reg_set      binding;                // - register bound to the segment
+#endif
+                                            // - segment:
+    unsigned        dgroup          : 1;    // - is part of DGROUP
+    unsigned        lab_gened       : 1;    // - label has been generated
+    unsigned        used            : 1;    // - has been used
+    unsigned        fixed_alignment : 1;    // - has a fixed alignment (no changes)
+    unsigned        cg_defed        : 1;    // - defined to code generator
+    unsigned        module_prefix   : 1;    // - name has ModuleName as a prefix
+    unsigned        has_data        : 1;    // - has data gened in segment
+    unsigned        only_strings    : 1;    // - only strings go in segment
+    char            name[1];                // - name
+};
+
+typedef struct {                            // DEF_SEG -- code/data default segments
+    PC_SEGMENT      *pcseg;                 // - default pc segment
+    unsigned        ctr;                    // - # of segments allocated
+    unsigned        ds_used         : 1;    // - true ==> has been used
+} DEF_SEG;
+
+static fe_seg_id    segid_max;              // last segment # used
+static fe_seg_id    import_segid;           // next import segment #
+#if _INTEL_CPU
+static fe_seg_id    segid_code_comdat;      // segment # for code comdat
+#endif
+static fe_seg_id    segid_default_code;     // segment # for default code segment
+static target_size_t dgroup_size;           // amount of DGROUP used so far
+static PC_SEGMENT   *seg_list;              // list of defined segments
+static DEF_SEG      code_def_seg;           // code segment -- default info.
+static DEF_SEG      data_def_seg;           // data segment -- default info.
+
+static struct {
+    unsigned in_back_end    : 1;            // true ==> now in CGBKMAIN
+    unsigned use_def_seg    : 1;            // true ==> #pragma def_seg active
+} flags;
+
+enum                                        // SEGMENT-ATTRIBUTE COMBINATIONS USED:
+{   SGAT_CODE_BASED                         // - code: based
+        = GIVEN_NAME | INIT | GLOBAL | EXEC
+,   SGAT_CODE_GEN                           // - code: being generated
+        = GIVEN_NAME | INIT | GLOBAL | EXEC
+,   SGAT_DATA_BASED                         // - data: based
+        = GIVEN_NAME | GLOBAL | INIT | PRIVATE
+,   SGAT_STACK                              // - data: stack
+        = GIVEN_NAME | GLOBAL
+,   SGAT_DATA_CON1                          // - data: constant(1)
+        = GIVEN_NAME | BACK | ROM | INIT
+,   SGAT_DATA_CON2                          // - data: constant(2)
+        = GIVEN_NAME | ROM | INIT
+,   SGAT_DATA_RW                            // - data: read/write initialized
+        = GIVEN_NAME | GLOBAL | INIT
+,   SGAT_CPP                                // - used for common code
+        = GIVEN_NAME | GLOBAL | INIT  | EXEC
+,   SGAT_BSS                                // - data: read/write uninitialized
+        = GIVEN_NAME | GLOBAL
+,   SGAT_DATA_PRIVATE_RW                    // - data: private read/write
+        = GIVEN_NAME | PRIVATE | INIT
+,   SGAT_DATA_PRIVATE_RO                    // - data: private read-only
+        = GIVEN_NAME | PRIVATE | INIT | ROM
+,   SGAT_DATA_COMMON_INIT                   // - data: common, init'ed, R/W
+        = GIVEN_NAME | GLOBAL | INIT | COMMON | COMDAT
+,   SGAT_DATA_COMMON_INIT_ROM               // - data: common, init'ed, R/O
+        = GIVEN_NAME | GLOBAL | INIT | COMMON | COMDAT | ROM
+,   SGAT_DATA_COMMON_ZERO                   // - data: common, uninitialized
+        = GIVEN_NAME | GLOBAL | COMMON | COMDAT
+,   SGAT_TLS_LIMIT                          // - thread-local storage delimiter seg
+        = GIVEN_NAME | ROM | INIT | THREAD_LOCAL
+,   SGAT_TLS_DATA                           // - thread-local data
+        = GIVEN_NAME | GLOBAL | INIT | THREAD_LOCAL
+};
+
+enum {
+    SA_IN_DGROUP        = 0x01,
+    SA_MODULE_PREFIX    = 0x02,
+    SA_DEFINE_ANYTIME   = 0x04,
+    SA_NULL             = 0x00
+};
+
+enum {
+    ADS_MODULE_PREFIX   = 0x01,
+    ADS_CONST_SEGMENT   = 0x02,
+    ADS_STRING_SEGMENT  = 0x04,
+    ADS_CODE_SEGMENT    = 0x08,
+    ADS_ZM_SEGMENT      = 0x10,
+    ADS_NULL            = 0x00
+};
+
+#define _markUsed( s, v ) \
+        {   PC_SEGMENT *t = s, *p; \
+            t->used = v; \
+            for( p = t->sibling; p != t; p = p->sibling ) { \
+                p->used = v; \
+            } \
+        }
+
+static void addSibling( PC_SEGMENT *seg, PC_SEGMENT *sib )
+{
+    DbgAssert( sib->sibling == sib );
+    sib->sibling = seg->sibling;
+    seg->sibling = sib;
+}
+
+static SYMBOL segEmitLabel(         // EMIT SEGMENT LABEL
+    PC_SEGMENT* seg )               // - current segment
+{
+    SYMBOL label;                   // - label in segment
+    segment_id old_segid;           // - old segment
+
+    label = seg->label;
+    if( label != NULL && ! seg->lab_gened ) {
+        if( seg->segid == SEG_STACK ) {
+            CGAutoDecl( (cg_sym_handle)label, TY_UINT_1 );
+        } else {
+            old_segid = DgSetSegSym( label );
+            CgBackGenLabel( label );
+            BESetSeg( old_segid );
+        }
+        seg->lab_gened = true;
+        _markUsed( seg, true );
+    }
+    return( label );
+}
+
+
+static void checkSegmentOverflow(   // CHECK FOR SEGMENTS OVERFLOW
+    void )
+{
+    if( segid_max < 0 || import_segid >= 0 ) {
+        CFatal( "Too many segments -- sub-divide source module" );
+    }
+}
+
+
+static PC_SEGMENT *segIdLookup( // LOOKUP SEGMENT FOR ID
+    fe_seg_id segid )          // - segment id
+{
+    PC_SEGMENT* curr;           // - current segment
+    PC_SEGMENT* retn;           // - segment for id
+
+    retn = NULL;
+    RingIterBeg( seg_list, curr ) {
+        if( curr->segid == segid ) {
+            retn = curr;
+            break;
+        }
+    } RingIterEnd( curr );
+    return( retn );
+}
+
+
+#if _CPU == _AXP || COMP_CFG_COFF == 1
+static fe_seg_id markSegmentComdat(  // MARK SEGMENT AS COMDAT SEGMENT
+    fe_seg_id segid )          // - segment id
+{
+    PC_SEGMENT* seg = segIdLookup( segid );
+    DbgVerify( NULL != seg, "markSegmentComdat -- no segment" );
+    seg->attrs |= COMDAT;
+    return( segid );
+}
+#endif
+
+
+static PC_SEGMENT *segNameLookup( // LOOKUP SEGMENT FOR NAME
+    char *name )                // - segment name
+{
+    PC_SEGMENT* curr;           // - current segment
+    PC_SEGMENT* retn;           // - segment for id
+
+    retn = NULL;
+    RingIterBeg( seg_list, curr ) {
+        if( 0 == strcmp( curr->name, name ) ) {
+            retn = curr;
+            break;
+        }
+    } RingIterEnd( curr );
+    return( retn );
+}
+
+
+static void segmentCgDefine(    // DEFINE A SEGMENT
+    PC_SEGMENT *segment )       // - current segment
+{
+    if( ! segment->cg_defed ) {
+        BEDefSeg( segment->segid
+                , segment->attrs
+                , segment->name
+                , segment->align );
+        segment->cg_defed = true;
+    }
+}
+
+
+static PC_SEGMENT *segmentAlloc(    // SEGMENT: ALLOCATE NEW SEGMENT
+    const char *seg_name,           // - segment name
+    const char *class_name,         // - segment class name
+    fe_seg_id segid,                // - segment id (if not SEG_NULL)
+    unsigned attrs,                 // - segment attributes
+    unsigned control )              // - control mask
+{
+    PC_SEGMENT *curr;               // - segment pointer
+    size_t size;                    // - size of segment name
+
+#if _INTEL_CPU && COMP_CFG_COFF == 0
+//alpha permits segments defined anywhere and we need it for comdat data
+//ditto for COFF
+    DbgVerify( !flags.in_back_end || (attrs & PRIVATE) || (control & SA_DEFINE_ANYTIME)
+             , "segmentAlloc -- defining in back end" );
+#endif
+    size = strlen( seg_name );
+    curr = RingAlloc( &seg_list, offsetof( PC_SEGMENT, name ) + size + 1 );
+    curr->sibling = curr;
+    stxvcpy( curr->name, seg_name, size );
+    curr->offset = 0;
+    curr->dgroup = ( (control & SA_IN_DGROUP) != 0 );
+    curr->lab_gened = false;
+    if( class_name != NULL ) {
+        curr->class_name = strpermsave( class_name );
+    } else {
+        curr->class_name = NULL;
+    }
+    curr->used = false;
+    curr->module_prefix = ( (control & SA_MODULE_PREFIX) != 0 );
+    curr->fixed_alignment = false;
+    curr->cg_defed = false;
+    curr->has_data = false;
+    curr->only_strings = false;
+    curr->label = NULL;
+    curr->attrs = attrs;
+#if _INTEL_CPU
+    HW_CAsgn( curr->binding, HW_EMPTY );
+#endif
+    if( segid == SEG_NULL ) {
+        segid = ++segid_max;
+        checkSegmentOverflow();
+    } else {
+        if( segid > segid_max ) {
+            segid_max = segid;
+            checkSegmentOverflow();
+        }
+    }
+    curr->segid = segid;
+    switch( segid ) {
+    case SEG_PROF_BEG:
+    case SEG_PROF_REF:
+    case SEG_PROF_END:
+        // we don't want padding introduced
+        curr->align = TARGET_LONG;
+        // we don't want alignment changed either
+        curr->fixed_alignment = true;
+        break;
+    case SEG_INIT_BEG:
+    case SEG_INIT_REF:
+    case SEG_INIT_END:
+    case SEG_FINI_BEG:
+    case SEG_FINI_REF:
+    case SEG_FINI_END:
+        // we don't want padding introduced
+#if _INTEL_CPU
+        curr->align = TARGET_SHORT;
+#elif _CPU == _AXP
+        curr->align = TARGET_POINTER;
+#else
+#error no alignment set
+#endif
+        // we don't want alignment changed either
+        curr->fixed_alignment = true;
+        break;
+    default:
+        curr->align = TARGET_CHAR;
+        if( flags.in_back_end ) {
+            segmentCgDefine( curr );
+        }
+        break;
+    }
+    return( curr );
+}
+
+
+static void initDefSeg(         // SET NEW DEFAULT SEGMENT INFO
+    DEF_SEG *def_seg,           // - default segment info.
+    PC_SEGMENT *pcseg )         // - default segment
+{
+    if( def_seg->pcseg != pcseg ) {
+        def_seg->pcseg = pcseg;
+        def_seg->ctr = 0;
+        def_seg->ds_used = false;
+    }
+}
+
+
+static void pruneDefSeg(        // PRUNE A DEFAULT SEGMENT IF NOT USED
+    DEF_SEG *def_seg )          // - default segment info.
+{
+    PC_SEGMENT *pcseg;          // - pc segment for default
+
+    if( ! def_seg->ds_used ) {
+        pcseg = def_seg->pcseg;
+        if( pcseg != NULL && ! pcseg->used ) {
+            RingDealloc( &seg_list, pcseg );
+        }
+    }
+}
+
+
+static PC_SEGMENT *addDefSeg(   // ADD A DEFAULT PC SEGMENT
+    DEF_SEG *def_seg,           // - default segment info.
+    unsigned ads_control )      // - control mask
+{
+    unsigned attrs;             // - attributes for segment
+    PC_SEGMENT *curr;           // - segment pointer
+    VBUF seg_name;              // - virtual buffer for name
+    unsigned sa_control;        // - segmentAlloc control mask
+
+    VbufInit( &seg_name );
+    ++def_seg->ctr;
+    sa_control = SA_NULL;
+    if( ads_control & ADS_MODULE_PREFIX ) {
+        if( (ads_control & ADS_CODE_SEGMENT) == 0 && DataSegName[0] != '\0' ) {
+            VbufConcStr( &seg_name, DataSegName );
+        } else {
+            VbufConcStr( &seg_name, ModuleName );
+        }
+        sa_control |= SA_MODULE_PREFIX;
+    }
+    if( ads_control & ADS_STRING_SEGMENT ) {
+        sa_control |= SA_DEFINE_ANYTIME;
+    }
+    VbufConcStr( &seg_name, def_seg->pcseg->name );
+    if( ads_control & ADS_ZM_SEGMENT ) {
+        VbufConcDecimal( &seg_name, def_seg->ctr );
+    }
+    if( def_seg == &code_def_seg ) {
+        attrs = SGAT_CODE_GEN;
+    } else {
+        if( ads_control & ADS_CONST_SEGMENT ) {
+            attrs = SGAT_DATA_PRIVATE_RO;
+        } else {
+            attrs = SGAT_DATA_PRIVATE_RW;
+        }
+        VbufConcDecimal( &seg_name, def_seg->ctr );
+    }
+    curr = segmentAlloc( VbufString( &seg_name ), NULL, SEG_NULL, attrs, sa_control );
+    if( 0 == (attrs & EXEC) ) {
+        _markUsed( curr, true );
+    }
+    if( ads_control & ADS_STRING_SEGMENT ) {
+        curr->only_strings = true;
+    }
+    VbufFree( &seg_name );
+    return( curr );
+}
+
+
+static
+target_size_t segmentTypeSize(  // SEGMENT: SIZE OF TYPE
+    TYPE type )                 // - type to be sized
+{
+    target_size_t size;
+
+    size = CgMemorySize( type );
+    if( size == 0 ) {
+        size = TARGET_CHAR;
+    }
+    return( size );
+}
+
+
+target_offset_t SegmentAlignment(   // SEGMENT: ALIGNMENT FOR TYPE
+    TYPE type )                     // - TYPE to align
+{
+    target_offset_t align;
+    TYPE align_type;
+
+    if( CompFlags.dont_align_segs ) {
+        return( TARGET_CHAR );
+    }
+#if _CPU == _AXP
+    if( PackAmount != TARGET_CHAR ) {
+#else
+    if( OptSize <= 50 || PackAmount != TARGET_CHAR ) {
+#endif
+        align_type = AlignmentType( type );
+        align = segmentTypeSize( align_type );
+        if( align == TARGET_CHAR ) {
+            // no alignment; let PackAlignment know the real size
+            align = segmentTypeSize( type );
+        }
+        align = PackAlignment( TARGET_MAX_PACKING, align );
+    } else {
+        align = TARGET_CHAR;
+    }
+    return( align );
+}
+
+
+target_offset_t SegmentAdjust(  // SEGMENT: ADJUST OFFSET TO ALIGN
+    fe_seg_id segid,            // - segment identifier
+    target_size_t offset,       // - current offset
+    target_offset_t align )     // - required aligment
+{
+    target_size_t   calc_offset;
+    target_offset_t adjust;
+
+    switch( segid ) {
+    case SEG_INIT_BEG:
+    case SEG_INIT_REF:
+    case SEG_INIT_END:
+    case SEG_FINI_BEG:
+    case SEG_FINI_REF:
+    case SEG_FINI_END:
+        /* no padding in these segments */
+        return( 0 );
+    }
+    calc_offset = _RoundUp( offset, align );
+    adjust = calc_offset - offset;
+    if( _CHECK_ADJUST( calc_offset, offset ) ) {
+        adjust = 0;
+    }
+    return( adjust );
+}
+
+
+struct seg_look {                               // used to lookup segments
+    const char      *seg_name;                  // - segment name
+    const char      *class_name;                // - segment class name
+    unsigned        attrs;                      // - attributes
+    fe_seg_id       segid;                      // - id for segment
+    target_offset_t align;                      // - segment alignment
+    target_size_t   sym_size;                   // - space needed for symbol
+    target_size_t   sym_align;                  // - alignment needed for symbol
+    unsigned        use_segid           : 1;    // - for lookup
+    unsigned        use_attrs           : 1;    // - for lookup
+    unsigned        use_align           : 1;    // - for lookup
+    unsigned        use_sym_size_align  : 1;    // - for lookup
+    unsigned        use_name            : 1;    // - for lookup
+    unsigned        use_only_strings    : 1;    // - for lookup
+};
+
+
+static bool same_segment(   // DETERMINE IF SAME SEGMENT
+    void * _curr,           // - current segment
+    const void * _lk )      // - segment lookup structure
+{
+    PC_SEGMENT *curr = _curr;
+    const struct seg_look* lk = _lk;
+
+    target_offset_t     align_adjust;
+    target_size_t       new_offset;
+
+    if( lk->use_segid && lk->segid != SEG_NULL && curr->segid != lk->segid ) {
+        return( false );
+    }
+    if( lk->use_attrs && curr->attrs != lk->attrs ) {
+        return( false );
+    }
+    if( lk->use_align && curr->align != lk->align ) {
+        return( false );
+    }
+    if( lk->use_sym_size_align ) {
+        align_adjust = SegmentAdjust( curr->segid, curr->offset, lk->sym_align );
+        new_offset = curr->offset + align_adjust + lk->sym_size;
+        if( _CHECK_ADJUST( new_offset, curr->offset ) ) {
+            new_offset = 0;
+        }
+        if( new_offset == 0 ) {
+            return( false );
+        }
+    }
+    if( lk->use_name ) {
+        if( strcmp( curr->name, lk->seg_name ) != 0 ) {
+            return( false );
+        }
+        if( curr->class_name != NULL ) {
+            if( lk->class_name == NULL ) {
+                return( false );
+            }
+            if( strcmp( curr->class_name, lk->class_name ) != 0 ) {
+                return( false );
+            }
+        } else {
+            if( lk->class_name != NULL ) {
+                return( false );
+            }
+        }
+    }
+    if( lk->use_only_strings && !curr->only_strings ) {
+        return( false );
+    }
+    return( true );
+}
+
+
+static PC_SEGMENT *segmentDefine(// SEGMENT: DEFINE IF REQUIRED
+    const char *seg_name,       // - segment name
+    const char *class_name,     // - segment class name
+    fe_seg_id segid,            // - segment id (if not SEG_NULL)
+    unsigned attrs,             // - segment attributes
+    unsigned control )          // - segmentAlloc control mask
+{
+    PC_SEGMENT *curr;           // - current segment
+    struct seg_look lk;         // - look-up structure
+#if _INTEL_CPU
+    const char *ptr;            // - scans register bound to segment
+    hw_reg_set seg_reg;
+
+    HW_CAsgn( seg_reg, HW_EMPTY );
+    for( ptr = seg_name; *ptr != '\0'; ++ptr ) {
+        if( *ptr == ':' ) {
+            seg_reg = PragRegName( seg_name, ptr - seg_name );
+            seg_name = ptr + 1;
+            break;
+        }
+    }
+#endif
+    lk.segid = segid;
+    lk.use_segid = true;
+    lk.attrs = attrs;
+    lk.use_attrs = true;
+    lk.use_align = false;
+    lk.use_sym_size_align = false;
+    lk.seg_name = seg_name;
+    lk.class_name = class_name;
+    lk.use_name = true;
+    lk.use_only_strings = false;
+    curr = RingLookup( seg_list, &same_segment, &lk );
+    if( curr == NULL ) {
+        curr = segmentAlloc( lk.seg_name, lk.class_name, lk.segid, lk.attrs, control );
+#if _INTEL_CPU
+        if( !HW_CEqual( seg_reg, HW_EMPTY ) ) {
+            curr->binding = seg_reg;
+        }
+#endif
+    }
+    return( curr );
+}
+
+
+#if _CPU == 8086
+static fe_seg_id createHugeSegment( target_size_t size, unsigned ads_control )
+{
+    PC_SEGMENT *curr;
+    fe_seg_id segid;
+    target_size_t used;
+
+    segid = SEG_NULL;
+    while( size > 0 ) {
+        curr = addDefSeg( &data_def_seg, ads_control );
+        if( segid == SEG_NULL ) {
+            segid = curr->segid;
+        }
+        used = TARGET_UINT_MAX + 1;
+        if( used > size ) {
+            used = size;
+        }
+        curr->offset = used;
+        curr->align = 16;
+        _markUsed( curr, true );
+        curr->has_data = true;
+        size -= used;
+    }
+    return( segid );
+}
+
+
+fe_seg_id SegmentAddHuge(       // SEGMENT: ADD SYMBOL TO HUGE SEGMENT
+    target_size_t size )        // - size of symbol
+{
+    return( createHugeSegment( size, ADS_MODULE_PREFIX ) );
+}
+
+
+fe_seg_id SegmentAddConstHuge(  // SEGMENT: ADD CONST SYMBOL TO HUGE SEGMENT
+    target_size_t size )        // - size of symbol
+{
+    return( createHugeSegment( size, ADS_MODULE_PREFIX | ADS_CONST_SEGMENT ) );
+}
+#else
+fe_seg_id SegmentAddHuge(       // SEGMENT: ADD SYMBOL TO HUGE SEGMENT
+    target_size_t size )        // - size of symbol
+{
+    return( SegmentAddFar( size, 16 ) );
+}
+
+
+fe_seg_id SegmentAddConstHuge(  // SEGMENT: ADD CONST SYMBOL TO HUGE SEGMENT
+    target_size_t size )        // - size of symbol
+{
+    return( SegmentAddConstFar( size, 16 ) );
+}
+#endif
+
+
+static void accumAlignment( PC_SEGMENT *curr, target_offset_t align )
+{
+    if( ! curr->fixed_alignment ) {
+        if( curr->align < align ) {
+            curr->align = align;
+        }
+    }
+}
+
+static fe_seg_id findFarSegment(// SEGMENT: ADD SYMBOL TO FAR SEGMENT
+    target_size_t size,         // - size of symbol
+    target_offset_t align,      // - alignment of symbol
+    unsigned ads_control )      // - addDefSeg control word
+{
+    PC_SEGMENT *curr;           // - new segment
+    struct seg_look lk;         // - look-up structure
+
+    lk.use_segid = false;
+    if( ads_control & ADS_CODE_SEGMENT ) {
+        lk.attrs = SGAT_CODE_BASED;
+    } else if( ads_control & ADS_CONST_SEGMENT ) {
+        lk.attrs = SGAT_DATA_PRIVATE_RO;
+    } else {
+        lk.attrs = SGAT_DATA_PRIVATE_RW;
+    }
+    lk.use_attrs = true;
+    lk.use_align = false;
+    lk.sym_size = size;
+    lk.sym_align = align;
+    lk.use_sym_size_align = true;
+    lk.use_name = false;
+    lk.use_only_strings = false;
+    if( ads_control & ADS_STRING_SEGMENT ) {
+        lk.use_only_strings = true;
+    }
+    curr = RingLookup( seg_list, &same_segment, &lk );
+    if( curr == NULL ) {
+        if( ads_control & ADS_CODE_SEGMENT ) {
+            curr = addDefSeg( &code_def_seg, ads_control );
+            code_def_seg.ds_used = true;
+        } else {
+            curr = addDefSeg( &data_def_seg, ads_control );
+            data_def_seg.ds_used = true;
+        }
+    }
+    curr->offset += SegmentAdjust( curr->segid, curr->offset, align );
+    curr->offset += size;
+    accumAlignment( curr, align );
+    _markUsed( curr, true );
+    curr->has_data = true;
+    return( curr->segid );
+}
+
+fe_seg_id SegmentAddFar(        // SEGMENT: ADD SYMBOL TO FAR SEGMENT
+    target_size_t size,         // - size of symbol
+    target_offset_t align )     // - alignment of symbol
+{
+    return( findFarSegment( size, align, ADS_MODULE_PREFIX ) );
+}
+
+
+fe_seg_id SegmentAddConstFar(   // SEGMENT: ADD CONST SYMBOL TO FAR SEGMENT
+    target_size_t size,         // - size of symbol
+    target_offset_t align )     // - alignment of symbol
+{
+    return( findFarSegment( size, align, ADS_MODULE_PREFIX | ADS_CONST_SEGMENT ) );
+}
+
+
+fe_seg_id SegmentAddStringConstFar(// SEGMENT: ADD CONST STRING TO FAR SEGMENT
+    target_size_t size,         // - size of symbol
+    target_offset_t align )     // - alignment of symbol
+{
+    return( findFarSegment( size, align,
+                            ADS_MODULE_PREFIX |
+                            ADS_CONST_SEGMENT |
+                            ADS_STRING_SEGMENT ) );
+}
+
+
+fe_seg_id SegmentAddStringCodeFar(// SEGMENT: ADD CONST STRING TO CODE SEGMENT
+    target_size_t size,         // - size of symbol
+    target_offset_t align )     // - alignment of symbol
+{
+    return( findFarSegment( size, align,
+                            ADS_CODE_SEGMENT |
+                            ADS_STRING_SEGMENT ) );
+}
+
+
+fe_seg_id SegmentAddSym(        // SEGMENT: ADD SYMBOL TO SPECIFIED SEGMENT
+    SYMBOL sym,                 // - sym to add
+    fe_seg_id segid,            // - id of segment to use
+    target_size_t size,         // - size of sym
+    target_offset_t align )     // - alignment for sym
+{
+    PC_SEGMENT *curr;           // - new segment
+    target_size_t aligned_offset;
+    target_size_t calc_offset;
+    target_size_t total_size;
+
+    if( segid == SEG_DATA || ( segid == SEG_BSS && flags.use_def_seg ) ) {
+        curr = data_def_seg.pcseg;
+        segid = curr->segid;
+    } else if( segid == SEG_CODE ) {
+        curr = code_def_seg.pcseg;
+        segid = curr->segid;
+    } else {
+        curr = segIdLookup( segid );
+    }
+    if( curr == NULL ) {
+        CFatal( "segment: cannot find default segment" );
+    } else {
+        accumAlignment( curr, align );
+        if( ( ! SymIsInitialized( sym ) ) && SymIsExtern( sym ) ) {
+            segid = curr->segid;
+            _markUsed( curr, true );
+            curr->has_data = true;
+            data_def_seg.ds_used = true;
+        } else {
+            aligned_offset = SegmentAdjust( curr->segid, curr->offset, align );
+            calc_offset = curr->offset + aligned_offset + size;
+            if( _CHECK_ADJUST( calc_offset, curr->offset ) ) {
+                calc_offset = 0;
+            }
+            if( calc_offset == 0 ) {
+                if( size != 0 ) {
+                    CErr( ERR_MAX_SEGMENT_EXCEEDED, curr->name, sym );
+                }
+                segid = SEG_NULL;
+            } else if( curr->dgroup ) {
+                total_size = dgroup_size + size + aligned_offset;
+                if( _CHECK_ADJUST( total_size, dgroup_size ) ) {
+                    calc_offset = 0;
+                }
+                if( calc_offset == 0 ) {
+                    if( size != 0 ) {
+                        CErr( ERR_MAX_DGROUP_EXCEEDED, sym, curr->name );
+                    }
+                    segid = SEG_NULL;
+                } else {
+                    dgroup_size += size + aligned_offset;
+                    curr->offset = calc_offset;
+                    _markUsed( curr, true );
+                    curr->has_data = true;
+                    segid = curr->segid;
+                    data_def_seg.ds_used = true;
+                }
+            } else {
+                curr->offset = calc_offset;
+                _markUsed( curr, true );
+                curr->has_data = true;
+                segid = curr->segid;
+                data_def_seg.ds_used = true;
+            }
+        }
+    }
+    return( segid );
+}
+
+
+#if _CPU == _AXP || COMP_CFG_COFF == 1
+fe_seg_id SegmentAddComdatData( // ADD SEGMENT FOR A COMDAT DATA SYMBOL
+    SYMBOL sym,                 // - the symbol
+    SEGID_CONTROL control )     // - segment control
+{
+    unsigned attrs;             // - attributes
+    char const * name;          // - segment name
+    PC_SEGMENT* seg;            // - allocated segment
+
+    /* unused parameters */ (void)sym;
+
+    if( control & SI_ALL_ZERO ) {
+        attrs = SGAT_DATA_COMMON_ZERO;
+        name = TS_SEG_BSS;
+    } else {
+        type_flag modflags;
+        TypeModFlags( sym->sym_type, &modflags );
+        if( modflags & TF1_CONST ) {
+            attrs = SGAT_DATA_COMMON_INIT_ROM;
+            name = TS_SEG_DATA;
+        } else {
+            attrs = SGAT_DATA_COMMON_INIT;
+            name = TS_SEG_CONST2;
+        }
+    }
+    seg = segmentAlloc( name, NULL, SEG_NULL, attrs, SA_IN_DGROUP );
+    return( seg->segid );
+}
+#endif
+
+
+fe_seg_id SegmentImport(        // GET NEXT IMPORT SEGMENT #
+    void )
+{
+    --import_segid;
+    checkSegmentOverflow();
+    return( import_segid );
+}
+
+
+static SYMBOL segDefineLabel(   // DEFINE LABEL FOR SEGMENT, IF REQ'D
+    PC_SEGMENT *seg )           // - current segment
+{
+    SYMBOL label;               // - reference symbol
+    NAME name;                  // - label's name
+    SYMBOL func;                // - function being compiled
+
+    label = seg->label;
+    if( label == NULL ) {
+        func = ScopeFunctionInProgress();
+        if( ( func != NULL ) && ( func->segid == seg->segid ) ) {
+            label = func;
+        }
+    }
+    if( label == NULL ) {
+        label = SymMakeDummy( GetBasicType( TYP_CHAR ), &name );
+        label->segid = seg->segid;
+        if( label->segid == SEG_STACK ) {
+            label->id = SYMC_AUTO;
+        } else {
+            label->id = SYMC_STATIC;
+            InsertSymbol( GetFileScope(), label, name );
+        }
+        seg->label = label;
+        _markUsed( seg, true );
+    }
+    return( label );
+}
+
+
+SYMBOL SegmentLabelSym(         // GET LABEL IN SEGMENT
+    fe_seg_id segid )           // - segment id
+{
+    return( segDefineLabel( segIdLookup( segid ) ) );
+}
+
+
+SYMBOL SegmentLabelGen(         // GENERATE SEGMENT LABEL IF REQ'D
+    fe_seg_id segid )          // - segment id
+{
+    PC_SEGMENT *seg;            // - current segment
+    SYMBOL label;               // - reference symbol
+
+    seg = segIdLookup( segid );
+    segmentCgDefine( seg );
+    segDefineLabel( seg );
+    label = segEmitLabel( seg );
+    return( label );
+}
+
+
+SYMBOL SegmentLabelStackReset(  // RESET STACK-SEGMENT LABEL
+    void )
+{
+    SYMBOL lab;                 // - label used for stack
+    PC_SEGMENT *stk;            // - segment for stack;
+
+    stk = segIdLookup( SEG_STACK );
+    lab = stk->label;
+    stk->label = NULL;
+    stk->lab_gened = false;
+    return( lab );
+}
+
+#if _INTEL_CPU
+    #define CODE_ENDING "TEXT"
+#elif _CPU == _AXP
+    #define CODE_ENDING "text"
+#else
+    #error Invalid machine
+#endif
+#define ENDING_SIZE (sizeof(CODE_ENDING)-1)
+
+static bool isCodeSegmentName( char *segname )
+{
+    size_t len;
+
+    len = strlen( segname );
+    if( len >= 4 ) {
+        if( stricmp( segname + len - ENDING_SIZE, CODE_ENDING ) == 0 ) {
+            return( true );
+        }
+    }
+    return( false );
+
+}
+
+static bool segmentIsCode(
+    fe_seg_id segid )           // - function symbol
+{
+    PC_SEGMENT *seg;
+
+    seg = segIdLookup( segid );
+    if( (seg->attrs & EXEC) == 0 ) {
+        CErr( ERR_CODE_IN_NONCODE_SEG, seg->name );
+        InfMsgPtr( INF_CODE_SEGMENT_SUFFIX, CODE_ENDING );
+        return( false );
+    }
+    return( true );
+}
+
+#undef CODE_ENDING
+#undef ENDING_SIZE
+
+fe_seg_id SegmentFindNamed(     // FIND SEGMENT ENTRY FOR NAME
+    char* segname )             // - segment name
+{
+    PC_SEGMENT *segmt;          // - defined segment
+
+    if( 0 == strcmp( segname, "_STACK" ) ) {
+        return( SEG_STACK );
+    }
+    if( 0 == strcmp( segname, "_CODE" ) ) {
+        return( SEG_CODE );
+    }
+    segmt = segNameLookup( segname );
+    if( segmt == NULL ) {
+        if( isCodeSegmentName( segname ) ) {
+            segmt = segmentDefine( segname
+                                 , NULL
+                                 , SEG_NULL
+                                 , SGAT_CODE_BASED
+                                 , SA_NULL );
+        } else {
+            segmt = segmentDefine( segname
+                                 , NULL
+                                 , SEG_NULL
+                                 , SGAT_DATA_BASED
+                                 , SA_NULL );
+        }
+    }
+    _markUsed( segmt, true );
+    return( segmt->segid );
+}
+
+
+fe_seg_id SegmentFindBased(     // FIND SEGMENT ID FOR TF1_BASED_STRING
+    TYPE expr_type )            // - type being based
+{
+    TYPE base_mod;              // - __based modifier
+    STRING_CONSTANT string;     // - constant for segment name
+    char *segname;              // - segment name
+
+    base_mod = BasedType( expr_type );
+    string = base_mod->u.m.base;
+    segname = string->string;
+    return( SegmentFindNamed( segname ) );
+}
+
+
+static PC_SEGMENT *segmentAllocRom(    // ALLOCATE R/O DATA SEGMENT
+    char *name,                 // - name
+    fe_seg_id segid )           // - segment id
+{
+    return( segmentAlloc( name, NULL, segid, SGAT_DATA_CON2, SA_IN_DGROUP ) );
+}
+
+static PC_SEGMENT *segmentAllocRW(    // ALLOCATE R/W DATA SEGMENT
+    char *name,                 // - name
+    fe_seg_id segid )           // - segment id
+{
+    return( segmentAlloc( name, NULL, segid, SGAT_DATA_RW, SA_IN_DGROUP ) );
+}
+
+
+void SegmentData(               // SET DEFAULT DATA SEGMENT
+    char *segname,              // - segment name
+    char *segclass )            // - segment class name
+{
+    PC_SEGMENT *seg;            // - new default segment
+    unsigned control;           // - segmentAlloc control mask
+
+    if( segname == NULL ) {
+        segname = TS_SEG_DATA;
+        flags.use_def_seg = false;
+    } else {
+        flags.use_def_seg = true;
+    }
+    pruneDefSeg( &data_def_seg );
+    control = SA_IN_DGROUP;
+    if( strpref( ModuleName, segname ) ) {
+        control |= SA_MODULE_PREFIX;
+    }
+    seg = segmentDefine( segname, segclass, SEG_NULL, SGAT_DATA_RW, control );
+    initDefSeg( &data_def_seg, seg );
+}
+
+
+void SegmentCode(               // SET DEFAULT CODE SEGMENT
+    char *segname,              // - segment name
+    char *segclass )            // - segment class name
+{
+    PC_SEGMENT *seg;            // - new default segment
+    unsigned control;           // - segmentAlloc control mask
+
+    if( segname == NULL ) {
+        SegmentCode( TextSegName, NULL );
+        return;
+    }
+    pruneDefSeg( &code_def_seg );
+    control = SA_NULL;
+    if( strpref( ModuleName, segname ) ) {
+        control |= SA_MODULE_PREFIX;
+    }
+    seg = segmentDefine( segname, segclass, SEG_NULL, SGAT_CODE_GEN, control );
+    initDefSeg( &code_def_seg, seg );
+}
+
+static void initDefaultCodeSeg( char *code_seg_name )
+{
+    PC_SEGMENT *pcseg;
+
+    SegmentCode( code_seg_name, NULL );
+    code_def_seg.ds_used = true;
+    pcseg = code_def_seg.pcseg;
+    _markUsed( pcseg, true );
+    segid_default_code = pcseg->segid;
+}
+
+static void initDefaultDataSeg( void )
+{
+    PC_SEGMENT *pcseg;
+
+    SegmentData( NULL, NULL );
+    data_def_seg.ds_used = true;        // used for data externs
+    pcseg = data_def_seg.pcseg;
+    _markUsed( pcseg, true );
+}
+
+#if _CPU == 386
+static void initP5TimingSegs( void )
+{
+    PC_SEGMENT *seg;
+    PC_SEGMENT *sib;
+
+    if( TargetSwitches & (P5_PROFILING | NEW_P5_PROFILING) ) {
+        seg = segmentAllocRom( TS_SEG_TIB, SEG_PROF_BEG );
+        sib = segmentAllocRW( TS_SEG_TI, SEG_PROF_REF );
+        addSibling( seg, sib );
+        sib = segmentAllocRom( TS_SEG_TIE, SEG_PROF_END );
+        addSibling( seg, sib );
+        _markUsed( seg, true );
+    }
+}
+#else
+#define initP5TimingSegs()
+#endif
+
+void SegmentInit(               // SEGMENT: INITIALIZATION
+    char *code_seg_name )       // - name of data segment
+{
+    PC_SEGMENT *seg;
+    PC_SEGMENT *sib;
+
+    if( CompFlags.dll_subsequent ) {
+        flags.in_back_end = false;
+        seg_list = NULL;
+        dgroup_size = 0;
+        memset( &code_def_seg, 0, sizeof( code_def_seg ) );
+        memset( &data_def_seg, 0, sizeof( data_def_seg ) );
+        segid_max = SEG_NULL;
+#if _INTEL_CPU
+        segid_code_comdat = SEG_NULL;
+#endif
+    }
+    import_segid = -1;
+    // code seg
+    initDefaultCodeSeg( code_seg_name );
+    // string literal data seg
+    segmentAlloc( TS_SEG_CONST, NULL, SEG_CONST, SGAT_DATA_CON1, SA_IN_DGROUP );
+    // other R/O data seg
+    segmentAllocRom( TS_SEG_CONST2, SEG_CONST2 );
+    // r/w data seg
+    initDefaultDataSeg();
+    // thread-local storage
+    seg = segmentAlloc( TS_SEG_TLSB, TS_SEG_TLS_CLASS, SEG_TLS_BEG, SGAT_TLS_LIMIT, SA_IN_DGROUP );
+    sib = segmentAlloc( TS_SEG_TLS, TS_SEG_TLS_CLASS, SEG_TLS, SGAT_TLS_DATA, SA_IN_DGROUP );
+    addSibling( seg, sib );
+    sib = segmentAlloc( TS_SEG_TLSE, TS_SEG_TLS_CLASS, SEG_TLS_END, SGAT_TLS_LIMIT, SA_IN_DGROUP );
+    addSibling( seg, sib );
+    // bss
+    segmentAlloc( TS_SEG_BSS, NULL, SEG_BSS, SGAT_BSS, SA_IN_DGROUP );
+    // profiling data
+    initP5TimingSegs();
+    // init data
+    seg = segmentAllocRom( TS_SEG_XIB, SEG_INIT_BEG );
+    sib = segmentAllocRW( TS_SEG_XI, SEG_INIT_REF );
+    addSibling( seg, sib );
+    sib = segmentAllocRom( TS_SEG_XIE, SEG_INIT_END );
+    addSibling( seg, sib );
+    // fini data
+    seg = segmentAllocRom( TS_SEG_YIB, SEG_FINI_BEG );
+    sib = segmentAllocRW( TS_SEG_YI, SEG_FINI_REF );
+    addSibling( seg, sib );
+    sib = segmentAllocRom( TS_SEG_YIE, SEG_FINI_END );
+    addSibling( seg, sib );
+    // stack
+    segmentAlloc( TS_SEG_STACK, NULL, SEG_STACK, SGAT_STACK, SA_IN_DGROUP );
+}
+
+
+void SegmentFini(               // SEGMENT: COMPLETION
+    void )
+{
+    RingFree( &seg_list );
+}
+
+
+static fe_seg_id nextZmSegment( // GET NEXT CODE SEGMENT FOR -zm
+    void )
+{
+    fe_seg_id segid;            // - segment id
+    unsigned ads_control;       // - def seg control
+
+    if( code_def_seg.ds_used ) {
+        ads_control = ADS_NULL;
+        if( IsBigCode() && CompFlags.zm_switch_used ) {
+            if( !CompFlags.zmf_switch_used ) {
+                ads_control = ADS_ZM_SEGMENT;
+            }
+        }
+        segid = addDefSeg( &code_def_seg, ads_control )->segid;
+    } else {
+        code_def_seg.ds_used = true;
+        segid = code_def_seg.pcseg->segid;
+        SegmentMarkUsed( segid );
+    }
+    return( segid );
+}
+
+bool SegmentIfBasedOK( SYMBOL func )
+{
+    fe_seg_id segid;
+
+    segid = func->segid;
+    if( segid == SEG_NULL ) {
+        if( NULL != BasedType( func->sym_type ) ) {
+            segid = SegmentFindBased( func->sym_type );
+            return( segmentIsCode( segid ) );
+        }
+    }
+    return( true );
+}
+
+fe_seg_id SegmentForDefinedFunc(// GET SEGMENT FOR A DEFINED FUNCTION
+    SYMBOL func )               // - function
+{
+    fe_seg_id segid;
+
+    segid = func->segid;
+    if( segid == SEG_NULL ) {
+        if( NULL != BasedType( func->sym_type ) ) {
+            segid = SegmentFindBased( func->sym_type );
+        } else if( CompFlags.zm_switch_used ) {
+#if _INTEL_CPU
+            if( SymIsGennedComdatFun( func ) ) {
+                segid = segid_code_comdat;
+                if( SEG_NULL == segid ) {
+                    segid = nextZmSegment();
+                    segid_code_comdat = segid;
+                }
+            } else {
+                segid = nextZmSegment();
+            }
+#elif _CPU == _AXP || COMP_CFG_COFF == 1
+            segid = nextZmSegment();
+            if( SymIsGennedComdatFun( func ) ) {
+                segid = markSegmentComdat( segid );
+            }
+#else
+            #error Bad Machine Type
+#endif
+#if _CPU == _AXP || COMP_CFG_COFF == 1
+        } else if( SymIsGennedComdatFun( func ) ) {
+            segid = nextZmSegment();
+            segid = markSegmentComdat( segid );
+#endif
+        } else {
+            segid = code_def_seg.pcseg->segid;
+            SegmentMarkUsed( segid );
+            code_def_seg.ds_used = true;
+        }
+    }
+    return( segid );
+}
+
+
+fe_seg_id SegmentDefaultCode(   // GET CURRENT DEFAULT CODE SEGMENT
+    void )
+{
+    return( segid_default_code );
+}
+
+
+void SegmentMarkRoBlock(        // INDICATE R/O BLOCK TO BE GENERATED
+    void )
+{
+    // NYI: should never be used (use SegmentMarkUsed with the symbol's segid)
+    SegmentMarkUsed( SEG_CONST2 );
+}
+
+
+void SegmentMarkUsed(           // MARK SEGMENT AS BEING USED
+    fe_seg_id segid )           // - XI, YI segment id
+{
+    PC_SEGMENT *seg;            // - the segment
+
+    if( segid != SEG_NULL ) {
+        seg = segIdLookup( segid );
+        // extern segments are not SEG_NULL, but will not be found
+        if( seg != NULL ) {
+            _markUsed( seg, true );
+        }
+    }
+}
+
+
+void SegmentCgDefineCode(       // DEFINE CODE SEGMENT IF REQ'D
+    fe_seg_id segid )           // - segment id
+{
+#ifndef NDEBUG
+    PC_SEGMENT *seg;
+
+    seg = segIdLookup( segid );
+    DbgAssert( seg->attrs & EXEC );
+    segmentCgDefine( seg );
+#else
+    segmentCgDefine( segIdLookup( segid ) );
+#endif
+}
+
+
+void SegmentCodeCgInit(         // TURN OFF USED BIT FOR ALL CODE SEGMENTS
+    void )
+{
+    PC_SEGMENT *segment;        // - current segment
+
+    // reset any #pragma data_seg/code_seg changes back to defaults
+    SegmentData( NULL, NULL );
+    SegmentCode( NULL, NULL );
+    RingIterBeg( seg_list, segment ) {
+        if( (segment->attrs & EXEC) && ! segment->has_data ) {
+            _markUsed( segment, false );
+        }
+    } RingIterEnd( segment )
+    // call out for non-call graph code segment uses
+    DbgSuppSegRequest();
+    // used for default code segment externs
+    SegmentMarkUsed( SEG_CODE );
+}
+
+
+void SegmentCgInit(             // INITIALIZE SEGMENTS FOR CODE-GENERATION
+    void )
+{
+    PC_SEGMENT *segment;        // - current segment
+
+    RingIterBeg( seg_list, segment ) {
+        switch( segment->segid ) {
+        case SEG_STACK :
+            // Cg already "knows" about this segment
+            segment->cg_defed = true;
+            break;
+        default :
+            if( segment->attrs & BACK ) {
+                segmentCgDefine( segment );
+                break;
+            }
+            if( ! segment->used )
+                break;
+            /* fall through */
+        case SEG_DATA :
+        case SEG_CONST :
+        case SEG_CONST2 :
+        case SEG_BSS :
+            // These could be defined only if they are used but unfortunately
+            // the CG doesn't like DGROUP segments being defined on the fly.
+            // Based pointers would cause these segments to be defined on the
+            // fly so if we get rid of based pointer support, we could selectively
+            // define them but then again, it's only four segments...
+            segmentCgDefine( segment );
+            break;
+        }
+    } RingIterEnd( segment )
+    flags.in_back_end = true;
+}
+
+
+char *SegmentClassName(         // GET CLASS NAME OF SEGMENT (IF ANY)
+    fe_seg_id segid )           // - id of segment
+{
+    PC_SEGMENT *pc_seg;
+    char *class_name;
+
+    pc_seg = segIdLookup( segid );
+    if( pc_seg == NULL ) {
+        return( NULL );
+    }
+    class_name = pc_seg->class_name;
+    if( class_name == NULL && DataSegName[0] != '\0' ) {
+        class_name = DataSegName;
+    }
+    return( class_name );
+}
+
+
+#if _INTEL_CPU
+void* SegmentBoundReg(          // GET REGISTER BOUND TO SEGMENT
+    fe_seg_id segid )           // - segment id
+{
+    void* retn;                 // - NULL or hardware reg set
+    PC_SEGMENT *seg;            // - segment for id
+
+    seg = segIdLookup( segid );
+    if( seg == NULL ) {
+        retn = NULL;
+    } else {
+        retn = &seg->binding;
+    }
+    return( retn );
+}
+#endif
+
+pch_status PCHReadSegments( void )
+{
+    char *src_suffix;
+    char *dest_suffix;
+    char *class_name;
+    size_t class_name_len;
+    size_t suffix_len;
+    size_t len;
+    size_t old_module_len;
+    size_t curr_module_len;
+    size_t extra;
+    fe_seg_id sib_segid;
+    PC_SEGMENT *curr;
+
+    curr_module_len = strlen( ModuleName );
+    old_module_len = PCHReadUInt();
+    extra = 0;
+    if( curr_module_len > old_module_len ) {
+        extra = curr_module_len - old_module_len;
+    }
+    PCHReadVar( segid_max );
+    PCHReadVar( dgroup_size );
+    RingFree( &seg_list );
+    for( ; (len = PCHReadUInt()) != 0; ) {
+        curr = CMemAlloc( len + extra );
+        PCHRead( curr, len );
+        if( curr->module_prefix ) {
+            if( old_module_len != curr_module_len ) {
+                suffix_len = len;
+                suffix_len -= offsetof( PC_SEGMENT, name );
+                suffix_len -= old_module_len;
+                src_suffix = &(curr->name[old_module_len]);
+                dest_suffix = &(curr->name[curr_module_len]);
+                memmove( dest_suffix, src_suffix, suffix_len );
+            }
+            memcpy( curr->name, ModuleName, curr_module_len );
+        }
+        curr->label = SymbolMapIndex( curr->label );
+        class_name_len = PCHGetUInt( curr->class_name );
+        if( class_name_len != 0 ) {
+            class_name = CPermAlloc( class_name_len );
+            PCHRead( class_name, class_name_len );
+        } else {
+            class_name = NULL;
+        }
+        curr->class_name = class_name;
+        RingAppend( &seg_list, curr );
+    }
+    RingIterBeg( seg_list, curr ) {
+        sib_segid = (fe_seg_id)(pointer_uint)curr->sibling;
+        if( sib_segid != curr->segid ) {
+            curr->sibling = segIdLookup( sib_segid );
+        } else {
+            curr->sibling = curr;
+        }
+    } RingIterEnd( curr )
+    code_def_seg.pcseg = segIdLookup( PCHReadUInt() );
+    data_def_seg.pcseg = segIdLookup( PCHReadUInt() );
+    return( PCHCB_OK );
+}
+
+pch_status PCHWriteSegments( void )
+{
+    size_t prefix_len;
+    size_t len;
+    size_t class_name_len;
+    SYMBOL save_label;
+    char *save_class_name;
+    PC_SEGMENT *save_sibling;
+    PC_SEGMENT *curr;
+
+    prefix_len = strlen( ModuleName );
+    PCHWriteUInt( prefix_len );
+    PCHWriteVar( segid_max );
+    PCHWriteVar( dgroup_size );
+    RingIterBeg( seg_list, curr ) {
+        class_name_len = 0;
+        if( curr->class_name != NULL ) {
+            class_name_len = strlen( curr->class_name ) + 1;
+        }
+        save_sibling = curr->sibling;
+        curr->sibling = (PC_SEGMENT *)(pointer_uint)save_sibling->segid;
+        save_label = curr->label;
+        curr->label = SymbolGetIndex( save_label );
+        save_class_name = curr->class_name;
+        curr->class_name = PCHSetUInt( class_name_len );
+        len = offsetof( PC_SEGMENT, name ) + strlen( curr->name ) + 1;
+        PCHWriteUInt( len );
+        PCHWrite( curr, len );
+        curr->sibling = save_sibling;
+        curr->label = save_label;
+        curr->class_name = save_class_name;
+        if( class_name_len != 0 ) {
+            PCHWrite( save_class_name, class_name_len );
+        }
+    } RingIterEnd( curr )
+    PCHWriteUInt( 0 );
+    PCHWriteUInt( code_def_seg.pcseg->segid );
+    PCHWriteUInt( data_def_seg.pcseg->segid );
+    return( PCHCB_OK );
+}
+
+pch_status PCHInitSegments( bool writing )
+{
+    /* unused parameters */ (void)writing;
+
+    return( PCHCB_OK );
+}
+
+pch_status PCHFiniSegments( bool writing )
+{
+    /* unused parameters */ (void)writing;
+
+    return( PCHCB_OK );
+}
+
+static void fini(               // FINALIZATION
+    INITFINI* defn )            // - definition
+{
+    /* unused parameters */ (void)defn;
+
+    SegmentFini();
+}
+
+INITDEFN( segment, InitFiniStub, fini );

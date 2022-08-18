@@ -1,0 +1,40 @@
+#include "ssbar.rh"
+#if defined (__NT__)
+#define SSB_ATTRS   SS_SUNKEN | SS_WHITEFRAME
+#else
+#define SSB_ATTRS   SS_WHITEFRAME
+#endif
+
+SSBAR DIALOG 30, 30, 199, 166
+STYLE WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Status Bar Contents"
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "Items", 102, 6, 3, 186, 81
+    GROUPBOX        "Commands", 101, 98, 88, 94, 72
+    LTEXT           "Col: 19", 106, 115, 43, 24, 8
+    LTEXT           "Line: 21", 108, 55, 43, 28, 8
+    LTEXT           "8:03 am", 111, 17, 20, 27, 8
+    LTEXT           "Friday, Mar 04", 110, 60, 20, 50, 8
+    LTEXT           "Mode: overstrike", 112, 125, 20, 56, 8
+    LTEXT           "Menu help text", 113, 16, 64, 50, 8
+    GROUPBOX        "Alignment", 105, 6, 88, 86, 72
+    LTEXT           "Col: 19", 114, 20, 105, 51, 8
+    CTEXT           "Col: 19", 115, 22, 124, 51, 8
+    RTEXT           "Col: 19", 116, 27, 143, 51, 8
+    LTEXT           "Split", 117, 116, 111, 16, 8
+    LTEXT           "Clump", 118, 156, 111, 21, 8
+    CONTROL         "", SSB_TIME,           "Static", SSB_ATTRS, 13, 17, 34, 16
+    CONTROL         "", SSB_MODE,           "Static", SSB_ATTRS, 122, 17, 61, 16
+    CONTROL         "", SSB_MESSAGE,        "Static", SSB_ATTRS, 13, 60, 170, 16
+    CONTROL         "", SSB_LINE,           "Static", SSB_ATTRS, 51, 39, 34, 16
+    CONTROL         "", SSB_DATE,           "Static", SSB_ATTRS, 57, 17, 56, 16
+    CONTROL         "", SSB_ALIGN_LEFT,     "Static", SSB_ATTRS, 17, 101, 64, 16
+    CONTROL         "", SSB_ALIGN_CENTER,   "Static", SSB_ATTRS, 17, 120, 64, 16
+    CONTROL         "", SSB_ALIGN_RIGHT,    "Static", SSB_ATTRS, 17, 139, 64, 16
+    CONTROL         "", SSB_CMD_DESTROY,    "Static", SSB_ATTRS, 149, 107, 33, 16
+    CONTROL         "", SSB_CMD_DEFAULTS,   "Static", SSB_ATTRS, 125, 134, 38, 16
+    CONTROL         "", SSB_COLUMN,         "Static", SSB_ATTRS, 112, 39, 29, 16
+    CONTROL         "", SSB_CMD_SPLIT,      "Static", SSB_ATTRS, 109, 107, 31, 16
+    LTEXT           "Defaults", 119, 130, 138, 28, 8
+END

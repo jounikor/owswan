@@ -1,0 +1,121 @@
+#
+# Watcom GML/Script (wgml) Makefile
+# =======================================
+#
+
+proj_name = wgml_research
+wgml_research_autodepends = .AUTODEPEND
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+!include wres.mif
+
+!include ../../wgmlobjs.mif
+
+#
+# cflags
+#
+.c: ../c;../../c;$(watcom_dir)/c
+
+inc_dirs = -I. -I"../h" -I"../../h" $(wres_inc_dirs)
+
+research_common_objs = &
+            cmdlhelp.obj  &
+            common.obj    &
+            dfinterp.obj  &
+            heapchk.obj   &
+            research.obj
+
+cf_common_objs = &
+            $(research_common_objs) &
+            cfdir.obj     &
+            cfdev.obj     &
+            cfdrv.obj     &
+            cffon.obj     &
+            cffunc.obj    &
+            cfheader.obj
+
+cfc_objs = &
+            $(cf_common_objs) &
+            cfcheck.obj   &
+            cfcutils.obj
+
+cfp_objs = &
+            $(cf_common_objs) &
+            cfparse.obj       &
+            cfputils.obj
+
+cop_common_objs = &
+            $(research_common_objs) &
+            $(common_objs) &
+            $(scr_objs)   &
+            $(gml_objs)   &
+            $(lay_objs)   &
+            $(dev_objs)
+
+copp_objs = &
+            $(cop_common_objs) &
+            copparse.obj
+
+devld_objs = &
+            $(cop_common_objs) &
+            devldchk.obj
+
+ff_objs = &
+            $(research_common_objs) &
+            findfunc.obj
+
+outc_objs = &
+            $(cop_common_objs) &
+            outcheck.obj
+
+nwgml : cfcheck.exe cfparse.exe copparse.exe &
+        devldchk.exe findfunc.exe outcheck.exe .SYMBOLIC
+
+#
+# EXE's
+#
+exetarg_prebuild_objs = wgmlmsge.gh wgmlmsgs.gh
+exetarg_libs = $(wres_lib)
+exetarg_res_wresui = wresui.res
+
+exetarg_objs = $(cfc_objs)
+exetarg_name = cfcheck
+!include exetarg.mif
+
+exetarg_objs = $(cfp_objs)
+exetarg_name = cfparse
+!include exetarg.mif
+
+exetarg_objs = $(copp_objs)
+exetarg_name = copparse
+!include exetarg.mif
+
+exetarg_objs = $(devld_objs)
+exetarg_name = devldchk
+!include exetarg.mif
+
+exetarg_objs = $(ff_objs)
+exetarg_name = findfunc
+!include exetarg.mif
+
+exetarg_objs = $(outc_objs)
+exetarg_name = outcheck
+!include exetarg.mif
+
+#
+# rc and others
+#
+wresui.res : ../../h/wgml.rc wgmlmsgs.gh ../../h/wgml.msg ../../h/wgmlmsg.h ../../h/wgmlerr.msg
+    @%make echo_rc
+    $(rcui8)
+
+wgmlmsgs.gh : ../../h/wgmlerr.msg ../../h/wgml.msg $(__MAKEFILES__)
+    @%make echo_awk
+    $(awk) -v base=000 -f ../../makemdef.awk -v OUTFILE=$^. $<
+
+wgmlmsge.gh : ../../h/wgmlerr.msg ../../h/wgml.msg $(__MAKEFILES__)
+    @%make echo_awk
+    $(awk) -v rcbase=000 -f ../../msgtoenm.awk -v OUTFILE=$^. $<

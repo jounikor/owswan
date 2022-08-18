@@ -1,0 +1,256 @@
+proj_name = graph
+
+subdir_v2 = v2objs
+
+crwatpro_gsp = crwatpro.gsp
+
+additional_clean = $(crwatpro_gsp)
+
+graph_autodepends = .AUTODEPEND
+
+graph_nofpu = 1
+
+graph_distrib_lib = 1
+
+suppress_zc = 1
+
+supervga_support = -D_SUPERVGA
+
+memory_model_i86 = s
+!ifeq host_os dos
+memory_model_386 = s
+!else ifeq host_os qnx
+memory_model_386 = s
+!endif
+
+suffix_register = r
+suffix_stack = s
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c: ../c
+
+inc_dirs = -I. -I"$(graphlib_dir)/h" -I"$(mathlib_dir)/h"
+inc_dirs_dos = -I"$(clib_dir)/mbyte/h"
+inc_dirs_os2 = -I"$(clib_dir)/h" -I"$(clib_dir)/defwin/h" -I"$(lib_misc_dir)/h" -I"$(wpi_dir)/h"
+inc_dirs_win = -I"$(clib_dir)/h" -I"$(clib_dir)/defwin/h" -I"$(lib_misc_dir)/h" -I"$(wpi_dir)/h"
+
+extra_cpp_flags = -D_ENABLE_AUTODEPEND $(supervga_support) -D_FARD=
+
+extra_cpp_flags_i86 = -D_CGRAPH=__loadds
+extra_cpp_flags_386 = -D_CGRAPH=
+!ifeq convention stack
+extra_cpp_flags_386 += -D__STACK
+!endif
+
+extra_c_flags = -os -zl -nm=$[&$(suffix_$(convention)) $(extra_c_flags_$(machine)) -fo=$@
+
+extra_c_flags_i86 = -nt=GRAPH_TEXT
+extra_c_flags_386_ms_dos = -r
+extra_c_flags_386_ms_qnx = -r
+extra_c_flags_386_register = -3r
+extra_c_flags_386_stack = -3s
+extra_c_flags_386 = $(extra_c_flags_386_$(convention)) $(extra_c_flags_386_m$(memory_model_386)_$(host_os))
+
+#
+# aflags
+#
+!ifeq host_cpu 386
+.asm: $(graphlib_dir)/386asm
+!endif
+.asm: $(graphlib_dir)/asm
+
+extra_a_flags = $(supervga_support) -ms -i"../inc" $(extra_a_flags_$(machine)) -fo=$@
+
+extra_a_flags_i86 = -D_TEXT=GRAPH_TEXT
+extra_a_flags_386_register = -3r
+extra_a_flags_386_stack = -3s
+extra_a_flags_386 = $(extra_a_flags_386_$(convention))
+
+extra_a_flags_qnx = -D_QNX
+
+# explicit rules
+#################
+
+all: graphi.lib graphi2.lib .symbolic
+
+common_objs = &
+    $(_subdir_)sqrtf.obj &
+    $(_subdir_)std.obj &
+    $(_subdir_)activepg.obj &
+    $(_subdir_)arc.obj &
+    $(_subdir_)bkcolor.obj &
+    $(_subdir_)clearscr.obj &
+    $(_subdir_)clip.obj &
+    $(_subdir_)cliprgn.obj &
+    $(_subdir_)color.obj &
+    $(_subdir_)cursor.obj &
+    $(_subdir_)devutils.obj &
+    $(_subdir_)dispcurs.obj &
+    $(_subdir_)ellipse.obj &
+    $(_subdir_)fillmask.obj &
+    $(_subdir_)floodfll.obj &
+    $(_subdir_)fontsupp.obj &
+    $(_subdir_)getconf.obj &
+    $(_subdir_)getimage.obj &
+    $(_subdir_)getlogc.obj &
+    $(_subdir_)getphysc.obj &
+    $(_subdir_)getpos.obj &
+    $(_subdir_)global.obj &
+    $(_subdir_)grstatus.obj &
+    $(_subdir_)grtext.obj &
+    $(_subdir_)gtxtext.obj &
+    $(_subdir_)gtxtset.obj &
+    $(_subdir_)imagesiz.obj &
+    $(_subdir_)l1block.obj &
+    $(_subdir_)l1clip.obj &
+    $(_subdir_)l1ellips.obj &
+    $(_subdir_)l1fillar.obj &
+    $(_subdir_)l1getdot.obj &
+    $(_subdir_)l1getpic.obj &
+    $(_subdir_)l1hersh.obj &
+    $(_subdir_)l1line.obj &
+    $(_subdir_)l1paint.obj &
+    $(_subdir_)l1putdot.obj &
+    $(_subdir_)l1text.obj &
+    $(_subdir_)lineto.obj &
+    $(_subdir_)lnstyle.obj &
+    $(_subdir_)logorg.obj &
+    $(_subdir_)moveto.obj &
+    $(_subdir_)outtext.obj &
+    $(_subdir_)pie.obj &
+    $(_subdir_)pixel.obj &
+    $(_subdir_)plotactn.obj &
+    $(_subdir_)polygon.obj &
+    $(_subdir_)putchar.obj &
+    $(_subdir_)putimage.obj &
+    $(_subdir_)rectangl.obj &
+    $(_subdir_)remappal.obj &
+    $(_subdir_)scrollw.obj &
+    $(_subdir_)setchsiz.obj &
+    $(_subdir_)setchspc.obj &
+    $(_subdir_)setrows.obj &
+    $(_subdir_)settxpth.obj &
+    $(_subdir_)settxtal.obj &
+    $(_subdir_)settxtor.obj &
+    $(_subdir_)setvideo.obj &
+    $(_subdir_)setviewp.obj &
+    $(_subdir_)setwind.obj &
+    $(_subdir_)stylwrap.obj &
+    $(_subdir_)textcol.obj &
+    $(_subdir_)textpos.obj &
+    $(_subdir_)textwind.obj &
+    $(_subdir_)visualpg.obj &
+    $(_subdir_)windfunc.obj &
+    $(_subdir_)wrapon.obj &
+    $(_subdir_)zarc.obj &
+    $(_subdir_)zchsize.obj &
+    $(_subdir_)zellipse.obj &
+    $(_subdir_)zfloodfl.obj &
+    $(_subdir_)zgetimag.obj &
+    $(_subdir_)zgrtext.obj &
+    $(_subdir_)zimagesi.obj &
+    $(_subdir_)zlineto.obj &
+    $(_subdir_)zmoveto.obj &
+    $(_subdir_)zpie.obj &
+    $(_subdir_)zpixel.obj &
+    $(_subdir_)zpolygon.obj &
+    $(_subdir_)zputimag.obj &
+    $(_subdir_)zrectang.obj
+
+eng_nonwin_objs = &
+    $(_subdir_)8x8font.obj &
+    $(_subdir_)bit.obj &
+    $(_subdir_)gstklow.obj &
+    $(_subdir_)hercfont.obj &
+    $(_subdir_)l0drwlin.obj &
+    $(_subdir_)l0ellips.obj &
+    $(_subdir_)l1fill.obj &
+    $(_subdir_)l1putpic.obj &
+    $(_subdir_)lineutil.obj &
+    $(_subdir_)seginit.obj &
+    $(_subdir_)transpar.obj &
+    $(_subdir_)visit.obj
+
+english_objs = &
+    $(_subdir_)cgautils.obj &
+    $(_subdir_)cnvcolor.obj &
+    $(_subdir_)egautils.obj &
+    $(_subdir_)fast256.obj &
+    $(_subdir_)hgcutils.obj &
+    $(_subdir_)vgautils.obj &
+    $(_subdir_)grcga.obj &
+    $(_subdir_)grega.obj &
+    $(_subdir_)grhgc.obj &
+    $(_subdir_)grvga.obj &
+    $(_subdir_)selpal.obj &
+    $(_subdir_)setmode.obj &
+    $(_subdir_)sysmtype.obj
+
+win_objs = &
+    $(_subdir_)gphmain.obj &
+    $(_subdir_)winutil.obj
+
+special_objs = &
+    fsmath.obj &
+    dummy.obj
+
+!ifdef supervga_support
+svga_english_objs = &
+    $(_subdir_)grsvga.obj &
+    $(_subdir_)svgautil.obj &
+    $(_subdir_)svgainfo.obj
+!endif
+
+!ifeq host_os win
+grlib_template = $(common_objs) $(win_objs)
+!else
+grlib_template = $(common_objs) $(eng_nonwin_objs) $(english_objs) $(svga_english_objs)
+!endif
+
+#
+# LIB
+#
+_subdir_ =
+libtarg_prebuild_objs = graph.gh $(special_objs)
+libtarg_objs          = $(grlib_template)
+libtarg_name          = graphi
+!include libtarg.mif
+
+#
+# LIB version 2
+#
+_subdir_ = $(subdir_v2)/
+libtarg_prebuild_objs = $(subdir_v2) graph2.gh $(special_objs)
+libtarg_objs          = $(grlib_template)
+libtarg_name          = graphi2
+!include libtarg.mif
+
+#
+# rc and others
+#
+!ifeq release 1
+wsplice_extra_opts =
+!else
+wsplice_extra_opts = -d"depends.dep"
+!endif
+
+wsplice_opts_dos = -kDOS
+wsplice_opts_os2 = -kDOS
+wsplice_opts_qnx = -kQNX -u
+wsplice_opts_win = -kDOS
+
+wsplice_opts = $(wsplice_extra_opts) $(wsplice_opts_$(host_os))
+
+!include $(graphlib_dir)/headers.mif
+
+extra_cpp_v2_flags = -DVERSION2
+extra_a_v2_flags = -DVERSION2
+
+defrule_key = v2
+!include defrule.mif

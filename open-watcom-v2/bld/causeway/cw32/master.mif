@@ -1,0 +1,45 @@
+proj_name = causeway
+
+causeway_autodepends = .AUTODEPEND
+
+causeway_distrib_lib = 1
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# aflags
+#
+.asm : ../../asm
+
+extra_a_flags = -DENGLISH=1 -I"../../inc"
+
+#
+# lflags
+#
+extra_l_flags = op verbose, statics
+
+# explicit rules
+#################
+
+all : cwstub.exe cwdstub.exe .symbolic
+
+#
+# EXE
+#
+exetarg_objs = cw32.obj
+exetarg_name = cw32
+exetarg_opts = disable 1080
+!include exetarg.mif
+
+#
+# EXE
+#
+exetarg_objs = cwdstub.obj
+exetarg_name = cwdstub
+exetarg_opts = disable 1014
+!include exetarg.mif
+
+cwstub.exe : cw32.exe
+    $(cwc) $[@ $@

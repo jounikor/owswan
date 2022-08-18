@@ -1,0 +1,9 @@
+#pmake/150: build flat stack 32bit calls winnt iX86 rtdll os_nt cpu_386 cpplib
+
+component  = plib
+processor  = 386
+model      = mf
+system     = winnt
+convention = stack
+
+!include $(rtdll_dir)/master.mif

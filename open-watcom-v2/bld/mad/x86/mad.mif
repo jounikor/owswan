@@ -1,0 +1,12 @@
+target_cpu = x86
+
+imp_objs = &
+        x86addr.obj &
+        x86ctrl.obj &
+        x86types.obj &
+        x86reg.obj &
+        x86call.obj &
+        x86disas.obj &
+        x86trace.obj
+
+!include ../../master.mif

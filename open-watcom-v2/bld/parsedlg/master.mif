@@ -1,0 +1,23 @@
+proj_name = parsedlg
+
+parsedlg_autodepends = .autodepend
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+
+#
+# cflags
+#
+.c: ../c
+
+inc_dirs = -I"../h" -I"$(watcom_dir)/h"
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_objs = parsedlg.obj
+!include exetarg.mif

@@ -1,0 +1,154 @@
+#
+# Master makefile for creating trap files
+#
+
+description = 'Open Watcom Debugger Trap File'
+
+!ifdef test
+
+sys_x86_os2   = sys os2
+sys_x86_os2v2 = sys os2v2
+sys_x86_win   = sys windows
+sys_x86_nt    = sys nt
+sys_x86_dos   = sys dos
+sys_x86_rdos  = sys rdos_dll
+sys_x86_qnx   = sys qnx
+sys_x86_linux = sys linux
+sys_axp_nt    = sys ntaxp
+
+trap_ext_os2_i86 = cli1.exe
+trap_ext_qnx_i86 = cli.qnx
+trap_ext_qnx_386 = cli.qnx
+trap_ext_win_i86 = cliw.exe
+
+!ifdef trap_ext_$(host_os)_$(host_cpu)
+trap_basename = $(xname)
+!else
+trap_basename = $(xname)cli
+!endif
+
+!ifdef trap_ext_$(host_os)_$(host_cpu)
+target = $(trap_basename)$(trap_ext_$(host_os)_$(host_cpu))
+!else
+target = $(trap_basename).exe
+!endif
+
+TRAP_common_objs = testcli.obj
+TRAP_remote_objs =
+
+!else
+
+!include dllbase.mif
+
+!ifndef remote_link
+!ifndef core_only
+full_export = 1
+!endif
+!endif
+
+!ifdef full_export
+# remove reference to run-time code
+alias_symbols_nt = alias __DLLstart_='_LibMain@12'
+!endif
+
+!ifneq release 0
+dllbase = $(trap_dllbase_$(host_os)_$(host_cpu))
+!endif
+
+export_common_intel = export TrapInit_.1, TrapFini_.2, TrapRequest_.3
+export_common_risc = export TrapInit.1, TrapFini.2, TrapRequest.3
+!ifdef full_export
+export_full_os2 = export TrapTellHandles_.4, TrapTellHardMode_.5
+export_full_nt_intel = export TrapInfoFunction_.4, TrapInterruptProgram_.5, TrapTerminate_.6
+export_full_nt_risc = export TrapInfoFunction.4, TrapInterruptProgram.5, TrapTerminate.6
+export_full_win = export TRAPINPUTHOOK.5, TRAPINFOFUNCTION.6, TRAPHARDMODECHECK.7, TRAPGETHWNDFUNC.8, TRAPSETHARDMODE.12, TRAPUNLOCKINPUT.13
+!endif
+
+sys_x86_os2  = sys os2 dll initinstance &
+    $(export_common_intel) $(export_full_os2) &
+    op modname=$^& &
+    option description $(description)
+
+sys_x86_os2v2  = sys os2v2 dll initinstance terminstance &
+    $(export_common_intel) $(export_full_os2) &
+    lib os2386.lib &
+    op modname=$^& &
+    option description $(description)
+
+sys_x86_win  = sys windows_dll &
+    export WEP.1 RESIDENT &
+    export TRAPINIT.2, TRAPFINI.3, TRAPREQUEST.4 $(export_full_win) &
+    op modname=$^& &
+    option description $(description)
+#    option rwr
+
+sys_x86_dos  = sys dos
+
+sys_x86_rdos = sys rdos_dll &
+    export TrapInit_, TrapFini_, TrapRequest_ &
+    $(dllbase)
+
+sys_x86_qnx  = sys rex_qnx
+
+# For now Linux is linked as a PE DLL file since we have code to load
+# this under Linux already. Eventually it should be an ELF shared library.
+
+sys_x86_linux = sys pe_linux dll opt dosseg &
+    export TrapLoad_.1 &
+    option description $(description)
+
+sys_x86_nt   = sys nt_dll initinstance opt dosseg &
+    $(export_common_intel) $(export_full_nt_intel) &
+    $(alias_symbols_nt) &
+    op modname=$^& &
+    option description $(description) &
+    $(dllbase)
+
+sys_axp_nt   = sys ntaxp_dll initinstance &
+    $(export_common_risc) $(export_full_nt_risc) &
+    option description $(description) &
+    op modname=$^&
+
+sys_ppc_nt   = sys ntppc_dll initinstance &
+    $(export_common_risc) $(export_full_nt_risc) &
+    option description $(description) &
+    op modname=$^&
+
+sys_jvm_nt   = sys nt_dll initinstance opt dosseg &
+    $(export_common_intel) $(export_full_nt_intel) &
+    $(alias_symbols_nt) &
+    op modname=$^& &
+    option description $(description) &
+    $(dllbase)
+
+trap_ext_nt          = .dll
+trap_ext_os2_os2     = .dll
+trap_ext_os2_os2v2   = .d32
+trap_ext_rdos        = .dll
+trap_ext_win         = .dll
+
+trap_basename = $(xname)
+
+!ifdef trap_ext_$(host_os)_$(target_os)
+target = $(trap_basename)$(trap_ext_$(host_os)_$(target_os))
+!else ifdef trap_ext_$(host_os)
+target = $(trap_basename)$(trap_ext_$(host_os))
+!else
+target = $(trap_basename).trp
+!endif
+!ifndef __WATCOM_TOOLS__
+!ifdef ext_lib_shared
+target = $(trap_basename)$(ext_lib_shared)
+!endif
+!endif
+
+TRAP_common_objs = $(os_prefix)strt.obj
+!ifeq srv par
+TRAP_common_objs += $(os_prefix)noth.obj
+!else ifeq srv ser
+TRAP_common_objs += $(os_prefix)noth.obj
+!endif
+
+TRAP_remote_objs = remote.obj
+
+!endif

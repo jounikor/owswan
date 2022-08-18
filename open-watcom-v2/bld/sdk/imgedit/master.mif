@@ -1,0 +1,107 @@
+proj_name = wimgedit
+
+!ifndef wimgedit_autodepends
+wimgedit_autodepends = .AUTODEPEND
+!endif
+
+sys_windowed = 1
+
+memory_model_i86 = l
+
+!include cproj.mif
+!include defrule.mif
+!include deftarg.mif
+!include wres.mif
+!include trmem.mif
+
+!include $(commonui_dir)/client.mif
+!include $(wpi_dir)/client.mif
+!include $(wr_dir)/client.mif
+
+.JUST_ENOUGH
+
+# remap host_os
+target_os2 = os2
+target_win = win
+target_nt  = win
+
+#
+# cflags
+#
+.c : c;../c
+
+inc_dirs  = -I. -Ih -I"../h" $(wres_inc_dirs) $(wr_inc_dirs) $(commonui_inc_dirs) $(wpi_inc_dirs)
+
+extra_cpp_flags     = -DGUI_IS_GUI
+!ifdef wpitest
+extra_cpp_flags    += -D_WPI_TEST_
+!endif
+extra_cpp_flags_os2 = -D__OS2_PM__
+
+extra_c_flags = -fh
+
+extra_c_flags_win = -zc
+
+#
+# lflags
+#
+extra_l_flags_win = option rwr, stack=16k, heapsize=2k lib ddeml.lib
+extra_l_flags_os2 = option stack=12k, heapsize=2k
+
+# explicit rules
+#################
+
+#
+# EXE
+#
+exetarg_prebuild_objs = rcstr.grh
+exetarg_objs_extras_win = wincreat.obj title.obj winutils.obj
+exetarg_objs_os2      = pmcreate.obj pmutils.obj pmicon.obj wbitmap.obj
+exetarg_objs_win      = icon.obj snap.obj modclrs.obj pickbmp.obj iebmpdat.obj iedde.obj iectl3d.obj $(exetarg_objs_extras_win)
+exetarg_objs = &
+    imgedit.obj ieproc.obj ieglob.obj ieclrpal.obj ienew.obj &
+    iedraw.obj ieviewin.obj ieutil.obj iesave.obj iestatus.obj &
+    iefonts.obj ieopen.obj ieprofil.obj ietoolbr.obj xorand.obj &
+    freehand.obj clip.obj drawproc.obj undo.obj colors.obj &
+    iconinfo.obj fill.obj clrcntls.obj curclr.obj funcbar.obj &
+    bkcolor.obj imgdata.obj getdata.obj chgsize.obj settings.obj &
+    trnsform.obj hinttext.obj iemem.obj closeall.obj bits.obj &
+    errors.obj imgutil.obj &
+    $(exetarg_objs_$(target_$(host_os)))
+exetarg_libs_win      = $(wr_lib)
+exetarg_libs          = $(wres_lib) $(wpi_lib) $(commonui_lib) $(exetarg_libs_$(target_$(host_os)))
+exetarg_res_version_nt_386 = exever.res
+exetarg_res_version_nt_x64 = exever.res
+exetarg_res           = $(proj_name).res
+exetarg_nt_manif_386  = ntmanif.res
+exetarg_nt_manif_x64  = ntmanif.res
+!include exetarg.mif
+
+#
+# rc and others
+#
+!include verrc.mif
+
+rc_inc_dirs = -I"../res" $(commonui_inc_dirs) -Ih
+
+!ifeq host_os os2
+$(proj_name).res : ../res/os2/wimgedit.rc rcstr.grh $(__MAKEFILES__)
+    @%make echo_rc
+    $(rc) $(rc_flags) -ad -zk0 -I"../res/os2" $(cppflags) $(rc_inc_path) $[@ -fo=$@
+!else
+$(proj_name).res : ../res/wimgedit.rc rcstr.grh $(__MAKEFILES__)
+    @%make echo_rc
+    $(rc) $(rc_flags) -ad -zk0 $(cppflags) $(rc_inc_path) $[@ -fo=$@
+!endif
+
+ntmanif.res : ../res/ntmanif.rc
+    @%make echo_rc
+    $(rc) $(rc_flags) -I"../res" $(inc_dirs_sys_nt) $< -fo=$@
+
+rcstrmsg.gh : ../res/wimgedit.msg $(__MAKEFILES__)
+    @%make echo_cpp
+    $(cpp) $(rc_ui_flags) -o$@ $[@
+
+rcstr.grh : rcstrmsg.gh $(__MAKEFILES__)
+    @%make echo_awk
+    $(awk) -f $(build_dir)/msgtoh.awk -v OUTFILE=$^. $[@

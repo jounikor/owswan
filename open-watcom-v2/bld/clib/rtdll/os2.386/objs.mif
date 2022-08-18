@@ -1,0 +1,20 @@
+__cifx__ =$(system).$(processor)/$(libsubdir)
+
+dll_libs = $+ &
+    $(clib_dir)/library/$(__cifx__)/clib3$(dllname_$(convention)).lib &
+    $-
+
+dll_def = $+ &
+    $(clib_dir)/library/$(__cifx__)/export.gdf &
+    $(clib_dir)/intel/export.def &
+    $(clib_dir)/startup/export.def &
+    $(clib_dir)/startup/$(convention).def &
+    $-
+
+dll_objs = $+ &
+    $(clib_dir)/startup/library/$(__cifx__)/clibdo32.obj &
+    $-
+
+!include ../../static.mif
+
+__cifx__ =
