@@ -36,7 +36,7 @@ FOO = Example $(ROM)
 #TARGET := wscl		# $4000:0000
 TARGET := wsc		# $2000:0000
 
-LOCAL_CFLAGS = -bcl=$(TARGET) -1 -zc -ml -s -i=$(WATCOM)/h -i=$(WATCOM)/libwsc/h
+LOCAL_CFLAGS = -fe=$(BIN) -fm=$(MAP) -bcl=$(TARGET) -1 -zc -ml -s -i=$(WATCOM)/h -i=$(WATCOM)/libwsc/h
 LOCAL_LDFLAGS = rom -v
 
 #
