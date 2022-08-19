@@ -1,0 +1,18 @@
+
+Manual build instructions for MacOS. 
+
+    git clone https://github.com/jounikor/owswan.git
+    cd owswan/open-watcom-v2
+    source setvars.sh
+    . ./build.sh preboot
+    cd bld
+    builder boot
+    builder build
+    builder cprel osxx64
+
+
+Once successful your binaries can be found from
+    $OWROOT/rel/osx64
+
+Libraries and headers can be found from
+    $OWROOT/rel/
