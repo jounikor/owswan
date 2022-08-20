@@ -23,7 +23,7 @@ Bear in mind that:
 * Only *large memory model* is supported i.e., compile with `-ml`.
 * Stack checking must be disabled. Either compile with `-s` or use `#pragma off (check_stack)`. The startup code does not provide required glue for that to work.
 * No floating point libraries. Fixed point \o/
-* Non-ROMmable initialized static variable and statically allocated variable storage is very limited. Basically the RAM between `$0000:0100` -> `$0000:0e00` is shared between data, bss and stack segments. The stack grows down from `$0000:0e00` and no checks are performed whether bss or data gets overwritten by extensive stack usage.
+* Non-ROMmable initialized static variable and statically allocated variable storage is very limited. Basically the RAM between `$0000:0100` -> `$0000:0dff` is shared between data, bss and stack segments. The stack grows down from `$0000:0e00` and no checks are performed whether bss or data gets overwritten by extensive stack usage.
   - This is the assumed lower RAM layout. In a case you want/need to have a different setup you need to modify the `wlink.lnk` file.
   - The `wlink.lnk` sets the "stack size" to 512 bytes to avoid linking time warnings.. however, this setting is artificial.
 * In order to ensure that your static or const variables really end up to ROM and not into the small available RAM the following measures are good to know:
@@ -63,7 +63,7 @@ Bear in mind that:
 * Stack top is located at `$0000:0e00`.
 * IRQ vectors up to `$0000:0040` are in use.
 * The WS(C) IRQ base is set to `$0000:0020`.
-* RAM from `$0000:01000` to `$0000:0e00` is reserved for C-compiler to use.
+* RAM from `$0000:0100` to `$0000:0dff` is reserved for C-compiler to use.
 * All WS(C) IRQs are turned off and acknowledged. CPU IRQs are enabled. 
 
 ### Additional information included into the ROM ###
@@ -171,6 +171,11 @@ rel/libwsc/h/
 
 ### Building OpenWatcom ###
 See the normal OpenWatcom build instructions. The Wonderswan modifications should build automatically. Note that currently testing has been only made against old OSX (i.e. host OS `osxx64`).
+
+### Useful links ###
+* [WSMan by trap15](http://daifukkat.su/docs/wsman/)
+* [80186 programming for the Wonderswan and Wonderswan Color](https://www.chibialiens.com/8086/wonderswan.php)
+* [wstech v24](https://gitlab.com/TASVideos/BizHawk/-/blob/master/wonderswan/wstech24.txt)
 
 
 ### TODO ###
