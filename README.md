@@ -49,16 +49,21 @@ Bear in mind that:
   - The compiled code execution starts at `$4000:0000` thus leaving 786432 bytes for compiled code and data. However, this arrangement leaves both REG_BANK_ROM0 & REG_BANK_ROM1 fully unoccupied and available for the programmer to exploit.
   - Raw data banks are placed at the beginning of the ROM (preceding the compiled code).
   - *Minimum 8Mbit* and up to 128Mbit ROMs are supported. The `wscromtool` will make sure ROM between `$4000:0000` and `$ffff:ffff` is always fully mappable.
+* By default, if `wcl` is used to compile + link your project, the output binary file has the same name as your first C-file with `.bin` extension. You can always override this using the `-fe` commandine option.
+* By default, if `wcl` is used to compile + link your project, the output map file has the same name as your first C-file with `.map` extension. You can always override this using the `-fm` commandine option.
 
 
 ### Assumptions and memory map layout when main(void) is called ###
 * REG_BANK_ROM2 is $ff.
-* REG_BANK_ROM0 is set to "first bank" of the ROM.
+* REG_BANK_ROM0 is set to value in `__wsc_first_bank`.
 * REG_BANK_ROM1 is ??.
 * REG_BANK_SRAM is ??.
 * Code execution (wsccrt0) starts either from `$2000:0000` (the compile/linkin target was set to `wsc`) or from `$4000:0000` (the compile/linkin target was set to `wscl`).
   - No parameters are passed to main().
+* Stack top is located at `$0000:0e00`.
+* IRQ vectors up to `$0000:0040` are in use.
 * The WS(C) IRQ base is set to `$0000:0020`.
+* RAM from `$0000:01000` to `$0000:0e00` is reserved for C-compiler to use.
 * All WS(C) IRQs are turned off and acknowledged. CPU IRQs are enabled. 
 
 ### Additional information included into the ROM ###
@@ -73,7 +78,7 @@ Bear in mind that:
 ### wscromtool ###
 The `wscromtool` is used to:
 * Build the final ROM including metadata and boostrap code.
-* Compile the (optional) binary file that can be used to add plain data (bank/segment) into the ROM. During the creation of the data file an associated C-header file is generated, which lists the BANK, SIZE and OFFSET of the raw data files.
+* Compile the (optional) binary file that can be used to add raw data banks into the ROM. During the creation of the data file an associated C-header file is generated, which lists the BANK, SIZE and OFFSET of the raw data files.
 
 To see the top level commands and options just enter the tool name:
 ```
@@ -176,7 +181,7 @@ See the normal OpenWatcom build instructions. The Wonderswan modifications shoul
 - [x] Refactor (i.e. implement proper) wsccrt0.
 - [x] Larger than 1MB (8Mbit) support. This would we a very simple "filesystem" to swap in required ROM bank and provide offset to required const data.
 - [ ] Proper documentation.
-- [ ] Sample code.
+- [x] Sample code.
 - [x] WonderSwan specific library for helper functions.
 
 
