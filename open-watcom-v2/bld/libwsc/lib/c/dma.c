@@ -25,22 +25,27 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
-#include <stdint.h>
 #include "libwsc.h"
+#include <stdint.h>
+#include <stdbool.h>
 
-void set_hw_irq(irq_handler_f handler, uint8_t irq_num)
+
+void dma_copy(void * dst, void * __far src, int bytes, bool dec)
 {
-    uint8_t base, irqs;
-    uint32_t *p;
+    OUTB(REG_DMA_SRC_LOW,(uint8_t)src);
+    OUTB(REG_DMA_SRC_MID,(uint16_t)src >> 8);
+    /* FIX: Somewhat ugly __far pointer notmalization.. */
+    OUTB(REG_DMA_SRC_HGH,(uint32_t)src >> 28);
+    
+    OUTB(REG_DMA_DST_LOW,(uint8_t)dst);
+    OUTB(REG_DMA_DST_MID,(uint16_t)dst >> 8);
+    OUTB(REG_DMA_LEN_LOW,bytes);
+    OUTB(REG_DMA_LEN_HGH,bytes >> 8);
 
-    base = INB(REG_INT_BASE);
-    OUTB(REG_INT_ACK,(1 << irq_num));
-    irqs = INB(REG_INT_ENABLE);
-    irqs = irqs | (1 << irq_num);
-
-    p = (uint32_t *)((base+irq_num) * 4); 
-    *p = (uint32_t)handler;
-    OUTB(REG_INT_ENABLE,irqs);
+    if (dec) {
+        OUTB(REG_DMA_CTRL,0xc0);
+    } else {
+        OUTB(REG_DMA_CTRL,0x80);        
+    }
 }
-
 

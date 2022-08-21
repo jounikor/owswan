@@ -29,16 +29,18 @@
  * For more information, please refer to <http://unlicense.org/>
  */
 
+#include <stdint.h>
+#include <stdbool.h>
 
 /* These consume BSS space and are setup by the crt0 */
-extern unsigned char __wsc_data_bank;
-extern unsigned char __wsc_first_bank;
+extern uint8_t __wsc_data_bank;
+extern uint8_t __wsc_first_bank;
 
 /* Inline ASM helpers for ROM and SRAM bank switching */
-extern void SET_BANK_ROM0(unsigned char __bank);
-extern void SET_BANK_ROM1(unsigned char __bank);
-extern void SET_BANK_ROM2(unsigned char __bank);
-extern void SET_BANK_SRAM(unsigned char __bank);
+extern void SET_BANK_ROM0(uint8_t __bank);
+extern void SET_BANK_ROM1(uint8_t __bank);
+extern void SET_BANK_ROM2(uint8_t __bank);
+extern void SET_BANK_SRAM(uint8_t __bank);
 
 #pragma aux  SET_BANK_ROM0 = 	\
 	"out 0xc2,al"				\
@@ -60,14 +62,14 @@ extern void SET_BANK_SRAM(unsigned char __bank);
 #define GET_DATA_BANK(n) ((n+__wsc_data_bank) & 0xff)
 
 /* Other helper inline ASM functions */
-extern void OUTB(unsigned char __port, unsigned char __value);
-extern void OUTW(unsigned char __port, unsigned short __value);
-extern unsigned char INB(unsigned char __port);
-extern unsigned short INW(unsigned char __port);
+extern void OUTB(uint8_t __port, uint8_t __value);
+extern void OUTW(uint8_t __port, uint16_t __value);
+extern uint8_t INB(uint8_t __port);
+extern uint16_t INW(uint8_t __port);
 extern void enable_irq(void);
 extern void disable_irq(void);
-extern void ack_hw_irq(unsigned char irq);
-extern void ack_hw_irq_mask(unsigned char irq);
+extern void ack_hw_irq(uint8_t irq);
+extern void ack_hw_irq_mask(uint8_t irq);
 
 #pragma aux  OUTB = 	\
 	"out dx,al"			\
@@ -168,9 +170,10 @@ extern void ack_hw_irq_mask(unsigned char irq);
 #define REG_PALMONO_F_HGH		0x3f
 #define REG_DMA_SRC_LOW		0x40
 #define REG_DMA_SRC_MID		0x41
-#define REG_DMA_SRC_HI		0x42
-#define REG_DMA_DST_LOW		0x44
-#define REG_DMA_DST_HGH		0x45
+#define REG_DMA_SRC_HGH		0x42
+
+#define REG_DMA_DST_LOW     0x44
+#define REG_DMA_DST_MID		0x45
 #define REG_DMA_LEN_LOW		0x46
 #define REG_DMA_LEN_HGH		0x47
 #define REG_DMA_CTRL			0x48
@@ -316,7 +319,9 @@ extern void ack_hw_irq_mask(unsigned char irq);
 #define DEFADDR_2BPP_TILES	0x2000
 #define DEFADDR_2BPP_SPR	0x2000
 #define DEFADDR_4BPP_SPR	0x4000
-#define DEFADDR_4BPP_TILES	0x8000
+#define DEFADDR_4BPP_TILES  0x8000
+#define DEFADDR_4BPP_TILES0 0x4000
+#define DEFADDR_4BPP_TILES1 0x8000
 #define FIXADDR_PAL_0_7		0xfe00
 #define FIXADDR_PAL_8_15	0xff00
 
@@ -374,7 +379,7 @@ extern void ack_hw_irq_mask(unsigned char irq);
 /* libwscl.lib function prototypes */
 typedef void (* __far irq_handler_f)(void);
 
-void set_hw_irq(irq_handler_f handler, unsigned char irq);
-
+void set_hw_irq(irq_handler_f handler, uint8_t irq);
+void dma_copy(void * dst, void * __far src, int bytes, bool dec);
 
 #endif  /* _LIBSWC_H_INCLUDED */
