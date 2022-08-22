@@ -30,11 +30,11 @@
 #include <stdbool.h>
 
 
-void dma_copy(void * dst, void * __far src, int bytes, bool dec)
+void dma_copy(void * __near dst, void * __far src, int bytes)
 {
     OUTB(REG_DMA_SRC_LOW,(uint8_t)src);
     OUTB(REG_DMA_SRC_MID,(uint16_t)src >> 8);
-    /* FIX: Somewhat ugly __far pointer notmalization.. */
+    /* FIX: Somewhat ugly __far pointer normalization.. */
     OUTB(REG_DMA_SRC_HGH,(uint32_t)src >> 28);
     
     OUTB(REG_DMA_DST_LOW,(uint8_t)dst);
@@ -42,10 +42,29 @@ void dma_copy(void * dst, void * __far src, int bytes, bool dec)
     OUTB(REG_DMA_LEN_LOW,bytes);
     OUTB(REG_DMA_LEN_HGH,bytes >> 8);
 
-    if (dec) {
-        OUTB(REG_DMA_CTRL,0xc0);
-    } else {
-        OUTB(REG_DMA_CTRL,0x80);        
-    }
+    OUTB(REG_DMA_CTRL,0x80);        
 }
 
+void dma_copy_ram(void * __near dst, void * __near src, int bytes)
+{
+    OUTB(REG_DMA_SRC_LOW,(uint8_t)src);
+    OUTB(REG_DMA_SRC_MID,(uint16_t)src >> 8);
+    OUTB(REG_DMA_SRC_HGH,0);
+    
+    OUTB(REG_DMA_DST_LOW,(uint8_t)dst);
+    OUTB(REG_DMA_DST_MID,(uint16_t)dst >> 8);
+    
+    OUTB(REG_DMA_LEN_LOW,bytes);
+    OUTB(REG_DMA_LEN_HGH,bytes >> 8);
+
+    OUTB(REG_DMA_CTRL,0x80);        
+}
+
+void memcpy(void * __near dst, void * __far src, int bytes)
+{
+    uint8_t *d = dst;
+    uint8_t *s = src;
+    while (bytes--) {
+        *d++ = *s++;
+    }
+}

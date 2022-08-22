@@ -380,6 +380,8 @@ extern void ack_hw_irq_mask(uint8_t irq);
 typedef void (* __far irq_handler_f)(void);
 
 void set_hw_irq(irq_handler_f handler, uint8_t irq);
-void dma_copy(void * dst, void * __far src, int bytes, bool dec);
+void dma_copy(void * __near dst, void * __far src, int bytes);
+void dma_copy_ram(void * __near dst, void * __near src, int bytes);
+void memcpy(void * __near dst, void * __far src, int bytes);
 
 #endif  /* _LIBSWC_H_INCLUDED */
