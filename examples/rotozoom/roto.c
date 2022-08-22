@@ -1,6 +1,7 @@
 /*
  * (c) 2022 Jouni 'mr.spiv' Korhonen
  * Some testing with chunky modes and raster irqs.
+ * Maybe a rotozoomer some day.
  */
 
 #include <stdint.h>
@@ -330,7 +331,7 @@ void __far main(void)
         if (m == (uint16_t*)CHUNKY0) {
             m = (uint16_t*)CHUNKY1;
         } else {
-            n = (uint16_t*)CHUNKY0;
+            m = (uint16_t*)CHUNKY0;
         }
 
         prep_chunky(m,color);
