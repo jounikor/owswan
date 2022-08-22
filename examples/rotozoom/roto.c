@@ -10,7 +10,7 @@
 uint16_t g_hcnt;
 uint16_t* __near g_chunky_buffer;
 uint16_t* __near g_chunky;
-uint8_t g_wait_vb;
+volatile uint8_t g_wait_vb;
 
 // Stripe 0001 0010 0011 0100 0101 0110 0111 1000 
 #pragma pack(2)
