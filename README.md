@@ -2,7 +2,9 @@
 
 This fork and branch contain tools and modification to compile C-programs to [WonderSwan Color](https://en.wikipedia.org/wiki/WonderSwan) handheld console target. 
 
-The development has been done on OSX 10.13.6 as the main host OS. No testing has been done on any other host OS but Linux should be just fine. The build system has been 'cut' to compile in my system and therefore the build does not contain all material as the full Watcom build would do.
+The development has been done on OSX 10.13.6 as the main host OS. The build system has been 'cut' to compile in my system and therefore the build does not contain all material as the full Watcom build would do. To date following host OSes have been tested:
+* MacOS (High Sierra, Catalina)
+* Linux (WSL 4.4.0-19041-Microsoft #1237-Microsoft)
 
 Bear in mind that:
 * This is a hack.. a fork of Dos target.
