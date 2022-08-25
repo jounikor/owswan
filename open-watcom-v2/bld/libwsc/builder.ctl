@@ -18,6 +18,7 @@ set PROJDIR=<CWD>
     <CCCMD> startup/library/msdos.086/ml/wsccrt0.obj                    <OWRELROOT>/libwsc/wsccrt0.obj
     <CCCMD> lib/library/msdos.086/ml/libwscl.lib                        <OWRELROOT>/libwsc/libwscl.lib
     <CCCMD> h/libwsc.h                                                  <OWRELROOT>/libwsc/h/libwsc.h
+    <CCCMD> h/inlines.h                                                  <OWRELROOT>/libwsc/h/inlines.h
 
 [ BLOCK . . ]
 

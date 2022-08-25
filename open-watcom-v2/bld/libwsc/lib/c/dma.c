@@ -60,11 +60,3 @@ void dma_copy_ram(void * __near dst, void * __near src, int bytes)
     OUTB(REG_DMA_CTRL,0x80);        
 }
 
-void memcpy(void * __near dst, void * __far src, int bytes)
-{
-    uint8_t *d = dst;
-    uint8_t *s = src;
-    while (bytes--) {
-        *d++ = *s++;
-    }
-}

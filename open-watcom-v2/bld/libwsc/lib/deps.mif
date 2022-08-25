@@ -1,2 +1,2 @@
-irq.obj  : ../../../c/irq.c       $(libwsc_dir)/h/libwsc.h
-dma.obj  : ../../../c/dma.c       $(libwsc_dir)/h/libwsc.h
+irq.obj  : ../../../c/irq.c $(libwsc_dir)/h/libwsc.h  $(libwsc_dir)/h/inlines.h
+dma.obj  : ../../../c/dma.c $(libwsc_dir)/h/libwsc.h  $(libwsc_dir)/h/inlines.h

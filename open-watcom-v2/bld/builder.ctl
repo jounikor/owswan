@@ -64,8 +64,8 @@ cdsay .
 [ INCLUDE <OWSRCDIR>/cg/intel/i86/builder.ctl ]
 [ INCLUDE <OWSRCDIR>/cc/386/builder.ctl ]
 [ INCLUDE <OWSRCDIR>/cc/i86/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/plusplus/386/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/plusplus/i86/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/plusplus/386/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/plusplus/i86/builder.ctl ]
 # copy DOS4GW extender on build PATH for DOS build host
 [ IFDEF <BLD_HOST> DOS ]
 [ INCLUDE <OWSRCDIR>/redist/builder.ctl ]
@@ -143,13 +143,13 @@ cdsay .
 [ INCLUDE <OWSRCDIR>/libwsc/builder.ctl ]
 [ INCLUDE <OWSRCDIR>/clib/builder.ctl ]
 [ INCLUDE <OWSRCDIR>/mathlib/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/cpplib/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/rtdll/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/cpplib/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/rtdll/builder.ctl ]
 #
 ##[ INCLUDE <OWSRCDIR>/f77/f77lib/builder.ctl ]
 [ INCLUDE <OWSRCDIR>/fpuemu/builder.ctl ]
 [ INCLUDE <OWSRCDIR>/omftools/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/graphlib/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/graphlib/builder.ctl ]
 # Start with DOS4GW DOS extender stub.
 [ INCLUDE <OWSRCDIR>/wstuba/builder.ctl ]
 # Continue with Causeway DOS extender.
@@ -173,14 +173,14 @@ cdsay .
 # On to the compilers
 [ INCLUDE <OWSRCDIR>/cg/builder.ctl ]
 [ INCLUDE <OWSRCDIR>/cc/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/plusplus/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/plusplus/builder.ctl ]
 ##[ INCLUDE <OWSRCDIR>/f77/wfc/builder.ctl ]
 # Resource tools, first Resource compiler
 [ INCLUDE <OWSRCDIR>/rc/builder.ctl ]
 # Continue with SDK tools
-[ INCLUDE <OWSRCDIR>/wpi/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/commonui/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/sdk/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/wpi/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/commonui/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/sdk/builder.ctl ]
 # Now miscellaneous command line tools
 [ INCLUDE <OWSRCDIR>/wscromtool/builder.ctl ]
 [ INCLUDE <OWSRCDIR>/ndisasm/builder.ctl ]
@@ -195,16 +195,16 @@ cdsay .
 ##[ INCLUDE <OWSRCDIR>/gui/builder.ctl ]
 ##[ INCLUDE <OWSRCDIR>/aui/builder.ctl ]
 # The vi(w) editor
-[ INCLUDE <OWSRCDIR>/rcsdll/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/rcsdll/builder.ctl ]
 #[ INCLUDE <OWSRCDIR>/vi/builder.ctl ]
 # Build the debugger and sampler
-[ INCLUDE <OWSRCDIR>/dip/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/mad/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/rsilib/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/wattcp/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/trap/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/dip/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/mad/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/rsilib/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/wattcp/builder.ctl ]
+####[INCLUDE <OWSRCDIR>/trap/builder.ctl ]
 #[ INCLUDE <OWSRCDIR>/wv/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/wsample/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/wsample/builder.ctl ]
 # GUI tools libraries
 ##[ INCLUDE <OWSRCDIR>/wclass/builder.ctl ]
 # Other GUI tools
@@ -216,7 +216,7 @@ cdsay .
 ##[ INCLUDE <OWSRCDIR>/ide/builder.ctl ]
 # The miscelaneous tools
 [ INCLUDE <OWSRCDIR>/cmdedit/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/cvpack/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/cvpack/builder.ctl ]
 # OW clones for MS tools
 [ INCLUDE <OWSRCDIR>/mstools/builder.ctl ]
 # Miscelaneous files
@@ -230,10 +230,10 @@ cdsay .
 # Build help viewer
 ##[ INCLUDE <OWSRCDIR>/hlpview/builder.ctl ]
 # Build help compilers
-[ INCLUDE <OWSRCDIR>/hcdos/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/hcwin/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/wipfc/builder.ctl ]
-[ INCLUDE <OWSRCDIR>/bmp2eps/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/hcdos/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/hcwin/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/wipfc/builder.ctl ]
+####[ INCLUDE <OWSRCDIR>/bmp2eps/builder.ctl ]
 # Copy the redistributable components
 [ INCLUDE <OWSRCDIR>/redist/builder.ctl ]
 # Build installer tools

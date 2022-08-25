@@ -31,6 +31,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "inlines.h"
 
 /* These consume BSS space and are setup by the crt0 */
 extern uint8_t __wsc_data_bank;
@@ -41,22 +42,6 @@ extern void SET_BANK_ROM0(uint8_t __bank);
 extern void SET_BANK_ROM1(uint8_t __bank);
 extern void SET_BANK_ROM2(uint8_t __bank);
 extern void SET_BANK_SRAM(uint8_t __bank);
-
-#pragma aux  SET_BANK_ROM0 = 	\
-	"out 0xc2,al"				\
-	__parm   [al];
-
-#pragma aux  SET_BANK_ROM1 = 	\
-	"out 0xc3,al"				\
-	__parm   [al];
-
-#pragma aux  SET_BANK_ROM2 = 	\
-	"out 0xc0,al"				\
-	__parm   [al];
-
-#pragma aux  SET_BANK_SRAM = 	\
-	"out 0xc1,al"				\
-	__parm   [al];
 
 /* Calculate the ROM Bank relative to start of additional data bank segments */
 #define GET_DATA_BANK(n) ((n+__wsc_data_bank) & 0xff)
@@ -70,42 +55,6 @@ extern void enable_irq(void);
 extern void disable_irq(void);
 extern void ack_hw_irq(uint8_t irq);
 extern void ack_hw_irq_mask(uint8_t irq);
-
-#pragma aux  OUTB = 	\
-	"out dx,al"			\
-	__parm   [dx] [al];
-
-#pragma aux  OUTW = 	\
-	"out dx,ax"			\
-	__parm   [dx] [ax];
-
-#pragma aux  INB = 		\
-	"in al,dx"			\
-	__parm   [dx]		\
-	__value  [al];
-
-#pragma aux  INW = 		\
-	"in ax,dx"			\
-	__parm   [dx]		\
-	__value  [ax];
-
-#pragma aux enable_irq = \
-    "sti";
-
-#pragma aux disable_irq = \
-    "cli";
-
-#pragma aux ack_hw_irq  = \
-    "mov al,0x1"        \
-    "shl al,cl"			\
-    "out 0xb6,al"       \
-    __modify [al] 	  	\
-    __parm [cl];
-                                                                                                                   
-#pragma aux ack_hw_irq_mask = \
-    "out 0xb6,al"    \
-    __parm [al];
-
 
 /* IO Map defines.. stolen from http://daifukkat.su/docs/wsman/ */
 #define REG_DISP_CTRL			0x00
@@ -382,6 +331,7 @@ typedef void (* __far irq_handler_f)(void);
 void set_hw_irq(irq_handler_f handler, uint8_t irq);
 void dma_copy(void * __near dst, void * __far src, int bytes);
 void dma_copy_ram(void * __near dst, void * __near src, int bytes);
-void memcpy(void * __near dst, void * __far src, int bytes);
+extern void memcpy(void * __near dst, void * __far src, int bytes);
+
 
 #endif  /* _LIBSWC_H_INCLUDED */

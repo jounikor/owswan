@@ -12,10 +12,8 @@ Bear in mind that:
 
 ### What is provided ###
 * Two new targets added into the `wlink.lnk`: for small ROMs `wsc` and `wscl` for larger ROMs:
-  - `wcl -bcl=wsc` to compile and link for the WonderSwan Color. Program code starts at `$2000:0000`.
-  - `wcc -bt=wsc` to compile for the WonderSwan Color. 
-  - `wcl -bcl=wscl` to compile and link for the WonderSwan Color. Program code starts at `$4000:0000`.
-  - `wcc -bt=wscl` to compile for the WonderSwan Color.
+  - `wcl -bcl=wsc` or `wcc -bt=wsc` to compile and link for the WonderSwan Color. Program code starts at `$2000:0000`.
+  - `wcl -bcl=wscl` or `wcc -bt=wscl` to compile and link for the WonderSwan Color. Program code starts at `$4000:0000`.
 
 * A `wscromtool` to convert the output flat binary to WonderSwan Color ROM. There are few quirks to it.. which will be documented later..
 * A simple `wsccrt0.obj` to do the required initialization and call your C main().
