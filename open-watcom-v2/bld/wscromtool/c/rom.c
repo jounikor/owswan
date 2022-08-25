@@ -33,35 +33,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-#include <getopt.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <getopt.h>
 
 #include "wscrom.h"
 #include <wscromtool.h>
 #include "wscerror.h"
 
 extern bool g_verbose;
-
-static struct option longopts[] = {
-    {"verbose", no_argument,        NULL,       'v'},
-    {"debug",   no_argument,        NULL,       'd'},
-
-    {"data",    required_argument,  NULL,       'D'},
-    {"pub-id",  required_argument,  NULL,       'p'},
-    {"game-id", required_argument,  NULL,       'g'},
-    {"game-rev",required_argument,  NULL,       'r'},
-    {"mono",    no_argument,        NULL,       'm'},
-    {"sram-eeprom",    required_argument,  NULL,       's'},
-    {"1-cycle", no_argument,        NULL,       '1'},
-    {"8bit-bus",no_argument,        NULL,       '8'},
-    {"vertical",no_argument,        NULL,       'V'},
-    {"rtc",     no_argument,        NULL,       'R'},
-
-    {"keep-order", no_argument,    NULL,       'k'},
-    /* Done */
-    {NULL,         0,               NULL,       0 }
-};
+extern struct option longopts[];
+extern const char *optstring;
 
 static void usage(char** argv)
 {
@@ -283,9 +265,11 @@ static int load_rom(char *rom_name, char *aux_name, int *symbols,
     romlen -= offset;
     orglen = romlen;
 
-    if (aux_name && ((fh_aux = fopen(aux_name,"rb")) == NULL)) {
-        fclose(fh_rom);
-        return ERR_WSC_FILEOPEN;
+    if (aux_name) {
+        if ((fh_aux = fopen(aux_name,"rb")) == NULL) {
+            fclose(fh_rom);
+            return ERR_WSC_FILEOPEN;
+        }
     }
 
     if (fh_aux) {
@@ -314,7 +298,11 @@ static int load_rom(char *rom_name, char *aux_name, int *symbols,
     if (orglen > (romlen - datlen - sizeof(rom_metadata_t))) {
         if (*is_large) {
             fclose(fh_rom);
-            fclose(fh_aux);
+            
+            if (fh_aux) {
+                fclose(fh_aux);
+            }
+            
             return ERR_WSC_ROMSIZE; 
         }
     
@@ -333,7 +321,11 @@ static int load_rom(char *rom_name, char *aux_name, int *symbols,
 
     if (romlen < 0) {
         fclose(fh_rom);
-        fclose(fh_aux);
+        
+        if (fh_aux) {
+            fclose(fh_aux);
+        }
+        
         return romlen;        
     }
 
@@ -352,14 +344,22 @@ static int load_rom(char *rom_name, char *aux_name, int *symbols,
 
     if ((*rom = calloc(1,romlen)) == NULL) {
         fclose(fh_rom);
-        fclose(fh_aux);
+        
+        if (fh_aux) {
+            fclose(fh_aux);
+        }
+        
         return ERR_WSC_MALLOC;
     }
 
     /* Read the aux data.. position at the beginnin of the ROM */
-    if (auxlen > 0 && (fread(*rom,1,orgauxlen,fh_aux) != orgauxlen)) {
+    if (auxlen > 0 && fread(*rom,1,orgauxlen,fh_aux) != orgauxlen) {
         fclose(fh_rom);
-        fclose(fh_aux);
+        
+        if (fh_aux) {
+            fclose(fh_aux);
+        }
+        
         free(*rom);
         return ERR_WSC_FILEREAD;
     }
@@ -369,7 +369,11 @@ static int load_rom(char *rom_name, char *aux_name, int *symbols,
 
     if (fread(*rom+romlen-romsta,1,orglen,fh_rom) != orglen) {
         fclose(fh_rom);
-        fclose(fh_aux);
+        
+        if (fh_aux) {
+            fclose(fh_aux);
+        }
+        
         free(*rom);
         return ERR_WSC_FILEREAD;
     }
@@ -379,14 +383,20 @@ static int load_rom(char *rom_name, char *aux_name, int *symbols,
 
     if (fread(*rom+romlen-datlen-sizeof(rom_metadata_t),1,datlen,fh_rom) != datlen) {
         fclose(fh_rom);
-        fclose(fh_aux);
+        
+        if (fh_aux) {
+            fclose(fh_aux);
+        }
+
         free(*rom);
         return ERR_WSC_FILEREAD;
     }
 
-
     fclose(fh_rom);
-    fclose(fh_aux);
+    
+    if (fh_aux) {
+        fclose(fh_aux);
+    } 
 
     return romlen;
 }
@@ -509,7 +519,7 @@ int rom(int argc, char** argv)
 
     optind = 0;
 
-    while ((ch = getopt_long(argc, argv, "vdDp:mr:s:38VR", longopts, NULL)) != -1) {
+    while ((ch = getopt_long(argc, argv, optstring, longopts, NULL)) != -1) {
         switch (ch) {
         case 'v': case 'd': case 'k':
             break;
@@ -536,7 +546,7 @@ int rom(int argc, char** argv)
                 printf("No SRAM/EEPROM available.\n");
             }
             break;
-        case '3':   // --1-cycle,-1
+        case '1':   // --1-cycle,-1
             cycle_1 = true;
             break;
         case '8':   // --8bit-bus,-8
@@ -553,7 +563,7 @@ int rom(int argc, char** argv)
         }
     }
     
-    if (argc - optind < 3) {
+    if (argc - optind < 2) {
         usage(argv);
     }
     

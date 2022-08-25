@@ -36,6 +36,7 @@
 #include <getopt.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <getopt.h>
 
 #include "rom.h"
 #include "fs.h"
@@ -52,13 +53,12 @@
 /* global flags */
 bool g_verbose = false;
 
+/* commandline options to be shared between all commands */
 
-static struct option longopts[] = {
-    /* generic */
+struct option longopts[] = {
     {"verbose", no_argument,        NULL,       'v'},
     {"debug",   no_argument,        NULL,       'd'},
 
-    /* these are optionf from 'rom' just to please getopt_long() */
     {"data",    required_argument,  NULL,       'D'},
     {"pub-id",  required_argument,  NULL,       'p'},
     {"game-id", required_argument,  NULL,       'g'},
@@ -70,13 +70,12 @@ static struct option longopts[] = {
     {"vertical",no_argument,        NULL,       'V'},
     {"rtc",     no_argument,        NULL,       'R'},
 
-    /* these are optionf from 'fs' just to please getopt_long() */
-    {"keep-order",     no_argument, NULL,       'k'},
-
-
+    {"keep-order", no_argument,    NULL,       'k'},
     /* Done */
     {NULL,         0,               NULL,       0 }
 };
+
+const char *optstring = "kvdDp:mr:s:18VRg";
 
 static void usage(char** argv)
 {
@@ -163,9 +162,13 @@ int main(int argc, char** argv)
     int ch;
     int ret = 0;
 
+    if (argc < 2) {
+        usage(argv);
+    }
+
     optind = 2;
 
-    while ((ch = getopt_long(argc, argv, "kvdDp:mr:s:38VR", longopts, NULL)) != -1) {
+    while ((ch = getopt_long(argc, argv, optstring, longopts, NULL)) != -1) {
         switch (ch) {
         case 'v':   // --verbose,-v
         case 'd':   // --debug,-d
@@ -174,10 +177,6 @@ int main(int argc, char** argv)
         default:
             break;
         }
-    }
-
-    if (argc < 2) {
-        usage(argv);
     }
 
     if (!strcmp(argv[1],"rom")) {

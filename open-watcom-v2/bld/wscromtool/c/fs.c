@@ -40,36 +40,15 @@
 #include <errno.h>
 #include <ctype.h>
 #include <stdarg.h>
+#include <getopt.h>
 
 #include "wscromtool.h"
 #include "wscerror.h"
 #include "fs.h"
 
 extern bool g_verbose;
-
-static struct option longopts[] = {
-    /* generic */
-    {"verbose", no_argument,        NULL,       'v'},
-    {"debug",   no_argument,        NULL,       'd'},
-
-    /* these are optionf from 'rom' just to please getopt_long() */
-    {"data",    required_argument,  NULL,       'D'},
-    {"pub-id",  required_argument,  NULL,       'p'},
-    {"game-id", required_argument,  NULL,       'g'},
-    {"game-rev",required_argument,  NULL,       'r'},
-    {"mono",    no_argument,        NULL,       'm'},
-    {"sram-eeprom",    required_argument,  NULL,       's'},
-    {"1-cycle", no_argument,        NULL,       '1'},
-    {"8bit-bus",no_argument,        NULL,       '8'},
-    {"vertical",no_argument,        NULL,       'V'},
-    {"rtc",     no_argument,        NULL,       'R'},
-
-    /* these are optionf from 'fs' just to please getopt_long() */
-    {"keep-order",  no_argument,    NULL,       'k'},
-
-    /* Done */
-    {NULL,         0,               NULL,       0 }
-};
+extern struct option longopts[];
+extern const char *optstring;
 
 static void usage(char** argv)
 {
@@ -341,11 +320,11 @@ int fs(int argc, char **argv)
 
     optind = 0;
 
-    while ((ch = getopt_long(argc, argv, "kvdDp:mr:s:38VR", longopts, NULL)) != -1) {
+    while ((ch = getopt_long(argc, argv, optstring, longopts, NULL)) != -1) {
         switch (ch) {
         case 'v': case 'd': case 'D': case 'p':
         case 'g': case 'r': case 'm': case 's':
-        case '3': case '8': case 'V': case 'R':
+        case '1': case '8': case 'V': case 'R':
             break;
         case 'k':   // --keep-order,-k
             keep_order = true;
