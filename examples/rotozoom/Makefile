@@ -6,7 +6,7 @@
 # To run in emu
 #    make run
 
-.PHONY: clean all run
+.PHONY: clean all run banks
 .SUFFIXES:
 .SUFFIXES: .c .h
 .DEFAULT:
@@ -15,6 +15,8 @@
 SRCS := roto.c
 HDRS := 
 OBJS := 
+RAWS := apina.raw
+BANK := banks
 
 #
 LOCAL_LIBS := libwscl.lib
@@ -24,6 +26,8 @@ PROG := roto
 BIN  := $(PROG).bin
 ROM  := $(PROG).wsc
 MAP  := $(PROG).map
+TOOL := wscromtool
+
 
 #
 CC := wcl
@@ -37,7 +41,7 @@ TARGET := wscl		# $4000:0000
 #TARGET := wsc		# $2000:0000
 
 LOCAL_CFLAGS = -fe=$(BIN) -fm=$(MAP) -bcl=$(TARGET) -1 -zc -ml -s -i=$(WATCOM)/h -i=$(WATCOM)/libwsc/h
-LOCAL_LDFLAGS = rom -v
+LOCAL_LDFLAGS = rom -v --data $(BANK).bin
 
 #
 # rules
@@ -47,11 +51,14 @@ all: $(ROM)
 
 $(PROG): $(BIN)
 
-$(ROM): $(BIN) $(MAP)
+$(ROM): $(BIN) $(MAP) $(RAWS) $(BANK).bin
 	$(LD) $(LOCAL_LDFLAGS) $(BIN) $(MAP) $(ROM)
 
 $(BIN): $(SRCS)
 	$(CC) $(LOCAL_CFLAGS) $< $(LOCAL_LIBS)
+
+banks: 
+	$(TOOL) fs $(BANK).bin $(BANK).h $(RAWS)
 
 
 run: $(ROM)

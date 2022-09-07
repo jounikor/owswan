@@ -6,6 +6,7 @@
 
 #include <stdint.h>
 #include <libwsc.h>
+#include "banks.h"
 
 uint16_t g_hcnt;
 uint16_t* __near g_chunky_buffer;
@@ -300,6 +301,11 @@ __declspec(noreturn) void __far main(void)
     OUTB(REG_BACK_COLOR,0);
 
     OUTB(REG_LINE_CMP,0);
+
+    /* Page in the gfx to $2000:0000 */
+    SET_BANK_ROM0(__wsc_data_bank+BANK_APINA_RAW);
+
+
 
     /* */
     m = (uint16_t*)CHUNKY0;
