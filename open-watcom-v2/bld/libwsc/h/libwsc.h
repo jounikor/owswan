@@ -333,5 +333,9 @@ void dma_copy(void * __near dst, void * __far src, int bytes);
 void dma_copy_ram(void * __near dst, void * __near src, int bytes);
 extern void memcpy(void * __near dst, void * __far src, int bytes);
 
+/* Useful macros */
+#define MAKE_FAR_PTR(ptr) (ptr & 0xffff | ((ptr & 0xf0000) << 12))
+
+
 
 #endif  /* _LIBSWC_H_INCLUDED */

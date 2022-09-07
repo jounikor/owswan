@@ -9,8 +9,8 @@
 #include "banks.h"
 
 uint16_t g_hcnt;
-uint16_t* __near g_chunky_buffer;
-uint16_t* __near g_chunky;
+//uint16_t* __far g_chunky_buffer;
+uint16_t __far *g_chunky;
 volatile uint8_t g_wait_vb;
 
 // Stripe 0001 0010 0011 0100 0101 0110 0111 1000 
@@ -173,7 +173,7 @@ void __interrupt __far  vb_irq(void)
     *(uint16_t *)(FIXADDR_PAL_0_7) = 0;
     g_hcnt = 0;
     g_wait_vb++;
-    g_chunky = g_chunky_buffer;
+    g_chunky = (uint16_t __far *)MAKE_FAR_PTR(0x20000);
     OUTB(REG_LINE_CMP,g_hcnt);
     ack_hw_irq(HWINT_VBLANK);
 }
@@ -181,7 +181,7 @@ void __interrupt __far  vb_irq(void)
 void __interrupt __far hline_irq(void)
 {
     uint16_t * __near pal = (uint16_t *)(FIXADDR_PAL_0_7+2);
-    uint16_t * __near s = g_chunky;
+    uint16_t __far *s = g_chunky;
 
     /* This produces actually decent code.. */
     pal[1-1] = s[0];        /* SRC0, palette 0, colors 1->15 */
@@ -240,7 +240,7 @@ void __interrupt __far hline_irq(void)
     pal[54-1] = s[53];
     pal[55-1] = s[54];
     pal[56-1] = s[55];
-    g_chunky = s+56;
+    g_chunky = s+128;
 
     g_hcnt += 4;
     OUTB(REG_LINE_CMP,g_hcnt);
@@ -250,7 +250,7 @@ void __interrupt __far hline_irq(void)
 void prep_chunky(uint16_t * chunky, uint16_t color)
 {
     int n;
-    g_chunky_buffer = chunky;
+    //g_chunky_buffer = chunky;
 
     for (n = 0; n < 56*36; n++) {
         chunky[n] = color;
@@ -308,8 +308,8 @@ __declspec(noreturn) void __far main(void)
 
 
     /* */
-    m = (uint16_t*)CHUNKY0;
-    prep_chunky(m,color);
+    //m = (uint16_t*)CHUNKY0;
+    //prep_chunky(m,color);
     g_wait_vb = 0;
 
     enable_irq();
@@ -318,7 +318,7 @@ __declspec(noreturn) void __far main(void)
         while (g_wait_vb == 0);
         
         color++;
-
+/*
         if (m == (uint16_t*)CHUNKY0) {
             m = (uint16_t*)CHUNKY1;
         } else {
@@ -326,6 +326,7 @@ __declspec(noreturn) void __far main(void)
         }
 
         prep_chunky(m,color);
+*/
         g_wait_vb = 0;
         *(uint16_t *)(FIXADDR_PAL_0_7) = 0xf00;
     }
