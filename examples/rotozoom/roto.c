@@ -13,6 +13,10 @@ uint16_t g_hcnt;
 uint16_t __far *g_chunky;
 volatile uint8_t g_wait_vb;
 
+#define BG_MAP 0x2000   /* SCR0 */
+#define FG_MAP 0x2800   /* SCR1 */
+
+
 // Stripe 0001 0010 0011 0100 0101 0110 0111 1000 
 #pragma pack(2)
 
@@ -166,22 +170,199 @@ const uint16_t __far fg_line[] = {
     0x0000,0x0000
 };
 
+#define S 16
+
+uint16_t __far offset_table[56] = {
+    S+0,2,4,6,8,10,12,14,16,18,
+    20,22,24,26,28,30,32,34,36,38,
+    40,42,44,46,48,50,52,54,56,58,
+    60,62,64,66,68,70,72,74,76,78,
+    80,82,84,86,88,90,92,94,96,98,
+    100,102,104,106,108,110
+};
 
 
-void __interrupt __far  vb_irq(void)
+typedef void (*ram_fn)(int16_t __far *);
+
+#define SMC_START_OFFS 21
+#define SMC_OFFS_STEP 8
+
+#define SMC_CODE_SIZE   0x1cf
+#define SMC0 0xc000
+#define SMC1 (SMC0+SMC_CODE_SIZE)
+
+
+/* #pragma aux smc_asm_line parm [ds bx]
+ * This did not work.. by default the pointer is
+ * passed in DX:AX.. so we conform to that..
+ */
+
+void __declspec(naked) smc_asm_line(uint16_t __far *base)
+{
+    /* Supposed to be $1cf bytes of code.. DO NOT MODIFY without
+     * changing related defines and support functions
+     *
+     * In any case this is great example (pun intended) of
+     * self-modifying code done in C and inline asm.. 
+     */
+    _asm {
+        pusha
+        push ds
+        push es
+
+        ;; Pass parameters into proper registers..
+        mov bx,ax
+        mov ds,dx
+        
+        ;; Constants
+        xor ax,ax
+        mov es,ax
+        mov si,0xfe02       ;; FIXADDR_PAL_0_7 + 2
+
+        mov ax,ds:[bx]
+        mov es:[si],ax
+
+        ;; 1. SMC starts +25 bytes from starts
+        ;; step to ext SMC is 4 bytes
+        mov ax,ds:0x1111[bx]
+        mov es:0x02[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x04[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x06[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x08[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x0a[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x0c[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x0e[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x10[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x12[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x14[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x16[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x18[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x1a[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x1c[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x72[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x20[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x22[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x24[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x26[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x28[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x2a[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x2c[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x2e[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x30[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x32[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x34[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x36[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x38[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x3a[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x3c[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x74[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x40[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x42[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x44[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x46[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x48[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x4a[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x4c[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x4e[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x50[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x52[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x54[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x56[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x58[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x5a[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x5c[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x76[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x60[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x62[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x64[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x66[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x68[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x6a[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x6c[si],ax
+        mov ax,ds:0x1111[bx]
+        mov es:0x6e[si],ax
+
+        ;;
+        pop es
+        pop ds
+        popa
+        retf
+    }
+}
+
+
+void __interrupt vb_irq(void)
 {
     *(uint16_t *)(FIXADDR_PAL_0_7) = 0;
     g_hcnt = 0;
     g_wait_vb++;
-    g_chunky = (uint16_t __far *)MAKE_FAR_PTR(0x20000);
+    g_chunky = (uint16_t __far *)MAKE_FAR_PTR(0x20000+offset_table[0]);
     OUTB(REG_LINE_CMP,g_hcnt);
     ack_hw_irq(HWINT_VBLANK);
 }
 
-void __interrupt __far hline_irq(void)
+void __interrupt hline_irq(void)
 {
-    uint16_t * __near pal = (uint16_t *)(FIXADDR_PAL_0_7+2);
     uint16_t __far *s = g_chunky;
+
+#if 1
+    ram_fn gen_line = (ram_fn)SMC0;
+    gen_line(s);
+#else
+    uint16_t * __near pal = (uint16_t *)(FIXADDR_PAL_0_7+2);
 
     /* This produces actually decent code.. */
     pal[1-1] = s[0];        /* SRC0, palette 0, colors 1->15 */
@@ -240,35 +421,49 @@ void __interrupt __far hline_irq(void)
     pal[54-1] = s[53];
     pal[55-1] = s[54];
     pal[56-1] = s[55];
-    g_chunky = s+128;
+#endif
+    g_chunky += 128;
 
     g_hcnt += 4;
     OUTB(REG_LINE_CMP,g_hcnt);
     ack_hw_irq(HWINT_LINE);
 }
 
-void prep_chunky(uint16_t * chunky, uint16_t color)
+void move_smc(void)
 {
+    uint8_t __far *s, __far *d;
     int n;
-    //g_chunky_buffer = chunky;
 
-    for (n = 0; n < 56*36; n++) {
-        chunky[n] = color;
-        color += 0x123;
+    d = (uint8_t *)MAKE_FAR_PTR(SMC0);
+    s = (uint8_t *)smc_asm_line;
+
+    for (n = 0; n < SMC_CODE_SIZE; n++) {
+        *d++ = s[n];
+    }
+    for (n = 0; n < SMC_CODE_SIZE; n++) {
+        *d++ = s[n];
     }
 }
 
-#define BG_MAP 0x2000   /* SCR0 */
-#define FG_MAP 0x2800   /* SCR1 */
-#define CHUNKY0 0xc000
-#define CHUNKY1 (CHUNKY0+56*36*2)
+void prep_smc(uint8_t __near *fn, uint16_t __far *offs, int num)
+{
+    // Skip first as it is implicitly given by the start of the pointer..
+    int pos = SMC_START_OFFS;
+
+    // Fix offsets
+    while (--num > 0) {
+        *((uint16_t __near *)(fn+pos)) = *++offs;
+        pos += SMC_OFFS_STEP;
+    }
+}
+
+
 
 __declspec(noreturn) void __far main(void)
 {
     int n;
     uint16_t * m;
     uint16_t color = 10;
-
 
     disable_irq();
     OUTB(REG_DISP_MODE,DISP_4BPP|DISP_COLOR|DISP_FORMAT_PACKED);
@@ -305,11 +500,11 @@ __declspec(noreturn) void __far main(void)
     /* Page in the gfx to $2000:0000 */
     SET_BANK_ROM0(__wsc_data_bank+BANK_APINA_RAW);
 
-
+    /* prepare SMC */
+    move_smc();
+    prep_smc(SMC0,offset_table,56);
 
     /* */
-    //m = (uint16_t*)CHUNKY0;
-    //prep_chunky(m,color);
     g_wait_vb = 0;
 
     enable_irq();
@@ -318,15 +513,6 @@ __declspec(noreturn) void __far main(void)
         while (g_wait_vb == 0);
         
         color++;
-/*
-        if (m == (uint16_t*)CHUNKY0) {
-            m = (uint16_t*)CHUNKY1;
-        } else {
-            m = (uint16_t*)CHUNKY0;
-        }
-
-        prep_chunky(m,color);
-*/
         g_wait_vb = 0;
         *(uint16_t *)(FIXADDR_PAL_0_7) = 0xf00;
     }
